@@ -14,51 +14,53 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import server.auxilary.IO;
+import server.auxilary.RemoteComms;
 import server.model.BusinessObject;
 import server.model.JobEmployee;
 import server.repositories.JobEmployeeRepository;
-
-import java.util.LinkedList;
 import java.util.List;
 
 @RepositoryRestController
-@RequestMapping("/jobs/employees")
 public class JobEmployeeController
 {
-        private PagedResourcesAssembler<JobEmployee> pagedAssembler;
-        @Autowired
-        private JobEmployeeRepository job_employeeRepository;
+    private PagedResourcesAssembler<JobEmployee> pagedAssembler;
 
-        @Autowired
-        public JobEmployeeController(PagedResourcesAssembler<JobEmployee> pagedAssembler)
-        {
-            this.pagedAssembler = pagedAssembler;
-        }
+    @Autowired
+    private JobEmployeeRepository job_employeeRepository;
 
-        //Job Employee Route Handlers
-        @GetMapping(path="/{id}", produces = "application/hal+json")
-        public ResponseEntity<Page<JobEmployee>> getJobEmployee(@PathVariable("id") String id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
-        {
-            IO.log(getClass().getName(), IO.TAG_INFO, "handling Job Employees GET request id: "+ id);
-            List<JobEmployee> contents = IO.getInstance().mongoOperations().find(new Query(Criteria.where("job_id").is(id)), JobEmployee.class, "job_employees");
-            return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
-        }
+    @Autowired
+    public JobEmployeeController(PagedResourcesAssembler<JobEmployee> pagedAssembler)
+    {
+        this.pagedAssembler = pagedAssembler;
+    }
 
-        @GetMapping
-        public ResponseEntity<Page<JobEmployee>> getJobEmployees(Pageable pageRequest, PersistentEntityResourceAssembler assembler)
-        {
-            IO.log(getClass().getName(), IO.TAG_INFO, "handling JobEmployee GET request {all}");
-            List<JobEmployee> contents =  IO.getInstance().mongoOperations().findAll(JobEmployee.class, "job_employees");
-            return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
-        }
+    //Job Employee Route Handlers
+    @GetMapping(path="/jobs/employees/{id}", produces = "application/hal+json")
+    public ResponseEntity<Page<JobEmployee>> getJobEmployee(@PathVariable("id") String id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    {
+        IO.log(getClass().getName(), IO.TAG_INFO, "handling JobEmployees GET request job_id: ["+ id+"]");
+        List<JobEmployee> contents = IO.getInstance().mongoOperations().find(new Query(Criteria.where("job_id").is(id)), JobEmployee.class, "job_employees");
+        return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
+    }
 
-        @PostMapping
-        @PutMapping
-        public ResponseEntity<Page<JobEmployee>> addJobEmployee(@RequestBody JobEmployee job_employee, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    @GetMapping("/jobs/employees")
+    public ResponseEntity<Page<JobEmployee>> getJobEmployees(Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    {
+        IO.log(getClass().getName(), IO.TAG_INFO, "handling JobEmployee GET request {all}");
+        List<JobEmployee> contents =  IO.getInstance().mongoOperations().findAll(JobEmployee.class, "job_employees");
+        return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
+    }
+
+    @PutMapping("/jobs/employees")
+    public ResponseEntity<String> addJobEmployee(@RequestBody JobEmployee job_employee)
+    {
+        IO.log(getClass().getName(), IO.TAG_INFO, "handling JobEmployee creation request: ");
+        if(job_employee!=null)
         {
-            IO.log(getClass().getName(), IO.TAG_INFO, "handling JobEmployee creation request: " + job_employee.asJSON());
-            List<BusinessObject> contents = new LinkedList<>();
-            contents.add(job_employee);
-            return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
+            job_employee.setDate_logged(System.currentTimeMillis());
+            String new_job_employee_id = RemoteComms.commitBusinessObjectToDatabase(job_employee, "job_employees", "jobs_timestamp");
+            return new ResponseEntity<>(new_job_employee_id, HttpStatus.OK);
         }
+        return null;
+    }
 }

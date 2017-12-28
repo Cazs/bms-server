@@ -5,9 +5,6 @@
  */
 package server.model;
 
-import java.io.Serializable;
-
-import org.springframework.data.annotation.Id;
 import org.springframework.data.rest.core.annotation.RestResource;
 import server.auxilary.IO;
 
@@ -15,59 +12,23 @@ import server.auxilary.IO;
  *
  * @author ghost
  */
-public class Job implements BusinessObject, Serializable
+public class Job extends BusinessObject
 {
-    @Id
-    @RestResource(exported = true)
-    private String _id;
     private long planned_start_date;
-    private long date_logged;
     private long date_assigned;
     private long date_started;
     private long date_completed;
     private long job_number;
     private String invoice_id;
     private String quote_id;
-    private String creator;
     private boolean signed;
-    private boolean marked;
     private String signed_job;
     private Employee[] assigned_employees;
     private FileMetadata[] safety_catalogue;
 
-    @Override
-    public String get_id()
-    {
-        return _id;
-    }
-
-    public void set_id(String _id)
-    {
-        this._id = _id;
-    }
-
-    @Override
-    public boolean isMarked()
-    {
-        return marked;
-    }
-
-    @Override
-    public void setMarked(boolean marked){this.marked=marked;}
-
     public long getPlanned_start_date() {return planned_start_date;}
 
     public void setPlanned_start_date(long planned_start_date) {this.planned_start_date = planned_start_date;}
-
-    public long getDate_logged() 
-    {
-        return date_logged;
-    }
-
-    public void setDate_logged(long date_logged) 
-    {
-        this.date_logged = date_logged;
-    }
 
     public long getJob_number()
     {
@@ -112,16 +73,6 @@ public class Job implements BusinessObject, Serializable
     public boolean isJob_completed()
     {
         return (date_completed>0);
-    }
-
-    public String getCreator()
-    {
-        return creator;
-    }
-
-    public void setCreator(String creator)
-    {
-        this.creator = creator;
     }
 
     public void setSigned(boolean signed)
@@ -174,6 +125,7 @@ public class Job implements BusinessObject, Serializable
     @RestResource(exported = false)
     public boolean isValid()
     {
+        super.isValid();
         if(getJob_number()<0)
         {
             IO.log(getClass().getName(), IO.TAG_ERROR, "invalid job_number value.");
@@ -228,6 +180,7 @@ public class Job implements BusinessObject, Serializable
     @Override
     public void parse(String var, Object val)
     {
+        super.parse(var, val);
         try
         {
             switch (var.toLowerCase())
@@ -244,9 +197,6 @@ public class Job implements BusinessObject, Serializable
                 case "planned_start_date":
                     planned_start_date = Long.parseLong(String.valueOf(val));
                     break;
-                case "date_logged":
-                    date_logged = Long.parseLong(String.valueOf(val));
-                    break;
                 case "date_assigned":
                     date_assigned = Long.parseLong(String.valueOf(val));
                     break;
@@ -258,9 +208,6 @@ public class Job implements BusinessObject, Serializable
                     break;
                 case "job_number":
                     job_number = Long.parseLong(String.valueOf(val));
-                    break;
-                case "creator":
-                    creator = String.valueOf(val);
                     break;
                 case "invoice_id":
                     invoice_id = (String)val;
@@ -290,8 +237,6 @@ public class Job implements BusinessObject, Serializable
     {
         switch (var.toLowerCase())
         {
-            case "_id":
-                return get_id();
             case "job_number":
                 return getJob_number();
             case "quote_id":
@@ -302,8 +247,6 @@ public class Job implements BusinessObject, Serializable
                 return getSigned_job();
             case "planned_start_date":
                 return getPlanned_start_date();
-            case "date_logged":
-                return getDate_logged();
             case "date_assigned":
                 return getDate_assigned();
             case "date_started":
@@ -312,39 +255,7 @@ public class Job implements BusinessObject, Serializable
                 return getDate_completed();
             case "invoice_id":
                 return getInvoice_id();
-            case "creator":
-                return creator;
-            default:
-                IO.log(getClass().getName(), IO.TAG_ERROR, "unknown Job attribute '" + var + "'.");
-                return null;
         }
-    }
-
-    @Override
-    public String asJSON()
-    {
-        //Return encoded URL parameters in UTF-8 charset
-        StringBuilder result = new StringBuilder("{");
-        /*result.append(URLEncoder.encode("job_number","UTF-8") + "="
-                + URLEncoder.encode(String.valueOf(job_number), "UTF-8"));*/
-        result.append(String.format("\"quote_id\": \"%s\"", quote_id));
-        result.append(String.format(", \"signed\": \"%s\"", signed));
-        result.append(String.format(", \"signed_job\": \"%s\"", signed_job));
-        result.append(String.format(", \"creator\": \"%s\"", creator));
-        if(date_logged>0)
-            result.append(String.format(", \"date_logged\": \"%s\"", date_logged));
-        if(date_assigned>0)
-            result.append(String.format(", \"date_assigned\": \"%s\"", date_assigned));
-        if(planned_start_date>0)
-            result.append(String.format(", \"planned_start_date\": \"%s\"", planned_start_date));
-        if(date_started>0)
-            result.append(String.format(", \"date_started\": \"%s\"", date_started));
-        if(date_completed>0)
-            result.append(String.format(", \"date_completed\": \"%s\"", date_completed));
-        if(invoice_id!=null)
-            result.append(String.format(", \"invoice_id\": \"%s\"", invoice_id));
-
-        result.append("}");
-        return result.toString();
+        return super.get(var);
     }
 }

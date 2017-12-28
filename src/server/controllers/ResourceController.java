@@ -55,7 +55,7 @@ public class ResourceController
         @PutMapping
         public ResponseEntity<Page<Resource>> addResource(@RequestBody Resource resource, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
         {
-            IO.log(getClass().getName(), IO.TAG_INFO, "handling Resource creation request: " + resource.asJSON());
+            IO.log(getClass().getName(), IO.TAG_INFO, "handling Resource creation request.");
             List<BusinessObject> contents = new LinkedList<>();
             contents.add(resource);
             return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);

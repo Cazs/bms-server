@@ -11,7 +11,15 @@ import fadulousbms.exceptions.LoginException;
 import fadulousbms.managers.SessionManager;
 import fadulousbms.model.BusinessObject;
 import fadulousbms.model.Error;*/
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import server.controllers.CounterController;
+import server.exceptions.InvalidBusinessObjectException;
+import server.exceptions.InvalidJobException;
 import server.model.BusinessObject;
+import server.model.Counter;
 import sun.net.www.http.HttpClient;
 
 import javax.swing.*;
@@ -22,8 +30,10 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.rmi.Remote;
 import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -247,5 +257,30 @@ public class RemoteComms
         String desc = IO.readStream(httpConn.getInputStream());
         IO.log(RemoteComms.class.getName(), httpConn.getResponseCode() + ":\t" + desc, IO.TAG_INFO);
         httpConn.disconnect();
+    }
+
+    public static String commitBusinessObjectToDatabase(BusinessObject businessObject, String collection, String timestamp_name)
+    {
+        if(businessObject!=null)
+        {
+            long date_logged = System.currentTimeMillis();
+            businessObject.setDate_logged(date_logged);
+            if (businessObject.isValid())
+            {
+                IO.log(RemoteComms.class.getName(),IO.TAG_INFO, "creating new BusinessObject{"+businessObject.getClass().getName()+"}: "+businessObject.toString());
+                //commit BusinessObject data to DB server
+                if(collection!=null)
+                    IO.getInstance().mongoOperations().insert(businessObject, collection);
+                else return null;
+                IO.log(RemoteComms.class.getName(),IO.TAG_INFO, "committed business object: ["+businessObject.get_id()+"]");
+                //update respective timestamp
+                if(timestamp_name!=null)
+                    CounterController.updateCounter(new Counter(timestamp_name, date_logged));
+                else return null;
+                return businessObject.get_id();
+            } else throw new InvalidBusinessObjectException();
+        }
+        IO.log(Remote.class.getName(),IO.TAG_ERROR, "invalid Business Object.");
+        return null;
     }
 }

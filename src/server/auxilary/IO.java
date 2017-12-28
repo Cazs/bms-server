@@ -25,6 +25,7 @@ import java.util.Arrays;
 public class IO<T extends BusinessObject>
 {
 
+    public static final String TAG_VERBOSE = "verbose";
     public static final String TAG_INFO = "info";
     public static final String TAG_WARN = "warning";
     public static final String TAG_ERROR = "error";
@@ -152,6 +153,10 @@ public class IO<T extends BusinessObject>
     {
         switch (tag.toLowerCase())
         {
+            case TAG_VERBOSE:
+                if (Globals.DEBUG_VERBOSE.getValue().toLowerCase().equals("on"))
+                    System.out.println(String.format("%s> %s: %s", src, tag, msg));
+                break;
             case TAG_INFO:
                 if (Globals.DEBUG_INFO.getValue().toLowerCase().equals("on"))
                     System.out.println(String.format("%s> %s: %s", src, tag, msg));

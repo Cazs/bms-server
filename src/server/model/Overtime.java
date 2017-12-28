@@ -12,51 +12,18 @@ import java.net.URLEncoder;
 /**
  * Created by ghost on 2017/01/21.
  */
-public class Overtime implements BusinessObject, Serializable
+public class Overtime extends BusinessObject
 {
-    @Id
-    private String _id;
     private String usr;
     private String job_id;
     private long date;
     private long time_in;
     private long time_out;
-    private long date_logged;
     private int status;
-    private String extra;
-    private boolean marked;
     public static final String TAG = "Overtime";
     public static final int STATUS_PENDING =0;
     public static final int STATUS_APPROVED =1;
     public static final int STATUS_ARCHIVED =2;
-
-    /**
-     * Function to get identifier of Quote object.
-     * @return Quote identifier.
-     */
-    @Override
-    public String get_id()
-    {
-        return _id;
-    }
-
-    /**
-     * Method to assign identifier to this object.
-     * @param _id identifier to be assigned to this object.
-     */
-    public void set_id(String _id)
-    {
-        this._id = _id;
-    }
-
-    @Override
-    public boolean isMarked()
-    {
-        return marked;
-    }
-
-    @Override
-    public void setMarked(boolean marked){this.marked=marked;}
 
     public StringProperty usrProperty(){return new SimpleStringProperty(getUsr());}
 
@@ -110,16 +77,6 @@ public class Overtime implements BusinessObject, Serializable
         this.time_out = time_out;
     }
 
-    public long getDate_logged()
-    {
-        return date_logged;
-    }
-
-    public void setDate_logged(long date_logged)
-    {
-        this.date_logged = date_logged;
-    }
-
     public int getStatus()
     {
         return status;
@@ -128,16 +85,6 @@ public class Overtime implements BusinessObject, Serializable
     public void setStatus(int status)
     {
         this.status= status;
-    }
-
-    public String getExtra()
-    {
-        return extra;
-    }
-
-    public void setExtra(String extra)
-    {
-        this.extra = extra;
     }
 
     @Override
@@ -180,12 +127,13 @@ public class Overtime implements BusinessObject, Serializable
         }
 
         IO.log(getClass().getName(), IO.TAG_INFO,  "valid " + getClass().getName() + " object.");
-        return true;
+        return super.isValid();
     }
 
     @Override
     public void parse(String var, Object val)
     {
+        super.parse(var, val);
         try
         {
             switch (var.toLowerCase())
@@ -211,11 +159,8 @@ public class Overtime implements BusinessObject, Serializable
                 case "status":
                     setStatus(Integer.parseInt(String.valueOf(val)));
                     break;
-                case "extra":
-                    setExtra((String)val);
-                    break;
                 default:
-                    IO.log(getClass().getName(), IO.TAG_ERROR, "Unknown Overtime attribute '" + var + "'.");
+                    IO.log(getClass().getName(), IO.TAG_ERROR, "Unknown "+getClass().getName()+" attribute '" + var + "'.");
                     break;
             }
         }catch (NumberFormatException e)
@@ -237,57 +182,13 @@ public class Overtime implements BusinessObject, Serializable
                 return getJob_id();
             case "date":
                 return getDate();
-            case "date_logged":
-                return date_logged;
             case "time_in":
                 return getTime_in();
             case "time_out":
                 return getTime_out();
             case "status":
                 return getStatus();
-            case "extra":
-                return getExtra();
-            default:
-                IO.log(TAG, IO.TAG_ERROR, "Unknown Overtime attribute '" + var + "'.");
-                return null;
         }
-    }
-
-    @Override
-    public String asJSON()
-    {
-        //Return encoded URL parameters in UTF-8 charset
-        StringBuilder result = new StringBuilder();
-        try
-        {
-            result.append(URLEncoder.encode("usr","UTF-8") + "="
-                    + URLEncoder.encode(usr, "UTF-8"));
-            result.append("&" + URLEncoder.encode("job_id","UTF-8") + "="
-                    + URLEncoder.encode(job_id, "UTF-8"));
-            if(getStatus()>0)
-                result.append("&" + URLEncoder.encode("status","UTF-8") + "="
-                        + URLEncoder.encode(String.valueOf(getStatus()), "UTF-8"));
-            if(getDate()>0)
-                result.append("&" + URLEncoder.encode("date","UTF-8") + "="
-                        + URLEncoder.encode(String.valueOf(getDate()), "UTF-8"));
-            if(getTime_in()>0)
-                result.append("&" + URLEncoder.encode("time_in","UTF-8") + "="
-                        + URLEncoder.encode(String.valueOf(getTime_in()), "UTF-8"));
-            if(getTime_out()>0)
-                result.append("&" + URLEncoder.encode("time_out","UTF-8") + "="
-                        + URLEncoder.encode(String.valueOf(getTime_out()), "UTF-8"));
-            if(getDate_logged()>0)
-                result.append("&" + URLEncoder.encode("date_logged","UTF-8") + "="
-                        + URLEncoder.encode(String.valueOf(getDate_logged()), "UTF-8"));
-            if(getExtra()!=null)
-                if(!getExtra().isEmpty())
-                    result.append("&" + URLEncoder.encode("extra","UTF-8") + "="
-                            + URLEncoder.encode(getExtra(), "UTF-8"));
-            return result.toString();
-        } catch (UnsupportedEncodingException e)
-        {
-            IO.log(TAG, IO.TAG_ERROR, e.getMessage());
-        }
-        return null;
+        return super.get(var);
     }
 }

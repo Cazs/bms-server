@@ -10,49 +10,15 @@ import java.net.URLEncoder;
 /**
  * Created by ghost on 2017/01/21.
  */
-public class PurchaseOrder implements BusinessObject, Serializable
+public class PurchaseOrder extends BusinessObject
 {
-    @Id
-    private String _id;
     private int po_number;
     private String supplier_id;
     private String contact_person_id;
     private double vat;
-    private long date_logged;
-    private String creator;
     private String account_name;
     private int status;
-    private boolean marked;
-    private String extra;
     public static final String TAG = "PurchaseOrder";
-
-    /**
-     * Function to get identifier of PurchaseOrder object.
-     * @return PurchaseOrder identifier.
-     */
-    @Override
-    public String get_id()
-    {
-        return _id;
-    }
-
-    /**
-     * Method to assign identifier to this object.
-     * @param _id identifier to be assigned to this object.
-     */
-    public void set_id(String _id)
-    {
-        this._id = _id;
-    }
-
-    @Override
-    public boolean isMarked()
-    {
-        return marked;
-    }
-
-    @Override
-    public void setMarked(boolean marked){this.marked=marked;}
 
     public int getPo_number()
     {
@@ -72,16 +38,6 @@ public class PurchaseOrder implements BusinessObject, Serializable
     public void setVat(double vat)
     {
         this.vat= vat;
-    }
-
-    public long getDate_logged()
-    {
-        return date_logged;
-    }
-
-    public void setDate_logged(long date_logged)
-    {
-        this.date_logged = date_logged;
     }
 
     public String getSupplier_id()
@@ -104,16 +60,6 @@ public class PurchaseOrder implements BusinessObject, Serializable
         this.contact_person_id=contact_person_id;
     }
 
-    public String getCreator()
-    {
-        return creator;
-    }
-
-    public void setCreator(String creator)
-    {
-        this.creator = creator;
-    }
-
     public String getAccount_name()
     {
         return account_name;
@@ -132,16 +78,6 @@ public class PurchaseOrder implements BusinessObject, Serializable
     public void setStatus(int status)
     {
         this.status = status;
-    }
-
-    public String getExtra()
-    {
-        return extra;
-    }
-
-    public void setExtra(String extra)
-    {
-        this.extra = extra;
     }
 
     @Override
@@ -184,12 +120,13 @@ public class PurchaseOrder implements BusinessObject, Serializable
         }
 
         IO.log(getClass().getName(), IO.TAG_INFO,  "valid " + getClass().getName() + " object.");
-        return true;
+        return super.isValid();
     }
 
     @Override
     public void parse(String var, Object val)
     {
+        super.parse(var, val);
         try
         {
             switch (var.toLowerCase())
@@ -218,14 +155,11 @@ public class PurchaseOrder implements BusinessObject, Serializable
                 case "creator":
                     setCreator((String)val);
                     break;
-                case "extra":
-                    setExtra(String.valueOf(val));
-                    break;
                 default:
                     IO.log(TAG, IO.TAG_ERROR, "Unknown "+TAG+" attribute '" + var + "'.");
                     break;
             }
-        }catch (NumberFormatException e)
+        } catch (NumberFormatException e)
         {
             IO.log(getClass().getName(), IO.TAG_ERROR, e.getMessage());
         }
@@ -236,8 +170,6 @@ public class PurchaseOrder implements BusinessObject, Serializable
     {
         switch (var.toLowerCase())
         {
-            case "_id":
-                return get_id();
             case "po_number":
                 return getPo_number();
             case "supplier_id":
@@ -254,47 +186,7 @@ public class PurchaseOrder implements BusinessObject, Serializable
                 return getCreator();
             case "status":
                 return getStatus();
-            case "extra":
-                return getExtra();
-            default:
-                IO.log(TAG, IO.TAG_ERROR, "Unknown "+TAG+" attribute '" + var + "'.");
-                return null;
         }
-    }
-
-    @Override
-    public String asJSON()
-    {
-        //Return encoded URL parameters in UTF-8 charset
-        StringBuilder result = new StringBuilder();
-        try
-        {
-            result.append(URLEncoder.encode("po_number","UTF-8") + "="
-                    + URLEncoder.encode(String.valueOf(po_number), "UTF-8"));
-            result.append("&" + URLEncoder.encode("supplier_id","UTF-8") + "="
-                    + URLEncoder.encode(supplier_id, "UTF-8"));
-            result.append("&" + URLEncoder.encode("contact_person_id","UTF-8") + "="
-                    + URLEncoder.encode(contact_person_id, "UTF-8"));
-            result.append("&" + URLEncoder.encode("vat","UTF-8") + "="
-                    + URLEncoder.encode(String.valueOf(vat), "UTF-8"));
-            result.append("&" + URLEncoder.encode("status","UTF-8") + "="
-                    + URLEncoder.encode(String.valueOf(status), "UTF-8"));
-            result.append("&" + URLEncoder.encode("account_name","UTF-8") + "="
-                    + URLEncoder.encode(account_name, "UTF-8"));
-            if(date_logged>0)
-                result.append("&" + URLEncoder.encode("date_logged","UTF-8") + "="
-                        + URLEncoder.encode(String.valueOf(date_logged), "UTF-8"));
-            result.append("&" + URLEncoder.encode("creator","UTF-8") + "="
-                    + URLEncoder.encode(creator, "UTF-8"));
-            if(extra!=null)
-                if(!extra.isEmpty())
-                    result.append("&" + URLEncoder.encode("extra","UTF-8") + "="
-                            + URLEncoder.encode(extra, "UTF-8"));
-            return result.toString();
-        } catch (UnsupportedEncodingException e)
-        {
-            IO.log(TAG, IO.TAG_ERROR, e.getMessage());
-        }
-        return null;
+        return super.get(var);
     }
 }

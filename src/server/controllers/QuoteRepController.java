@@ -15,12 +15,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import server.auxilary.IO;
 import server.exceptions.InvalidQuoteException;
-import server.model.BusinessObject;
-import server.model.Quote;
+import server.model.Counter;
 import server.model.QuoteRep;
 import server.repositories.QuoteRepRepository;
 
-import java.util.LinkedList;
 import java.util.List;
 
 @RepositoryRestController
@@ -54,31 +52,25 @@ public class QuoteRepController
         }
 
 
+        //public ResponseEntity<Page<QuoteRep>> addQuoteRep(@RequestBody QuoteRep quote_rep, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
         @PutMapping("/quotes/representatives")
-        public ResponseEntity<Page<QuoteRep>> addQuoteRep(@RequestBody QuoteRep quote_rep, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+        public ResponseEntity<String> addQuoteRep(@RequestBody QuoteRep quote_rep)
         {
             IO.log(getClass().getName(), IO.TAG_INFO, "handling QuoteRep creation request.");
-            List<BusinessObject> contents = new LinkedList<>();
             if(quote_rep!=null)
             {
                 long date_logged = System.currentTimeMillis();
                 //quote_rep.setDate_generated(date_logged);
                 if (quote_rep.isValid())
                 {
-                    System.out.println(">>>>>>>>>>>>>creating quote_rep: "+quote_rep.asJSON());
+                    IO.log(getClass().getName(), IO.TAG_INFO, "creating quote_rep.");
+                    //commit to server
                     IO.getInstance().mongoOperations().save(quote_rep, "quote_representatives");
-                    /*List<Quote> quotes = IO.getInstance().mongoOperations()
-                            .find(new Query(Criteria.where("date_logged").is(String.valueOf(quote_rep.get()))), Quote.class, "quotes");*
-                    if (quotes != null)
-                    {
-                        if (!quotes.isEmpty())
-                            contents.add(quotes.get(0));
-                        else IO.log(getClass().getName(), IO.TAG_ERROR, "could not find added Quote object in the database.");
-                    } else
-                        IO.log(getClass().getName(), IO.TAG_ERROR, "MongoDB operation returned null Quote object.");*/
+                    //update timestamp
+                    CounterController.updateCounter(new Counter("quotes_timestamp", date_logged));
+                    return new ResponseEntity<>(quote_rep.get_id(), HttpStatus.OK);
                 } else throw new InvalidQuoteException();
             }
-            return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents
-                    .size()), (ResourceAssembler) assembler), HttpStatus.OK);
+            return new ResponseEntity<>("Invalid quote_rep", HttpStatus.CONFLICT);
         }
 }

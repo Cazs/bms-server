@@ -11,26 +11,11 @@ import java.net.URLEncoder;
 /**
  * Created by ghost on 2017/02/03.
  */
-public class JobEmployee implements BusinessObject
+public class JobEmployee extends BusinessObject
 {
-    @Id
-    private String _id;
     private String job_id;
     private String usr;
-    private long date_logged;
-    private boolean marked;
     public static final String TAG = "JobEmployee";
-
-    @Override
-    public String get_id()
-    {
-        return _id;
-    }
-
-    public void set_id(String _id)
-    {
-        this._id = _id;
-    }
 
     public String getJob_id()
     {
@@ -52,25 +37,6 @@ public class JobEmployee implements BusinessObject
         this.usr = usr;
     }
 
-    public double getDate_logged()
-    {
-        return date_logged;
-    }
-
-    public void setDate_logged(long date_logged)
-    {
-        this.date_logged = date_logged;
-    }
-
-    @Override
-    public boolean isMarked()
-    {
-        return marked;
-    }
-
-    @Override
-    public void setMarked(boolean marked){this.marked=marked;}
-
     @Override
     public boolean isValid()
     {
@@ -91,12 +57,13 @@ public class JobEmployee implements BusinessObject
         }
 
         IO.log(getClass().getName(), IO.TAG_INFO,  "valid " + getClass().getName() + " object.");
-        return true;
+        return super.isValid();
     }
 
     @Override
     public void parse(String var, Object val)
     {
+        super.parse(var, val);
         try
         {
             switch (var.toLowerCase())
@@ -107,14 +74,11 @@ public class JobEmployee implements BusinessObject
                 case "usr":
                     usr = String.valueOf(val);
                     break;
-                case "date_logged":
-                    date_logged = Long.parseLong((String) val);
-                    break;
                 default:
-                    IO.log(getClass().getName(), IO.TAG_ERROR, "unknown JobEmployee attribute '" + var + "'.");
+                    IO.log(getClass().getName(), IO.TAG_ERROR, "unknown "+getClass().getName()+" attribute '" + var + "'.");
                     break;
             }
-        }catch (NumberFormatException e)
+        } catch (NumberFormatException e)
         {
             IO.log(getClass().getName(), IO.TAG_ERROR, e.getMessage());
         }
@@ -129,33 +93,7 @@ public class JobEmployee implements BusinessObject
                 return job_id;
             case "usr":
                 return usr;
-            case "date_logged":
-                return date_logged;
-            default:
-                IO.log(getClass().getName(), IO.TAG_ERROR, "unknown JobEmployee attribute '" + var + "'.");
-                return null;
         }
-    }
-
-    @Override
-    public String asJSON()
-    {
-        //Return encoded URL parameters in UTF-8 charset
-        StringBuilder result = new StringBuilder();
-        try
-        {
-            result.append(URLEncoder.encode("job_id","UTF-8") + "="
-                    + URLEncoder.encode(job_id, "UTF-8") + "&");
-            result.append(URLEncoder.encode("usr","UTF-8") + "="
-                    + URLEncoder.encode(usr, "UTF-8") + "&");
-            result.append(URLEncoder.encode("date_logged","UTF-8") + "="
-                    + URLEncoder.encode(String.valueOf(date_logged), "UTF-8"));
-
-            return result.toString();
-        } catch (UnsupportedEncodingException e)
-        {
-            IO.log(TAG, IO.TAG_ERROR, e.getMessage());
-        }
-        return null;
+        return super.get(var);
     }
 }

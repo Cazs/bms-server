@@ -55,7 +55,7 @@ public class InvoiceController
         @PutMapping
         public ResponseEntity<Page<Invoice>> addInvoice(@RequestBody Invoice invoice, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
         {
-            IO.log(getClass().getName(), IO.TAG_INFO, "handling Invoice creation request: " + invoice.asJSON());
+            IO.log(getClass().getName(), IO.TAG_INFO, "handling Invoice creation request.");
             List<BusinessObject> contents = new LinkedList<>();
             contents.add(invoice);
             return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);

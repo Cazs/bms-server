@@ -12,34 +12,11 @@ import java.net.URLEncoder;
 /**
  * Created by ghost on 2017/01/29.
  */
-public class QuoteRep implements BusinessObject, Serializable
+public class QuoteRep extends BusinessObject
 {
-    @Id
-    private String _id;
     private String quote_id;
     private String usr;
-    private boolean marked;
     public static final String TAG = "QuoteRepresentative";
-
-    @Override
-    public String get_id()
-    {
-        return _id;
-    }
-
-    public void set_id(String _id)
-    {
-        this._id = _id;
-    }
-
-    @Override
-    public boolean isMarked()
-    {
-        return marked;
-    }
-
-    @Override
-    public void setMarked(boolean marked){this.marked=marked;}
 
     public String getQuote_id()
     {
@@ -76,9 +53,8 @@ public class QuoteRep implements BusinessObject, Serializable
         }
 
         IO.log(getClass().getName(), IO.TAG_INFO,  "valid " + getClass().getName() + " object.");
-        return true;
+        return super.isValid();
     }
-
 
     @Override
     public void parse(String var, Object val)
@@ -94,10 +70,10 @@ public class QuoteRep implements BusinessObject, Serializable
                     usr = String.valueOf(val);
                     break;
                 default:
-                    System.err.println("Unknown QuoteRep attribute '" + var + "'.");
+                    System.err.println("Unknown "+getClass().getName()+" attribute '" + var + "'.");
                     break;
             }
-        }catch (NumberFormatException e)
+        } catch (NumberFormatException e)
         {
             IO.log(getClass().getName(), IO.TAG_ERROR, e.getMessage());
         }
@@ -113,28 +89,8 @@ public class QuoteRep implements BusinessObject, Serializable
             case "usr":
                 return usr;
             default:
-                System.err.println("Unknown QuoteRep attribute '" + var + "'.");
+                IO.log(getClass().getName(), IO.TAG_ERROR, "Unknown "+getClass().getName()+" attribute '" + var + "'.");
                 return null;
         }
-    }
-
-    @Override
-    public String asJSON()
-    {
-        //Return encoded URL parameters in UTF-8 charset
-        StringBuilder result = new StringBuilder();
-        try
-        {
-            result.append(URLEncoder.encode("quote_id","UTF-8") + "="
-                    + URLEncoder.encode(quote_id, "UTF-8") + "&");
-            result.append(URLEncoder.encode("usr","UTF-8") + "="
-                    + URLEncoder.encode(usr, "UTF-8") + "&");
-
-            return result.toString();
-        } catch (UnsupportedEncodingException e)
-        {
-            IO.log(TAG, IO.TAG_ERROR, e.getMessage());
-        }
-        return null;
     }
 }

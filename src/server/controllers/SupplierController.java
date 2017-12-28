@@ -55,7 +55,7 @@ public class SupplierController
         @PutMapping
         public ResponseEntity<Page<Supplier>> addSupplier(@RequestBody Supplier supplier, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
         {
-            IO.log(getClass().getName(), IO.TAG_INFO, "handling Supplier creation request: " + supplier.asJSON());
+            IO.log(getClass().getName(), IO.TAG_INFO, "handling Supplier creation request.");
             List<BusinessObject> contents = new LinkedList<>();
             contents.add(supplier);
             return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);

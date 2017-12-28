@@ -67,10 +67,9 @@ public class EmployeeController
         List<BusinessObject> contents = new LinkedList<>();
         if(employee!=null)
         {
-            employee.setDate_joined(System.currentTimeMillis());
+            employee.setDate_logged(System.currentTimeMillis());
             if (employee.isValid())
             {
-                System.out.println(">>>>>>>>>>>>>creating employee: "+employee.toString());
                 IO.getInstance().mongoOperations().save(employee, "employees");
                 List<Employee> employees = IO.getInstance().mongoOperations()
                         .find(new Query(Criteria.where("usr").is(employee.getUsr())), Employee.class, "employees");

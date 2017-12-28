@@ -16,48 +16,23 @@ import java.net.URLEncoder;
  *
  * @author ghost
  */
-public class Employee implements BusinessObject, Serializable
+public class Employee extends BusinessObject
 {
-    @Id
-    private String _id;
     private String usr;
     private String pwd;//hashed
     private String firstname;
     private String lastname;
     private String gender;
     private String email;
-    private long date_joined;
     private String tel;
     private String cell;
     private int access_level;
     private boolean active;
-    private String other;
-    private boolean marked;
     public static final String TAG = "Employee";
     public static int ACCESS_LEVEL_NONE = 0;
     public static int ACCESS_LEVEL_NORMAL = 1;
     public static int ACCESS_LEVEL_ADMIN = 2;
     public static int ACCESS_LEVEL_SUPER = 3;
-
-    @Override
-    public String get_id()
-    {
-        return _id;
-    }
-
-    public void set_id(String _id)
-    {
-        this._id = _id;
-    }
-
-    @Override
-    public boolean isMarked()
-    {
-        return marked;
-    }
-
-    @Override
-    public void setMarked(boolean marked){this.marked=marked;}
 
     public String getUsr()
     {
@@ -96,16 +71,6 @@ public class Employee implements BusinessObject, Serializable
         this.active = active;
     }
 
-    public String getOther() 
-    {
-        return other;
-    }
-
-    public void setOther(String other) 
-    {
-        this.other = other;
-    }
-
     public String getFirstname()
     {
         return firstname;
@@ -124,16 +89,6 @@ public class Employee implements BusinessObject, Serializable
     public void setLastname(String lastname)
     {
         this.lastname = lastname;
-    }
-
-    public long getDate_joined()
-    {
-        return date_joined;
-    }
-
-    public void setDate_joined(long date_joined)
-    {
-        this.date_joined = date_joined;
     }
 
     public String getEmail()
@@ -179,6 +134,7 @@ public class Employee implements BusinessObject, Serializable
     @Override
     public boolean isValid()
     {
+        super.isValid();
         if(getUsr()==null)
         {
             IO.log(getClass().getName(), IO.TAG_ERROR, "invalid usr value.");
@@ -197,11 +153,6 @@ public class Employee implements BusinessObject, Serializable
         if(getLastname()==null)
         {
             IO.log(getClass().getName(), IO.TAG_ERROR, "invalid lastname value.");
-            return false;
-        }
-        if(getDate_joined()<=0)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid date_joined value.");
             return false;
         }
         if(getCell()==null)
@@ -242,6 +193,7 @@ public class Employee implements BusinessObject, Serializable
     @Override
     public void parse(String var, Object val)
     {
+        super.parse(var, val);
         try
         {
             switch (var.toLowerCase())
@@ -270,17 +222,11 @@ public class Employee implements BusinessObject, Serializable
                 case "cell":
                     setCell((String)val);
                     break;
-                case "date_joined":
-                    setDate_joined(Long.parseLong(String.valueOf(val)));
-                    break;
                 case "active":
                     setActive(Boolean.parseBoolean((String)val));
                     break;
-                case "other":
-                    setOther((String)val);
-                    break;
                 default:
-                    IO.log(TAG, IO.TAG_WARN, String.format("unknown Employee attribute '%s'", var));
+                    IO.log(TAG, IO.TAG_WARN, String.format("unknown "+getClass().getName()+" attribute '%s'", var));
                     break;
             }
         }catch (NumberFormatException e)
@@ -292,41 +238,41 @@ public class Employee implements BusinessObject, Serializable
     @Override
     public Object get(String var)
     {
-        switch (var.toLowerCase())
+        Object val = super.get(var);
+        if(val==null)
         {
-            case "firstname":
-                return firstname;
-            case "lastname":
-                return lastname;
-            case "usr":
-                return usr;
-            case "access_level":
-                return access_level;
-            case "gender":
-                return gender;
-            case "email":
-                return email;
-            case "tel":
-                return tel;
-            case "cell":
-                return cell;
-            case "date_joined":
-                return date_joined;
-            case "active":
-                return active;
-            case "other":
-                return other;
-            default:
-                IO.log(TAG, IO.TAG_WARN, String.format("unknown Employee attribute '%s'", var));
-                return null;
-        }
+            switch (var.toLowerCase())
+            {
+                case "firstname":
+                    return firstname;
+                case "lastname":
+                    return lastname;
+                case "usr":
+                    return usr;
+                case "access_level":
+                    return access_level;
+                case "gender":
+                    return gender;
+                case "email":
+                    return email;
+                case "tel":
+                    return tel;
+                case "cell":
+                    return cell;
+                case "active":
+                    return active;
+                default:
+                    IO.log(TAG, IO.TAG_WARN, String.format("unknown "+getClass().getName()+" attribute '%s'", var));
+                    return null;
+            }
+        } else return val;
     }
 
     @Override
     public String toString()
     {
         //return String.format("[id = %s, firstname = %s, lastname = %s]", get_id(), getFirstname(), getLastname());
-        return "{\"_id\":\""+_id+"\", "+
+        return "{\"_id\":\""+get_id()+"\", "+
                 "\"lastname\":\""+lastname+"\","+
                 "\"usr\":\""+usr+"\","+
                 "\"pwd\":\""+pwd+"\","+
@@ -335,51 +281,10 @@ public class Employee implements BusinessObject, Serializable
                 "\"email\":\""+email+"\","+
                 "\"tel\":\""+tel+"\","+
                 "\"cell\":\""+cell+"\","+
-                "\"date_joined\":\""+date_joined+"\","+
+                "\"date_logged\":\""+getDate_logged()+"\","+
                 "\"active\":\""+active+"\","+
-                "\"other\":\""+other+"\"}";
+                "\"other\":\""+getOther()+"\"}";
     }
 
     public String getInitials(){return new String(firstname.substring(0,1) + lastname.substring(0,1));}
-
-    @Override
-    public String asJSON()
-    {
-        //Return encoded URL parameters in UTF-8 charset
-        StringBuilder result = new StringBuilder();
-        try
-        {
-            result.append(URLEncoder.encode("usr","UTF-8") + "="
-                    + URLEncoder.encode(usr, "UTF-8") + "&");
-            result.append(URLEncoder.encode("pwd","UTF-8") + "="
-                    + URLEncoder.encode(pwd, "UTF-8") + "&");
-            result.append(URLEncoder.encode("access_level","UTF-8") + "="
-                    + URLEncoder.encode(String.valueOf(access_level), "UTF-8") + "&");
-            result.append(URLEncoder.encode("firstname","UTF-8") + "="
-                    + URLEncoder.encode(firstname, "UTF-8") + "&");
-            result.append(URLEncoder.encode("lastname","UTF-8") + "="
-                    + URLEncoder.encode(lastname, "UTF-8") + "&");
-            result.append(URLEncoder.encode("gender","UTF-8") + "="
-                    + URLEncoder.encode(gender, "UTF-8") + "&");
-            result.append(URLEncoder.encode("email","UTF-8") + "="
-                    + URLEncoder.encode(email, "UTF-8") + "&");
-            result.append(URLEncoder.encode("tel","UTF-8") + "="
-                    + URLEncoder.encode(tel, "UTF-8") + "&");
-            result.append(URLEncoder.encode("cell","UTF-8") + "="
-                    + URLEncoder.encode(cell, "UTF-8") + "&");
-            result.append(URLEncoder.encode("date_joined","UTF-8") + "="
-                    + URLEncoder.encode(String.valueOf(date_joined), "UTF-8") + "&");
-            result.append(URLEncoder.encode("active","UTF-8") + "="
-                    + URLEncoder.encode(String.valueOf(active), "UTF-8"));
-            if(other!=null)
-                if(!other.isEmpty())
-                    result.append("&" + URLEncoder.encode("other","UTF-8") + "="
-                        + URLEncoder.encode(other, "UTF-8"));
-            return result.toString();
-        } catch (UnsupportedEncodingException e)
-        {
-            IO.log(TAG, IO.TAG_ERROR, e.getMessage());
-        }
-        return null;
-    }
 }

@@ -10,10 +10,8 @@ import java.net.URLEncoder;
 /**
  * Created by ghost on 2017/01/03.
  */
-public class Supplier implements BusinessObject, Serializable
+public class Supplier extends BusinessObject
 {
-    @Id
-    private String _id;
     private String supplier_name;
     private String physical_address;
     private String postal_address;
@@ -27,28 +25,6 @@ public class Supplier implements BusinessObject, Serializable
     private String registration_number;
     private String vat_number;
     private String account_name;
-    private String other;
-    private boolean marked;
-
-    @Override
-    public String get_id()
-    {
-        return _id;
-    }
-
-    public void set_id(String _id)
-    {
-        this._id = _id;
-    }
-
-    @Override
-    public boolean isMarked()
-    {
-        return marked;
-    }
-
-    @Override
-    public void setMarked(boolean marked){this.marked=marked;}
 
     public String getSupplier_name()
     {
@@ -180,16 +156,6 @@ public class Supplier implements BusinessObject, Serializable
         this.contact_email = contact_email;
     }
 
-    public String getOther()
-    {
-        return other;
-    }
-
-    public void setOther(String other)
-    {
-        this.other = other;
-    }
-
     @Override
     public boolean isValid()
     {
@@ -250,12 +216,13 @@ public class Supplier implements BusinessObject, Serializable
         }
 
         IO.log(getClass().getName(), IO.TAG_INFO,  "valid " + getClass().getName() + " object.");
-        return true;
+        return super.isValid();
     }
 
     @Override
     public void parse(String var, Object val)
     {
+        super.parse(var, val);
         try
         {
             switch (var.toLowerCase())
@@ -299,11 +266,8 @@ public class Supplier implements BusinessObject, Serializable
                 case "active":
                     setActive(Boolean.parseBoolean(String.valueOf(val)));
                     break;
-                case "other":
-                    setOther((String)val);
-                    break;
                 default:
-                    IO.log(getClass().getName(), IO.TAG_ERROR, "unknown Supplier attribute '" + var + "'.");
+                    IO.log(getClass().getName(), IO.TAG_ERROR, "unknown "+getClass().getName()+" attribute '" + var + "'.");
                     break;
             }
         }catch (NumberFormatException e)
@@ -343,59 +307,8 @@ public class Supplier implements BusinessObject, Serializable
                 return getWebsite();
             case "active":
                 return isActive();
-            case "other":
-                return getOther();
-            default:
-                IO.log(getClass().getName(), IO.TAG_ERROR, "unknown Supplier attribute '" + var + "'.");
-                return null;
         }
-    }
-
-    @Override
-    public String asJSON()
-    {
-        //Return encoded URL parameters in UTF-8 charset
-        StringBuilder result = new StringBuilder();
-        try
-        {
-            result.append(URLEncoder.encode("supplier_name","UTF-8") + "="
-                    + URLEncoder.encode(supplier_name, "UTF-8"));
-            result.append("&" + URLEncoder.encode("physical_address","UTF-8") + "="
-                    + URLEncoder.encode(physical_address, "UTF-8"));
-            result.append("&" + URLEncoder.encode("postal_address","UTF-8") + "="
-                    + URLEncoder.encode(postal_address, "UTF-8"));
-            result.append("&" + URLEncoder.encode("tel","UTF-8") + "="
-                    + URLEncoder.encode(tel, "UTF-8"));
-            if(fax!=null)
-                result.append("&" + URLEncoder.encode("fax","UTF-8") + "="
-                        + URLEncoder.encode(fax, "UTF-8"));
-            result.append("&" + URLEncoder.encode("contact_email","UTF-8") + "="
-                    + URLEncoder.encode(contact_email, "UTF-8"));
-            result.append("&" + URLEncoder.encode("speciality","UTF-8") + "="
-                    + URLEncoder.encode(speciality, "UTF-8"));
-            result.append("&" + URLEncoder.encode("registration_number","UTF-8") + "="
-                    + URLEncoder.encode(registration_number, "UTF-8"));
-            result.append("&" + URLEncoder.encode("vat_number","UTF-8") + "="
-                    + URLEncoder.encode(String.valueOf(getVat_number()), "UTF-8"));
-            result.append("&" + URLEncoder.encode("account_name","UTF-8") + "="
-                    + URLEncoder.encode(String.valueOf(getAccount_name()), "UTF-8"));
-            if(date_partnered>0)
-                result.append("&" + URLEncoder.encode("date_partnered","UTF-8") + "="
-                        + URLEncoder.encode(String.valueOf(date_partnered), "UTF-8"));
-            result.append("&" + URLEncoder.encode("website","UTF-8") + "="
-                    + URLEncoder.encode(website, "UTF-8"));
-            result.append("&" + URLEncoder.encode("active","UTF-8") + "="
-                    + URLEncoder.encode(String.valueOf(active), "UTF-8"));
-            if(other!=null)
-                result.append("&" + URLEncoder.encode("other","UTF-8") + "="
-                        + URLEncoder.encode(other, "UTF-8"));
-
-            return result.toString();
-        } catch (UnsupportedEncodingException e)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, e.getMessage());
-        }
-        return null;
+        return super.get(var);
     }
 
     @Override

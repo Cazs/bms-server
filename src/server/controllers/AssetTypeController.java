@@ -55,7 +55,7 @@ public class AssetTypeController
         @PutMapping
         public ResponseEntity<Page<AssetType>> addAssetType(@RequestBody AssetType asset_type, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
         {
-            IO.log(getClass().getName(), IO.TAG_INFO, "handling AssetType creation request: " + asset_type.asJSON());
+            IO.log(getClass().getName(), IO.TAG_INFO, "handling AssetType creation request.");
             List<BusinessObject> contents = new LinkedList<>();
             contents.add(asset_type);
             return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);

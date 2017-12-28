@@ -8,6 +8,7 @@ public enum Globals
     COMPANY("Airotek Engineering"),
     APP_NAME("Enterprise Resource Engine"),
     DEBUG_WARNINGS("on"),
+    DEBUG_VERBOSE("off"),
     DEBUG_INFO("on"),
     CURRENCY_SYMBOL("R"),
     DEBUG_ERRORS("on");

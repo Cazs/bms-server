@@ -20,20 +20,15 @@ public class APIController
     @GetMapping
     public String root()
     {
-        IO.log(getClass().getName(), IO.TAG_INFO, "handling API root get request.");
+        IO.log(getClass().getName(), IO.TAG_VERBOSE, "handling API root get request.");
         return "You have requested API root page, this does absolutely nothing.";
     }
 
     @GetMapping(path="/timestamp/{id}", produces = "application/hal+json")
-    public String getTimestamp(@PathVariable("id") String id)
+    public Counter getTimestamp(@PathVariable("id") String id)
     {
         IO.log(getClass().getName(), IO.TAG_INFO, "handling GET request for Counter: "+ id);
-        List<Counter> timestamps = IO.getInstance().mongoOperations().find(
-                new Query(Criteria.where("counter_name").is(id)), Counter.class, "counters");
-        if(timestamps!=null)
-            if(!timestamps.isEmpty())
-                return timestamps.get(0).toString();
-        return "Counter not found.";
+        return CounterController.getCounter(id);
     }
 
     @PutMapping("/auth")

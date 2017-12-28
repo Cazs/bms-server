@@ -10,6 +10,6 @@ import java.net.URLEncoder;
 /**
  * Created by ghost on 2017/01/13.
  */
-public class ResourceType extends Type implements BusinessObject, Serializable
+public class ResourceType extends Type
 {
 }

@@ -14,50 +14,52 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import server.auxilary.IO;
-import server.model.BusinessObject;
+import server.auxilary.RemoteComms;
+import server.exceptions.InvalidQuoteResourceException;
+import server.model.Counter;
 import server.model.QuoteItem;
 import server.repositories.QuoteItemRepository;
 
-import java.util.LinkedList;
 import java.util.List;
 
 @RepositoryRestController
-@RequestMapping("/quotes/resources")
+//@RequestMapping("/quotes/resources")
 public class QuoteResourceController
 {
-        private PagedResourcesAssembler<QuoteItem> pagedAssembler;
-        @Autowired
-        private QuoteItemRepository quote_resourceRepository;
+    private PagedResourcesAssembler<QuoteItem> pagedAssembler;
+    @Autowired
+    private QuoteItemRepository quote_resourceRepository;
 
-        @Autowired
-        public QuoteResourceController(PagedResourcesAssembler<QuoteItem> pagedAssembler)
-        {
-            this.pagedAssembler = pagedAssembler;
-        }
+    @Autowired
+    public QuoteResourceController(PagedResourcesAssembler<QuoteItem> pagedAssembler)
+    {
+        this.pagedAssembler = pagedAssembler;
+    }
 
-        @GetMapping(path="/{id}", produces = "application/hal+json")
-        public ResponseEntity<Page<QuoteItem>> getQuoteItem(@PathVariable("id") String id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
-        {
-            IO.log(getClass().getName(), IO.TAG_INFO, "handling QuoteItem GET request id: "+ id);
-            List<QuoteItem> contents = IO.getInstance().mongoOperations().find(new Query(Criteria.where("quote_id").is(id)), QuoteItem.class, "quote_resources");
-            return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
-        }
+    @GetMapping(path="/quotes/resources/{id}", produces = "application/hal+json")
+    public ResponseEntity<Page<QuoteItem>> getQuoteItem(@PathVariable("id") String id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    {
+        IO.log(getClass().getName(), IO.TAG_INFO, "handling QuoteItem GET request id: "+ id);
+        List<QuoteItem> contents = IO.getInstance().mongoOperations().find(new Query(Criteria.where("quote_id").is(id)), QuoteItem.class, "quote_resources");
+        return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
+    }
 
-        @GetMapping
-        public ResponseEntity<Page<QuoteItem>> getQuoteItems(Pageable pageRequest, PersistentEntityResourceAssembler assembler)
-        {
-            IO.log(getClass().getName(), IO.TAG_INFO, "handling QuoteItem GET request {all}");
-            List<QuoteItem> contents =  IO.getInstance().mongoOperations().findAll(QuoteItem.class, "quote_resources");
-            return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
-        }
+    @GetMapping("/quotes/resources")
+    public ResponseEntity<Page<QuoteItem>> getQuoteItems(Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    {
+        IO.log(getClass().getName(), IO.TAG_INFO, "handling QuoteItem GET request {all}");
+        List<QuoteItem> contents =  IO.getInstance().mongoOperations().findAll(QuoteItem.class, "quote_resources");
+        return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
+    }
 
-        @PostMapping
-        @PutMapping
-        public ResponseEntity<Page<QuoteItem>> addQuoteItem(@RequestBody QuoteItem quote_resource, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    @PutMapping("/quotes/resources")
+    public ResponseEntity<String> addQuoteItem(@RequestBody QuoteItem quote_resource)
+    {
+        IO.log(getClass().getName(), IO.TAG_INFO, "handling QuoteResource creation request.");
+        if(quote_resource!=null)
         {
-            IO.log(getClass().getName(), IO.TAG_INFO, "handling QuoteItem creation request: " + quote_resource.asJSON());
-            List<BusinessObject> contents = new LinkedList<>();
-            contents.add(quote_resource);
-            return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
+            RemoteComms.commitBusinessObjectToDatabase(quote_resource, "quote_resources", "quotes_timestamp");
         }
+        return new ResponseEntity<>("Invalid quote_resource", HttpStatus.CONFLICT);
+    }
 }

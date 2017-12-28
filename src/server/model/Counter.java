@@ -8,8 +8,25 @@ import org.springframework.data.annotation.Id;
 public class Counter
 {
     @Id
+    private String _id;
     private String counter_name;
     private long count;
+
+    public Counter(String counter_name, long count)
+    {
+        setCounter_name(counter_name);
+        setCount(count);
+    }
+
+    public String get_id()
+    {
+        return _id;
+    }
+
+    public void set_id(String _id)
+    {
+        this._id = _id;
+    }
 
     public String getCounter_name()
     {

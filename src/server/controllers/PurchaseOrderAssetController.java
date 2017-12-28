@@ -55,7 +55,7 @@ public class PurchaseOrderAssetController
         @PutMapping
         public ResponseEntity<Page<PurchaseOrderAsset>> addPurchaseOrderAsset(@RequestBody PurchaseOrderAsset purchase_order_asset, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
         {
-            IO.log(getClass().getName(), IO.TAG_INFO, "handling PurchaseOrderAsset creation request: " + purchase_order_asset.asJSON());
+            IO.log(getClass().getName(), IO.TAG_INFO, "handling PurchaseOrderAsset creation request.");
             List<BusinessObject> contents = new LinkedList<>();
             contents.add(purchase_order_asset);
             return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);

@@ -10,49 +10,15 @@ import java.net.URLEncoder;
 /**
  * Created by ghost on 2017/01/21.
  */
-public abstract class PurchaseOrderItem implements BusinessObject, Serializable
+public abstract class PurchaseOrderItem extends BusinessObject
 {
-    @Id
-    private String _id;
     private int item_number;
     private String purchase_order_id;
     private String item_id;
     private int quantity;
     private double discount;
     private double cost;
-    private long date_logged;
-    private boolean marked;
-    private String extra;
     private String type;
-
-    /**
-     * Function to get identifier of Quote object.
-     * @return Quote identifier.
-     */
-    @Override
-    public String get_id()
-    {
-        return _id;
-    }
-
-    /**
-     * Method to assign identifier to this object.
-     * @param _id identifier to be assigned to this object.
-     */
-    public void set_id(String _id)
-    {
-        this._id = _id;
-    }
-
-
-    @Override
-    public boolean isMarked()
-    {
-        return marked;
-    }
-
-    @Override
-    public void setMarked(boolean marked){this.marked=marked;}
 
     public int getItem_number()
     {
@@ -94,22 +60,6 @@ public abstract class PurchaseOrderItem implements BusinessObject, Serializable
         this.item_id = item_id;
     }
 
-    public long getDate_logged()
-    {
-        return date_logged;
-    }
-
-    public void setDate_logged(long date_logged)
-    {
-        this.date_logged = date_logged;
-    }
-
-    /*public abstract String getItem_name();
-
-    public abstract String getItem_description();
-
-    public abstract String getUnit();*/
-
     public int getQuantity()
     {
         return quantity;
@@ -137,16 +87,6 @@ public abstract class PurchaseOrderItem implements BusinessObject, Serializable
         this.discount = discount;
     }
 
-    public String getExtra()
-    {
-        return extra;
-    }
-
-    public void setExtra(String extra)
-    {
-        this.extra = extra;
-    }
-
     @Override
     public boolean isValid()
     {
@@ -160,16 +100,6 @@ public abstract class PurchaseOrderItem implements BusinessObject, Serializable
             IO.log(getClass().getName(), IO.TAG_ERROR, "invalid item_number value.");
             return false;
         }
-        /*if(getItem_name()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid item_name value.");
-            return false;
-        }
-        if(getItem_description()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid item_description value.");
-            return false;
-        }*/
         if(getPurchase_order_id()==null)
         {
             IO.log(getClass().getName(), IO.TAG_ERROR, "invalid purchase_order_id value.");
@@ -208,6 +138,7 @@ public abstract class PurchaseOrderItem implements BusinessObject, Serializable
     @Override
     public void parse(String var, Object val)
     {
+        super.parse(var, val);
         try
         {
             switch (var.toLowerCase())
@@ -230,9 +161,6 @@ public abstract class PurchaseOrderItem implements BusinessObject, Serializable
                 case "cost":
                     setCost(Double.parseDouble((String) val));
                     break;
-                case "extra":
-                    setExtra(String.valueOf(val));
-                    break;
                 default:
                     IO.log(getClass().getName(), IO.TAG_ERROR, "Unknown "+getClass().getName()+" attribute '" + var + "'.");
                     break;
@@ -248,8 +176,6 @@ public abstract class PurchaseOrderItem implements BusinessObject, Serializable
     {
         switch (var.toLowerCase())
         {
-            case "_id":
-                return get_id();
             case "purchase_order_id":
                 return getPurchase_order_id();
             case "item_id":
@@ -262,45 +188,7 @@ public abstract class PurchaseOrderItem implements BusinessObject, Serializable
                 return getQuantity();
             case "discount":
                 return getDiscount();
-            case "extra":
-                return extra;
-            default:
-                IO.log(getClass().getName(), IO.TAG_ERROR, "Unknown "+getClass().getName()+" attribute '" + var + "'.");
-                return null;
         }
-    }
-
-    @Override
-    public String asJSON()
-    {
-        //Return encoded URL parameters in UTF-8 charset
-        StringBuilder result = new StringBuilder();
-        try
-        {
-            result.append(URLEncoder.encode("purchase_order_id","UTF-8") + "="
-                    + URLEncoder.encode(purchase_order_id, "UTF-8"));
-            result.append("&" + URLEncoder.encode("item_id","UTF-8") + "="
-                    + URLEncoder.encode(item_id, "UTF-8"));
-            result.append("&" + URLEncoder.encode("item_number","UTF-8") + "="
-                    + URLEncoder.encode(String.valueOf(item_number), "UTF-8"));
-            result.append("&" + URLEncoder.encode("quantity","UTF-8") + "="
-                    + URLEncoder.encode(String.valueOf(quantity), "UTF-8"));
-            result.append("&" + URLEncoder.encode("discount","UTF-8") + "="
-                    + URLEncoder.encode(String.valueOf(discount), "UTF-8"));
-            result.append("&" + URLEncoder.encode("cost","UTF-8") + "="
-                    + URLEncoder.encode(String.valueOf(cost), "UTF-8"));
-            if(date_logged>0)
-                result.append("&" + URLEncoder.encode("date_logged","UTF-8") + "="
-                        + URLEncoder.encode(String.valueOf(date_logged), "UTF-8"));
-            if(extra!=null)
-                if(!extra.isEmpty())
-                    result.append("&" + URLEncoder.encode("extra","UTF-8") + "="
-                            + URLEncoder.encode(extra, "UTF-8"));
-            return result.toString();
-        } catch (UnsupportedEncodingException e)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, e.getMessage());
-        }
-        return null;
+        return super.get(var);
     }
 }

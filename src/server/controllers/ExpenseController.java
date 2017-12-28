@@ -55,7 +55,7 @@ public class ExpenseController
         @PutMapping
         public ResponseEntity<Page<Expense>> addExpense(@RequestBody Expense expense, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
         {
-            IO.log(getClass().getName(), IO.TAG_INFO, "handling Expense creation request: " + expense.asJSON());
+            IO.log(getClass().getName(), IO.TAG_INFO, "handling Expense creation request.");
             List<BusinessObject> contents = new LinkedList<>();
             contents.add(expense);
             return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);

@@ -12,38 +12,14 @@ import java.net.URLEncoder;
 /**
  * Created by ghost on 2017/02/24.
  */
-public class FileMetadata implements BusinessObject, Serializable
+public class FileMetadata extends BusinessObject
 {
-    @Id
-    private String _id;
     private String filename;
     private String label;
     private String path;
-    private long date_logged;
     private String content_type;
-    private String extra;//{"logo_options":{}, "required":false}
-    private boolean marked;
+    //TODO: private String extra;//{"logo_options":{}, "required":false}
     public static final String TAG = "FileMetadata";
-
-    @Override
-    public String get_id()
-    {
-        return _id;
-    }
-
-    public void set_id(String _id)
-    {
-        this._id = _id;
-    }
-
-    @Override
-    public boolean isMarked()
-    {
-        return marked;
-    }
-
-    @Override
-    public void setMarked(boolean marked){this.marked=marked;}
 
     public String getFilename()
     {
@@ -85,29 +61,10 @@ public class FileMetadata implements BusinessObject, Serializable
         this.content_type = type;
     }
 
-    public long getDate_logged()
-    {
-        return date_logged;
-    }
-
-    public void setDate_logged(long date_logged)
-    {
-        this.date_logged = date_logged;
-    }
-
-    public String getExtra()
-    {
-        return extra;
-    }
-
-    public void setExtra(String extra)
-    {
-        this.extra = extra;
-    }
-
     @Override
     public boolean isValid()
     {
+        super.isValid();
         if(getFilename()==null)
         {
             IO.log(getClass().getName(), IO.TAG_ERROR, "invalid filename value.");
@@ -141,6 +98,7 @@ public class FileMetadata implements BusinessObject, Serializable
     @Override
     public void parse(String var, Object val)
     {
+        super.parse(var, val);
         switch (var.toLowerCase())
         {
             case "filename":
@@ -155,9 +113,6 @@ public class FileMetadata implements BusinessObject, Serializable
             case "content_type":
                 content_type=(String)val;
                 break;
-            case "extra":
-                extra=(String) val;
-                break;
             default:
                 IO.log(TAG, IO.TAG_ERROR, "unknown "+TAG+" attribute '" + var + "'");
                 break;
@@ -167,48 +122,23 @@ public class FileMetadata implements BusinessObject, Serializable
     @Override
     public Object get(String var)
     {
-        switch (var.toLowerCase())
+        Object val = super.get(var);
+        if(val==null)
         {
-            case "filename":
-                return filename;
-            case "label":
-                return label;
-            case "path":
-                return path;
-            case "content_type":
-                return content_type;
-            case "extra":
-                return extra;
-            default:
-                return null;
-        }
-    }
-
-    @Override
-    public String asJSON()
-    {
-        //Return encoded URL parameters in UTF-8 charset
-        StringBuilder result = new StringBuilder();
-        try
-        {
-            result.append(URLEncoder.encode("filename","UTF-8") + "="
-                    + URLEncoder.encode(String.valueOf(filename), "UTF-8") + "&");
-            result.append(URLEncoder.encode("label","UTF-8") + "="
-                    + URLEncoder.encode(label, "UTF-8") + "&");
-            result.append(URLEncoder.encode("path","UTF-8") + "="
-                    + URLEncoder.encode(path, "UTF-8") + "&");
-            result.append(URLEncoder.encode("content_type","UTF-8") + "="
-                    + URLEncoder.encode(content_type, "UTF-8") + "&");
-            if(extra!=null)
-                result.append(URLEncoder.encode("extra","UTF-8") + "="
-                        + URLEncoder.encode(String.valueOf(extra), "UTF-8"));
-
-            return result.toString();
-        } catch (UnsupportedEncodingException e)
-        {
-            IO.log(TAG, IO.TAG_ERROR, e.getMessage());
-        }
-        return null;
+            switch (var.toLowerCase())
+            {
+                case "filename":
+                    return filename;
+                case "label":
+                    return label;
+                case "path":
+                    return path;
+                case "content_type":
+                    return content_type;
+                default:
+                    return null;
+            }
+        } else return val;
     }
 }
 

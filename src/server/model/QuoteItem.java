@@ -10,49 +10,16 @@ import java.net.URLEncoder;
 /**
  * Created by ghost on 2017/01/21.
  */
-public class QuoteItem implements BusinessObject, Serializable
+public class QuoteItem extends BusinessObject
 {
-    @Id
-    private String _id;
     private int item_number;
     private int quantity;
     private double unit_cost;
     private double markup;
     private String additional_costs;
-    private boolean marked;
     private String quote_id;
     private String resource_id;
-    private String extra;
     public static final String TAG = "QuoteItem";
-    
-    /**
-     * Function to get identifier of Quote object.
-     * @return Quote identifier.
-     */
-    @Override
-    public String get_id()
-    {
-        return _id;
-    }
-
-    /**
-     * Method to assign identifier to this object.
-     * @param _id identifier to be assigned to this object.
-     */
-    public void set_id(String _id)
-    {
-        this._id = _id;
-    }
-
-
-    @Override
-    public boolean isMarked()
-    {
-        return marked;
-    }
-
-    @Override
-    public void setMarked(boolean marked){this.marked=marked;}
 
     public int getItem_number()
     {
@@ -122,16 +89,6 @@ public class QuoteItem implements BusinessObject, Serializable
     public double getMarkup(){return this.markup;}
 
     public void setMarkup(double markup){this.markup=markup;}
-
-    public String getExtra()
-    {
-        return extra;
-    }
-
-    public void setExtra(String extra)
-    {
-        this.extra = extra;
-    }
 
     public double getRate()
     {
@@ -222,12 +179,13 @@ public class QuoteItem implements BusinessObject, Serializable
         }
 
         IO.log(getClass().getName(), IO.TAG_INFO,  "valid " + getClass().getName() + " object.");
-        return true;
+        return super.isValid();
     }
 
     @Override
     public void parse(String var, Object val)
     {
+        super.parse(var, val);
         try
         {
             switch (var.toLowerCase())
@@ -253,11 +211,8 @@ public class QuoteItem implements BusinessObject, Serializable
                 case "markup":
                     setMarkup(Double.parseDouble((String) val));
                     break;
-                case "extra":
-                    setExtra((String)val);
-                    break;
                 default:
-                    IO.log(getClass().getName(), IO.TAG_ERROR, "Unknown QuoteItem attribute '" + var + "'.");
+                    IO.log(getClass().getName(), IO.TAG_ERROR, "Unknown "+getClass().getName()+" attribute '" + var + "'.");
                     break;
             }
         }catch (NumberFormatException e)
@@ -285,45 +240,7 @@ public class QuoteItem implements BusinessObject, Serializable
                 return getUnitCost();
             case "markup":
                 return getMarkup();
-            case "extra":
-                return getExtra();
-            default:
-                IO.log(TAG, IO.TAG_ERROR, "Unknown "+getClass().getName()+" attribute '" + var + "'.");
-                return null;
         }
-    }
-
-    @Override
-    public String asJSON()
-    {
-        //Return encoded URL parameters in UTF-8 charset
-        StringBuilder result = new StringBuilder();
-        try
-        {
-            result.append(URLEncoder.encode("quote_id","UTF-8") + "="
-                    + URLEncoder.encode(quote_id, "UTF-8") + "&");
-            result.append(URLEncoder.encode("resource_id","UTF-8") + "="
-                    + URLEncoder.encode(resource_id, "UTF-8") + "&");
-            result.append(URLEncoder.encode("item_number","UTF-8") + "="
-                    + URLEncoder.encode(String.valueOf(item_number), "UTF-8") + "&");
-            if(additional_costs!=null)
-                result.append(URLEncoder.encode("additional_costs","UTF-8") + "="
-                        + URLEncoder.encode(additional_costs, "UTF-8") + "&");
-            result.append(URLEncoder.encode("quantity","UTF-8") + "="
-                    + URLEncoder.encode(String.valueOf(quantity), "UTF-8") + "&");
-            result.append(URLEncoder.encode("unit_cost","UTF-8") + "="
-                    + URLEncoder.encode(String.valueOf(unit_cost), "UTF-8") + "&");
-            result.append(URLEncoder.encode("markup","UTF-8") + "="
-                    + URLEncoder.encode(String.valueOf(markup), "UTF-8"));
-            if(extra!=null)
-                if(!extra.isEmpty())
-                    result.append("&" + URLEncoder.encode("extra","UTF-8") + "="
-                            + URLEncoder.encode(extra, "UTF-8"));
-            return result.toString();
-        } catch (UnsupportedEncodingException e)
-        {
-            IO.log(TAG, IO.TAG_ERROR, e.getMessage());
-        }
-        return null;
+        return super.get(var);
     }
 }

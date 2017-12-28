@@ -13,10 +13,8 @@ import java.net.URLEncoder;
 /**
  * Created by ghost on 2017/02/01.
  */
-public class Asset implements BusinessObject, Serializable
+public class Asset extends BusinessObject
 {
-    @Id
-    private String _id;
     private String asset_name;
     private String asset_description;
     private String asset_serial;
@@ -26,28 +24,6 @@ public class Asset implements BusinessObject, Serializable
     private long date_exhausted;
     private long quantity;
     private String unit;
-    private String other;
-    private boolean marked;
-
-    @Override
-    public String get_id()
-    {
-        return _id;
-    }
-
-    public void set_id(String _id)
-    {
-        this._id = _id;
-    }
-
-    @Override
-    public boolean isMarked()
-    {
-        return marked;
-    }
-
-    @Override
-    public void setMarked(boolean marked){this.marked=marked;}
 
     public String getAsset_name()
     {
@@ -139,16 +115,6 @@ public class Asset implements BusinessObject, Serializable
         this.unit = unit;
     }
 
-    public String getOther()
-    {
-        return other;
-    }
-
-    public void setOther(String other)
-    {
-        this.other = other;
-    }
-
     @Override
     public boolean isValid()
     {
@@ -195,6 +161,7 @@ public class Asset implements BusinessObject, Serializable
     @Override
     public void parse(String var, Object val)
     {
+        super.parse(var, val);
         switch (var.toLowerCase())
         {
             case "asset_name":
@@ -224,9 +191,6 @@ public class Asset implements BusinessObject, Serializable
             case "unit":
                 unit = (String)val;
                 break;
-            case "other":
-                other = (String)val;
-                break;
             default:
                 IO.log(getClass().getName(), "Unknown Asset attribute '" + var + "'.", IO.TAG_ERROR);
                 break;
@@ -236,75 +200,38 @@ public class Asset implements BusinessObject, Serializable
     @Override
     public Object get(String var)
     {
-        switch (var.toLowerCase())
+        Object val = super.get(var);
+        if(val==null)
         {
-            case "name":
-            case "asset_name":
-                return getAsset_name();
-            case "asset_type":
-                return asset_type;
-            case "description":
-            case "asset_description":
-                return getAsset_description();
-            case "asset_serial":
-                return asset_serial;
-            case "cost":
-            case "value":
-            case "asset_value":
-                return getAsset_value();
-            case "date_acquired":
-                return date_acquired;
-            case "date_exhausted":
-                return date_exhausted;
-            case "quantity":
-                return quantity;
-            case "unit":
-                return unit;
-            case "other":
-                return other;
-            default:
-                IO.log(getClass().getName(), "Unknown Asset attribute '" + var + "'.", IO.TAG_ERROR);
-                return null;
-        }
-    }
-
-    @Override
-    public String asJSON()
-    {
-        //Return encoded URL parameters in UTF-8 charset
-        StringBuilder result = new StringBuilder();
-        try
-        {
-            result.append("&" + URLEncoder.encode("asset_name","UTF-8") + "="
-                    + URLEncoder.encode(asset_name, "UTF-8"));
-            result.append("&" + URLEncoder.encode("asset_type","UTF-8") + "="
-                    + URLEncoder.encode(asset_type, "UTF-8"));
-            result.append("&" + URLEncoder.encode("asset_description","UTF-8") + "="
-                    + URLEncoder.encode(asset_description, "UTF-8"));
-            result.append("&" + URLEncoder.encode("asset_serial","UTF-8") + "="
-                    + URLEncoder.encode(String.valueOf(asset_serial), "UTF-8"));
-            result.append("&" + URLEncoder.encode("asset_value","UTF-8") + "="
-                    + URLEncoder.encode(String.valueOf(asset_value), "UTF-8"));
-            if(date_acquired>0)
-                result.append("&" + URLEncoder.encode("date_acquired","UTF-8") + "="
-                        + URLEncoder.encode(String.valueOf(date_acquired), "UTF-8"));
-            if(date_exhausted>0)
-                result.append("&" +  URLEncoder.encode("date_exhausted","UTF-8") + "="
-                        + URLEncoder.encode(String.valueOf(date_exhausted), "UTF-8"));
-            result.append("&" + URLEncoder.encode("quantity","UTF-8") + "="
-                    + URLEncoder.encode(String.valueOf(quantity), "UTF-8"));
-            result.append("&" + URLEncoder.encode("unit","UTF-8") + "="
-                    + URLEncoder.encode(String.valueOf(unit), "UTF-8"));
-            if(other!=null)
-                result.append("&" + URLEncoder.encode("other","UTF-8") + "="
-                        + URLEncoder.encode(other, "UTF-8"));
-
-            return result.toString();
-        } catch (UnsupportedEncodingException e)
-        {
-            IO.log(getClass().getName(), e.getMessage(), IO.TAG_ERROR);
-        }
-        return null;
+            switch (var.toLowerCase())
+            {
+                case "name":
+                case "asset_name":
+                    return getAsset_name();
+                case "asset_type":
+                    return asset_type;
+                case "description":
+                case "asset_description":
+                    return getAsset_description();
+                case "asset_serial":
+                    return asset_serial;
+                case "cost":
+                case "value":
+                case "asset_value":
+                    return getAsset_value();
+                case "date_acquired":
+                    return date_acquired;
+                case "date_exhausted":
+                    return date_exhausted;
+                case "quantity":
+                    return quantity;
+                case "unit":
+                    return unit;
+                default:
+                    IO.log(getClass().getName(), "Unknown "+getClass().getName()+" attribute '" + var + "'.", IO.TAG_ERROR);
+                    return null;
+            }
+        } else return val;
     }
 
     @Override

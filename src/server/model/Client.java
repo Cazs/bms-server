@@ -16,10 +16,8 @@ import java.net.URLEncoder;
  *
  * @author ghost
  */
-public class Client implements BusinessObject, Serializable
+public class Client extends BusinessObject
 {
-    @Id
-    private String _id;
     private String client_name;
     private String physical_address;
     private String postal_address;
@@ -32,29 +30,6 @@ public class Client implements BusinessObject, Serializable
     private long date_partnered;
     private String website;
     private boolean active;
-    private String other;
-    private Job[] jobs;
-    private boolean marked;
-
-    @Override
-    public String get_id()
-    {
-        return _id;
-    }
-
-    public void set_id(String _id)
-    {
-        this._id = _id;
-    }
-
-    @Override
-    public boolean isMarked()
-    {
-        return marked;
-    }
-
-    @Override
-    public void setMarked(boolean marked){this.marked=marked;}
 
     public String getClient_name()
     {
@@ -176,19 +151,10 @@ public class Client implements BusinessObject, Serializable
         this.account_name = account_name;
     }
 
-    public String getOther()
-    {
-        return other;
-    }
-
-    public void setOther(String other)
-    {
-        this.other = other;
-    }
-
     @Override
     public boolean isValid()
     {
+        super.isValid();
         if(getClient_name()==null)
         {
             IO.log(getClass().getName(), IO.TAG_ERROR, "invalid client_name value.");
@@ -247,6 +213,7 @@ public class Client implements BusinessObject, Serializable
     @Override
     public void parse(String var, Object val)
     {
+        super.parse(var, val);
         try
         {
             switch (var.toLowerCase())
@@ -303,84 +270,42 @@ public class Client implements BusinessObject, Serializable
     @Override
     public Object get(String var)
     {
-        switch (var.toLowerCase())
+        Object val = super.get(var);
+        if(val==null)
         {
-            case "client_name":
-                return getClient_name();
-            case "physical_address":
-                return getPhysical_address();
-            case "postal_address":
-                return getPostal_address();
-            case "tel":
-                return getTel();
-            case "fax":
-                return getFax();
-            case "contact_email":
-                return getContact_email();
-            case "registration_number":
-                return getRegistration_number();
-            case "vat_number":
-                return getVat_number();
-            case "account_name":
-                return getAccount_name();
-            case "date_partnered":
-                return getDate_partnered();
-            case "website":
-                return getWebsite();
-            case "active":
-                return isActive();
-            case "other":
-                return getOther();
-            default:
-                IO.log(getClass().getName(), IO.TAG_ERROR, "unknown Client attribute '" + var + "'.");
-                return null;
-        }
-    }
-
-    @Override
-    public String asJSON()
-    {
-        //Return encoded URL parameters in UTF-8 charset
-        StringBuilder result = new StringBuilder();
-        try
-        {
-            result.append(URLEncoder.encode("client_name","UTF-8") + "="
-                    + URLEncoder.encode(getClient_name(), "UTF-8"));
-            result.append("&" + URLEncoder.encode("physical_address","UTF-8") + "="
-                    + URLEncoder.encode(getPhysical_address(), "UTF-8"));
-            result.append("&" + URLEncoder.encode("postal_address","UTF-8") + "="
-                    + URLEncoder.encode(getPostal_address(), "UTF-8"));
-            result.append("&" + URLEncoder.encode("tel","UTF-8") + "="
-                    + URLEncoder.encode(getTel(), "UTF-8"));
-            if(getFax()!=null)
-                result.append("&" + URLEncoder.encode("fax","UTF-8") + "="
-                        + URLEncoder.encode(getFax(), "UTF-8"));
-            result.append("&" + URLEncoder.encode("contact_email","UTF-8") + "="
-                    + URLEncoder.encode(getContact_email(), "UTF-8"));
-            result.append("&" + URLEncoder.encode("registration_number","UTF-8") + "="
-                    + URLEncoder.encode(getRegistration_number(), "UTF-8"));
-            result.append("&" + URLEncoder.encode("vat_number","UTF-8") + "="
-                    + URLEncoder.encode(getVat_number(), "UTF-8"));
-            result.append("&" + URLEncoder.encode("account_name","UTF-8") + "="
-                    + URLEncoder.encode(String.valueOf(getAccount_name()), "UTF-8"));
-            if(getDate_partnered()>0)
-                result.append("&" + URLEncoder.encode("date_partnered","UTF-8") + "="
-                        + URLEncoder.encode(String.valueOf(getDate_partnered()), "UTF-8"));
-            if(getWebsite()!=null)
-                result.append("&" + URLEncoder.encode("website","UTF-8") + "="
-                        + URLEncoder.encode(getWebsite(), "UTF-8"));
-            result.append("&" + URLEncoder.encode("active","UTF-8") + "="
-                    + URLEncoder.encode(String.valueOf(isActive()), "UTF-8"));
-            if(other!=null)
-                result.append("&" + URLEncoder.encode("other","UTF-8") + "="
-                        + URLEncoder.encode(getOther(), "UTF-8"));
-
-            return result.toString();
-        } catch (UnsupportedEncodingException e)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, e.getMessage());
-        }
-        return null;
+            switch (var.toLowerCase())
+            {
+                case "client_name":
+                    return getClient_name();
+                case "physical_address":
+                    return getPhysical_address();
+                case "postal_address":
+                    return getPostal_address();
+                case "tel":
+                    return getTel();
+                case "fax":
+                    return getFax();
+                case "contact_email":
+                    return getContact_email();
+                case "registration_number":
+                    return getRegistration_number();
+                case "vat_number":
+                    return getVat_number();
+                case "account_name":
+                    return getAccount_name();
+                case "date_partnered":
+                    return getDate_partnered();
+                case "website":
+                    return getWebsite();
+                case "active":
+                    return isActive();
+                case "other":
+                    return getOther();
+                default:
+                    IO.log(getClass().getName(), IO.TAG_ERROR, "unknown "+getClass().getName()+" attribute '" + var + "'.");
+                    return null;
+            }
+        } else return val;
     }
 
     @Override
@@ -388,5 +313,4 @@ public class Client implements BusinessObject, Serializable
     {
         return client_name;
     }
-
 }

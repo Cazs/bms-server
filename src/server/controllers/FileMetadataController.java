@@ -55,7 +55,7 @@ public class FileMetadataController
         @PutMapping
         public ResponseEntity<Page<FileMetadata>> addFileMetadata(@RequestBody FileMetadata file_metadata, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
         {
-            IO.log(getClass().getName(), IO.TAG_INFO, "handling FileMetadata creation request: " + file_metadata.asJSON());
+            IO.log(getClass().getName(), IO.TAG_INFO, "handling FileMetadata creation request.");
             List<BusinessObject> contents = new LinkedList<>();
             contents.add(file_metadata);
             return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);

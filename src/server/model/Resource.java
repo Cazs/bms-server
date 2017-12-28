@@ -16,10 +16,8 @@ import java.net.URLEncoder;
  *
  * @author ghost
  */
-public class Resource implements BusinessObject, Serializable
+public class Resource extends BusinessObject
 {
-    @Id
-    private String _id;
     private String resource_name;
     private String resource_description;
     private String resource_serial;
@@ -29,29 +27,7 @@ public class Resource implements BusinessObject, Serializable
     private long date_acquired;
     private long date_exhausted;
     private String unit;
-    private String other;
-    private boolean marked;
     public static final String TAG = "Resource";
-
-    @Override
-    public String get_id()
-    {
-        return _id;
-    }
-
-    public void set_id(String _id)
-    {
-        this._id = _id;
-    }
-
-    @Override
-    public boolean isMarked()
-    {
-        return marked;
-    }
-
-    @Override
-    public void setMarked(boolean marked){this.marked=marked;}
 
     public String getResource_name()
     {
@@ -143,16 +119,6 @@ public class Resource implements BusinessObject, Serializable
         this.date_exhausted = date_exhausted;
     }
 
-    public String getOther()
-    {
-        return other;
-    }
-
-    public void setOther(String other)
-    {
-        this.other = other;
-    }
-
     @Override
     public boolean isValid()
     {
@@ -198,12 +164,13 @@ public class Resource implements BusinessObject, Serializable
         }
 
         IO.log(getClass().getName(), IO.TAG_INFO,  "valid " + getClass().getName() + " object.");
-        return true;
+        return super.isValid();
     }
 
     @Override
     public void parse(String var, Object val)
     {
+        super.parse(var, val);
         try
         {
             switch (var.toLowerCase())
@@ -235,14 +202,11 @@ public class Resource implements BusinessObject, Serializable
                 case "unit":
                     unit = String.valueOf(val);
                     break;
-                case "other":
-                    other = (String)val;
-                    break;
                 default:
                     IO.log(TAG, IO.TAG_ERROR,"Unknown "+TAG+" attribute '" + var + "'.");
                     break;
             }
-        }catch (NumberFormatException e)
+        } catch (NumberFormatException e)
         {
             IO.log(TAG, IO.TAG_ERROR, e.getMessage());
         }
@@ -274,52 +238,8 @@ public class Resource implements BusinessObject, Serializable
                 return quantity;
             case "unit":
                 return unit;
-            case "other":
-                return other;
-            default:
-                IO.log(TAG, IO.TAG_ERROR,"Unknown "+TAG+" attribute '" + var + "'.");
-                return null;
         }
-    }
-
-    @Override
-    public String asJSON()
-    {
-        //Return encoded URL parameters in UTF-8 charset
-        StringBuilder result = new StringBuilder();
-        try
-        {
-            result.append(URLEncoder.encode("resource_name","UTF-8") + "="
-                    + URLEncoder.encode(resource_name, "UTF-8"));
-            result.append("&" + URLEncoder.encode("resource_type","UTF-8") + "="
-                    + URLEncoder.encode(resource_type, "UTF-8"));
-            result.append("&" + URLEncoder.encode("resource_description","UTF-8") + "="
-                    + URLEncoder.encode(resource_description, "UTF-8"));
-            result.append("&" + URLEncoder.encode("resource_serial","UTF-8") + "="
-                    + URLEncoder.encode(resource_serial, "UTF-8"));
-            result.append("&" + URLEncoder.encode("resource_value","UTF-8") + "="
-                    + URLEncoder.encode(String.valueOf(resource_value), "UTF-8"));
-            if(date_acquired>0)
-                result.append("&" + URLEncoder.encode("date_acquired","UTF-8") + "="
-                        + URLEncoder.encode(String.valueOf(date_acquired), "UTF-8"));
-            if(date_exhausted>0)
-                result.append("&" + URLEncoder.encode("date_exhausted","UTF-8") + "="
-                        + URLEncoder.encode(String.valueOf(date_exhausted), "UTF-8"));
-            result.append("&" + URLEncoder.encode("unit","UTF-8") + "="
-                    + URLEncoder.encode(unit, "UTF-8"));
-            result.append("&" + URLEncoder.encode("quantity","UTF-8") + "="
-                    + URLEncoder.encode(String.valueOf(quantity), "UTF-8"));
-            if(other!=null)
-                if(!other.isEmpty())
-                    result.append("&" + URLEncoder.encode("other","UTF-8") + "="
-                            + URLEncoder.encode(other, "UTF-8"));
-
-            return result.toString();
-        } catch (UnsupportedEncodingException e)
-        {
-            IO.log(TAG, IO.TAG_ERROR, e.getMessage());
-        }
-        return null;
+        return super.get(var);
     }
 
     @Override

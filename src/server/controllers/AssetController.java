@@ -16,9 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import server.auxilary.IO;
 import server.model.Asset;
 import server.model.BusinessObject;
-import server.model.Resource;
 import server.repositories.AssetRepository;
-import server.repositories.ResourceRepository;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -57,7 +55,7 @@ public class AssetController
         @PutMapping
         public ResponseEntity<Page<Asset>> addAsset(@RequestBody Asset asset, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
         {
-            IO.log(getClass().getName(), IO.TAG_INFO, "handling Asset creation request: " + asset.asJSON());
+            IO.log(getClass().getName(), IO.TAG_INFO, "handling Asset creation request.");
             List<BusinessObject> contents = new LinkedList<>();
             contents.add(asset);
             return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);

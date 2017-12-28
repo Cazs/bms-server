@@ -55,7 +55,7 @@ public class OvertimeController
         @PutMapping
         public ResponseEntity<Page<Overtime>> addOvertime(@RequestBody Overtime overtime, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
         {
-            IO.log(getClass().getName(), IO.TAG_INFO, "handling Overtime creation request: " + overtime.asJSON());
+            IO.log(getClass().getName(), IO.TAG_INFO, "handling Overtime creation request.");
             List<BusinessObject> contents = new LinkedList<>();
             contents.add(overtime);
             return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);

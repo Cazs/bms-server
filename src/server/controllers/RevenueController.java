@@ -55,7 +55,7 @@ public class RevenueController
         @PutMapping
         public ResponseEntity<Page<Revenue>> addRevenue(@RequestBody Revenue revenue, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
         {
-            IO.log(getClass().getName(), IO.TAG_INFO, "handling Revenue creation request: " + revenue.asJSON());
+            IO.log(getClass().getName(), IO.TAG_INFO, "handling Revenue creation request.");
             List<BusinessObject> contents = new LinkedList<>();
             contents.add(revenue);
             return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);

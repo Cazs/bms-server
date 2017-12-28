@@ -10,10 +10,8 @@ import java.net.URLEncoder;
 /**
  * Created by ghost on 2017/01/21.
  */
-public class Quote implements BusinessObject, Serializable
+public class Quote extends BusinessObject
 {
-    @Id
-    private String _id;
     private String client_id;
     private String contact_person_id;
     private String parent_id;
@@ -21,45 +19,12 @@ public class Quote implements BusinessObject, Serializable
     private String request;
     private double vat;
     private String account_name;
-    private long date_generated;
-    private String creator;
     private double revision;
-    private String extra;
     private int status;
-    private boolean marked;
     public static final String TAG = "Quote";
     public static final int STATUS_PENDING =0;
     public static final int STATUS_APPROVED =1;
     public static final int STATUS_ARCHIVED =2;
-
-    /**
-     * Function to get identifier of Quote object.
-     * @return Quote identifier.
-     */
-    @Override
-    public String get_id()
-    {
-        return _id;
-    }
-
-    /**
-     * Method to assign identifier to this object.
-     * @param _id identifier to be assigned to this object.
-     */
-    public void set_id(String _id)
-    {
-        this._id = _id;
-    }
-
-
-    @Override
-    public boolean isMarked()
-    {
-        return marked;
-    }
-
-    @Override
-    public void setMarked(boolean marked){this.marked=marked;}
 
     public String getClient_id()
     {
@@ -101,16 +66,6 @@ public class Quote implements BusinessObject, Serializable
         this.request = request;
     }
 
-    public long getDate_generated()
-    {
-        return date_generated;
-    }
-
-    public void setDate_generated(long date_generated)
-    {
-        this.date_generated = date_generated;
-    }
-
     public int getStatus()
     {
         return status;
@@ -141,16 +96,6 @@ public class Quote implements BusinessObject, Serializable
         this.account_name = account_name;
     }
 
-    public String getCreator()
-    {
-        return this.creator;
-    }
-
-    public void setCreator(String creator)
-    {
-        this.creator = creator;
-    }
-
     public String getParent_id(){return this.parent_id;}
 
     public void setParent_id(String parent_id)
@@ -166,16 +111,6 @@ public class Quote implements BusinessObject, Serializable
     public void setRevision(double revision)
     {
         this.revision = revision;
-    }
-
-    public String getExtra()
-    {
-        return extra;
-    }
-
-    public void setExtra(String extra)
-    {
-        this.extra = extra;
     }
 
     @Override
@@ -216,11 +151,6 @@ public class Quote implements BusinessObject, Serializable
             IO.log(getClass().getName(), IO.TAG_ERROR, "invalid account_name value.");
             return false;
         }
-        if(getDate_generated()<=0)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid date_generated value.");
-            return false;
-        }
         if(getVat()<0)
         {
             IO.log(getClass().getName(), IO.TAG_ERROR, "invalid VAT value.");
@@ -238,62 +168,19 @@ public class Quote implements BusinessObject, Serializable
         }
 
         IO.log(getClass().getName(), IO.TAG_INFO,  "valid " + getClass().getName() + " object.");
-        return true;
-    }
-
-    @Override
-    public String asJSON()
-    {
-        //Return encoded URL parameters in UTF-8 charset
-        StringBuilder result = new StringBuilder();
-        try
-        {
-            result.append(URLEncoder.encode("client_id","UTF-8") + "="
-                    + URLEncoder.encode(client_id, "UTF-8") + "&");
-            result.append(URLEncoder.encode("contact_person_id","UTF-8") + "="
-                    + URLEncoder.encode(contact_person_id, "UTF-8") + "&");
-            if(date_generated>0)
-                result.append(URLEncoder.encode("date_generated","UTF-8") + "="
-                        + URLEncoder.encode(String.valueOf(date_generated), "UTF-8"));
-            result.append("&" + URLEncoder.encode("sitename","UTF-8") + "="
-                    + URLEncoder.encode(sitename, "UTF-8"));
-            result.append("&" + URLEncoder.encode("request","UTF-8") + "="
-                    + URLEncoder.encode(request, "UTF-8"));
-            if(status>0)
-                result.append("&" + URLEncoder.encode("status","UTF-8") + "="
-                        + URLEncoder.encode(String.valueOf(status), "UTF-8"));
-            result.append("&" + URLEncoder.encode("vat","UTF-8") + "="
-                    + URLEncoder.encode(String.valueOf(vat), "UTF-8"));
-            result.append("&" + URLEncoder.encode("account_name","UTF-8") + "="
-                    + URLEncoder.encode(account_name, "UTF-8"));
-            result.append("&" + URLEncoder.encode("creator","UTF-8") + "="
-                    + URLEncoder.encode(creator, "UTF-8"));
-            if(parent_id !=null)
-                result.append("&" + URLEncoder.encode("parent_id","UTF-8") + "="
-                        + URLEncoder.encode(parent_id, "UTF-8"));
-            result.append("&" + URLEncoder.encode("revision","UTF-8") + "="
-                    + URLEncoder.encode(String.valueOf(revision), "UTF-8"));
-            if(extra!=null)
-                if(!extra.isEmpty())
-                    result.append("&" + URLEncoder.encode("extra","UTF-8") + "="
-                            + URLEncoder.encode(extra, "UTF-8"));
-            return result.toString();
-        } catch (UnsupportedEncodingException e)
-        {
-            IO.log(TAG, IO.TAG_ERROR, e.getMessage());
-        }
-        return null;
+        return super.isValid();
     }
 
     @Override
     public String toString()
     {
-        return this._id;
+        return get_id();
     }
 
     @Override
     public void parse(String var, Object val)
     {
+        super.parse(var, val);
         try
         {
             switch (var.toLowerCase())
@@ -310,14 +197,8 @@ public class Quote implements BusinessObject, Serializable
                 case "request":
                     request = String.valueOf(val);
                     break;
-                case "date_generated":
-                    date_generated = Long.parseLong(String.valueOf(val));
-                    break;
                 case "status":
                     status = Integer.parseInt(String.valueOf(val));
-                    break;
-                case "creator":
-                    creator = String.valueOf(val);
                     break;
                 case "parent_id":
                     parent_id = String.valueOf(val);
@@ -331,14 +212,11 @@ public class Quote implements BusinessObject, Serializable
                 case "account_name":
                     account_name = String.valueOf(val);
                     break;
-                case "extra":
-                    extra = String.valueOf(val);
-                    break;
                 default:
-                    IO.log(getClass().getName(), IO.TAG_ERROR, "Unknown Quote attribute '" + var + "'.");
+                    IO.log(getClass().getName(), IO.TAG_ERROR, "Unknown "+getClass().getName()+" attribute '" + var + "'.");
                     break;
             }
-        }catch (NumberFormatException e)
+        } catch (NumberFormatException e)
         {
             IO.log(getClass().getName(), IO.TAG_ERROR, e.getMessage());
         }
@@ -349,8 +227,6 @@ public class Quote implements BusinessObject, Serializable
     {
         switch (var.toLowerCase())
         {
-            case "_id":
-                return _id;
             case "client_id":
                 return client_id;
             case "contact_person_id":
@@ -361,8 +237,6 @@ public class Quote implements BusinessObject, Serializable
                 return request;
             case "status":
                 return status;
-            case "creator":
-                return creator;
             case "parent_id":
                 return parent_id;
             case "vat":
@@ -371,11 +245,7 @@ public class Quote implements BusinessObject, Serializable
                 return account_name;
             case "revision":
                 return revision;
-            case "extra":
-                return extra;
-            default:
-                IO.log(getClass().getName(), IO.TAG_ERROR, "Unknown Quote attribute '" + var + "'.");
-                return null;
         }
+        return super.get(var);
     }
 }

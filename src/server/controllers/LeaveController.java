@@ -55,7 +55,7 @@ public class LeaveController
         @PutMapping
         public ResponseEntity<Page<Leave>> addLeave(@RequestBody Leave leave, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
         {
-            IO.log(getClass().getName(), IO.TAG_INFO, "handling Leave creation request: " + leave.asJSON());
+            IO.log(getClass().getName(), IO.TAG_INFO, "handling Leave creation request.");
             List<BusinessObject> contents = new LinkedList<>();
             contents.add(leave);
             return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
