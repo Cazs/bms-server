@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import server.auxilary.IO;
+import server.model.Asset;
 import server.model.AssetType;
 import server.model.BusinessObject;
 import server.repositories.AssetTypeRepository;
@@ -25,39 +26,44 @@ import java.util.List;
 @RequestMapping("/assets/types")
 public class AssetTypeController
 {
-        private PagedResourcesAssembler<AssetType> pagedAssembler;
-        @Autowired
-        private AssetTypeRepository asset_typeRepository;
+    private PagedResourcesAssembler<AssetType> pagedAssembler;
+    @Autowired
+    private AssetTypeRepository asset_typeRepository;
 
-        @Autowired
-        public AssetTypeController(PagedResourcesAssembler<AssetType> pagedAssembler)
-        {
-            this.pagedAssembler = pagedAssembler;
-        }
+    @Autowired
+    public AssetTypeController(PagedResourcesAssembler<AssetType> pagedAssembler)
+    {
+        this.pagedAssembler = pagedAssembler;
+    }
 
-        @GetMapping(path="/{id}", produces = "application/hal+json")
-        public ResponseEntity<Page<AssetType>> getAssetType(@PathVariable("id") String id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
-        {
-            IO.log(getClass().getName(), IO.TAG_INFO, "handling AssetType GET request id: "+ id);
-            List<AssetType> contents = IO.getInstance().mongoOperations().find(new Query(Criteria.where("_id").is(id)), AssetType.class, "asset_types");
-            return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
-        }
+    @GetMapping(path="/{id}", produces = "application/hal+json")
+    public ResponseEntity<Page<AssetType>> getAssetType(@PathVariable("id") String id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    {
+        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling AssetType GET request id: "+ id);
+        List<AssetType> contents = IO.getInstance().mongoOperations().find(new Query(Criteria.where("_id").is(id)), AssetType.class, "asset_types");
+        return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
+    }
 
-        @GetMapping
-        public ResponseEntity<Page<AssetType>> getAssetTypes(Pageable pageRequest, PersistentEntityResourceAssembler assembler)
-        {
-            IO.log(getClass().getName(), IO.TAG_INFO, "handling AssetType GET request {all}");
-            List<AssetType> contents =  IO.getInstance().mongoOperations().findAll(AssetType.class, "asset_types");
-            return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
-        }
+    @GetMapping
+    public ResponseEntity<Page<AssetType>> getAssetTypes(Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    {
+        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling AssetType GET request {all}");
+        List<AssetType> contents =  IO.getInstance().mongoOperations().findAll(AssetType.class, "asset_types");
+        return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
+    }
 
-        @PostMapping
-        @PutMapping
-        public ResponseEntity<Page<AssetType>> addAssetType(@RequestBody AssetType asset_type, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
-        {
-            IO.log(getClass().getName(), IO.TAG_INFO, "handling AssetType creation request.");
-            List<BusinessObject> contents = new LinkedList<>();
-            contents.add(asset_type);
-            return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
-        }
+    @PutMapping
+    public ResponseEntity<String> addAssetType(@RequestBody AssetType asset_type)
+    {
+        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling AssetType creation request.");
+        //HttpHeaders headers = new HttpHeaders();
+        return APIController.putBusinessObject(asset_type, "asset_types", "assets_timestamp");
+    }
+
+    @PostMapping
+    public ResponseEntity<String> patchAssetType(@RequestBody AssetType asset_type)
+    {
+        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling AssetType update request.");
+        return APIController.patchBusinessObject(asset_type, "asset_types", "assets_timestamp");
+    }
 }

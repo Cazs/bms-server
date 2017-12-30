@@ -120,50 +120,25 @@ public class Resource extends BusinessObject
     }
 
     @Override
-    public boolean isValid()
+    public String[] isValid()
     {
         if(getResource_name()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid resource_name value.");
-            return false;
-        }
+            return new String[]{"false", "invalid resource_name value."};
         if(getResource_description()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid resource_description value.");
-            return false;
-        }
+            return new String[]{"false", "invalid resource_description value."};
         if(getResource_value()<=0)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid resource_value value.");
-            return false;
-        }
+            return new String[]{"false", "invalid resource_value value."};
         if(getUnit()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid unit value.");
-            return false;
-        }
+            return new String[]{"false", "invalid unit value."};
         if(getQuantity()<=0)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid quantity value.");
-            return false;
-        }
+            return new String[]{"false", "invalid quantity value."};
         if(getDate_acquired()<=0)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid date_acquired value.");
-            return false;
-        }
+            return new String[]{"false", "invalid date_acquired value."};
         if(getResource_serial()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid resource_serial value.");
-            return false;
-        }
+            return new String[]{"false", "invalid resource_serial value."};
         if(getResource_type()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid resource_type value.");
-            return false;
-        }
+            return new String[]{"false", "invalid resource_type value."};
 
-        IO.log(getClass().getName(), IO.TAG_INFO,  "valid " + getClass().getName() + " object.");
         return super.isValid();
     }
 

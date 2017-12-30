@@ -62,37 +62,18 @@ public class FileMetadata extends BusinessObject
     }
 
     @Override
-    public boolean isValid()
+    public String[] isValid()
     {
-        super.isValid();
         if(getFilename()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid filename value.");
-            return false;
-        }
+            return new String[]{"false", "invalid filename value."};
         if(getLabel()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid label value.");
-            return false;
-        }
+            return new String[]{"false", "invalid label value."};
         if(get_path()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid creator value.");
-            return false;
-        }
+            return new String[]{"false", "invalid path value."};
         if(getContent_type()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid content_type value.");
-            return false;
-        }
-        if(getDate_logged()<=0)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid date_logged value.");
-            return false;
-        }
+            return new String[]{"false", "invalid content_type value."};
 
-        IO.log(getClass().getName(), IO.TAG_INFO,  "valid " + getClass().getName() + " object.");
-        return true;
+        return super.isValid();
     }
 
     @Override

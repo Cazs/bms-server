@@ -123,29 +123,12 @@ public class Job extends BusinessObject
 
     @Override
     @RestResource(exported = false)
-    public boolean isValid()
+    public String[] isValid()
     {
-        super.isValid();
         if(getJob_number()<0)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid job_number value.");
-            return false;
-        }
+            return new String[]{"false", "invalid job_number value."};
         if(getQuote_id()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid quote_id value.");
-            return false;
-        }
-        if(getCreator()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid creator value.");
-            return false;
-        }
-        if(getDate_logged()<=0)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid date_logged value.");
-            return false;
-        }
+            return new String[]{"false", "invalid quote_id value."};
         /*
         if(getInvoice_id()==null)
         {
@@ -172,9 +155,7 @@ public class Job extends BusinessObject
             IO.log(getClass().getName(), IO.TAG_ERROR, "invalid date_completed value.");
             return false;
         }*/
-
-        IO.log(getClass().getName(), IO.TAG_INFO,  "valid " + getClass().getName() + " object.");
-        return true;
+        return super.isValid();
     }
 
     @Override
@@ -233,7 +214,7 @@ public class Job extends BusinessObject
     }
 
     @Override
-    public Object get(String var)
+    public Object get(String var)//
     {
         switch (var.toLowerCase())
         {
@@ -257,5 +238,31 @@ public class Job extends BusinessObject
                 return getInvoice_id();
         }
         return super.get(var);
+    }
+
+    @Override
+    public String toString()
+    {
+        String json_obj = "{\"_id\":\""+get_id()+"\"";
+        json_obj+=",\"quote_id\":\""+quote_id+"\""
+                +",\"signed\":\""+signed+"\""
+                +",\"creator\":\""+getCreator()+"\""
+                +",\"date_logged\":\""+getDate_logged()+"\"";
+        if(signed_job!=null)
+            json_obj+=",\"signed_job\":\""+signed_job+"\"";
+        if(date_assigned>0)
+            json_obj+=",\"date_assigned\":\""+date_assigned+"\"";
+        if(planned_start_date>0)
+            json_obj+=",\"planned_start_date\":\""+planned_start_date+"\"";
+        if(date_started>0)
+            json_obj+=",\"date_started\":\""+date_started+"\"";
+        if(date_completed>0)
+            json_obj+=",\"date_completed\":\""+date_completed+"\"";
+        if(invoice_id!=null)
+            json_obj+=",\"invoice_id\":\""+invoice_id+"\"";
+        json_obj+="}";
+
+        IO.log(getClass().getName(),IO.TAG_INFO, json_obj);
+        return json_obj;
     }
 }

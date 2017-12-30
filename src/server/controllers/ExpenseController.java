@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import server.auxilary.IO;
+import server.model.Employee;
 import server.model.Expense;
 import server.model.BusinessObject;
 import server.repositories.ExpenseRepository;
@@ -38,7 +39,7 @@ public class ExpenseController
         @GetMapping(path="/{id}", produces = "application/hal+json")
         public ResponseEntity<Page<Expense>> getExpense(@PathVariable("id") String id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
         {
-            IO.log(getClass().getName(), IO.TAG_INFO, "handling Expense GET request id: "+ id);
+            IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Expense GET request id: "+ id);
             List<Expense> contents = IO.getInstance().mongoOperations().find(new Query(Criteria.where("_id").is(id)), Expense.class, "expenses");
             return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
         }
@@ -46,18 +47,23 @@ public class ExpenseController
         @GetMapping
         public ResponseEntity<Page<Expense>> getExpenses(Pageable pageRequest, PersistentEntityResourceAssembler assembler)
         {
-            IO.log(getClass().getName(), IO.TAG_INFO, "handling Expense GET request {all}");
+            IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Expense GET request {all}");
             List<Expense> contents =  IO.getInstance().mongoOperations().findAll(Expense.class, "expenses");
             return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
         }
 
-        @PostMapping
         @PutMapping
-        public ResponseEntity<Page<Expense>> addExpense(@RequestBody Expense expense, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+        public ResponseEntity<String> addExpense(@RequestBody Expense expense)
         {
-            IO.log(getClass().getName(), IO.TAG_INFO, "handling Expense creation request.");
-            List<BusinessObject> contents = new LinkedList<>();
-            contents.add(expense);
-            return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
+            IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Expense creation request.");
+            //HttpHeaders headers = new HttpHeaders();
+            return APIController.putBusinessObject(expense, "expenses", "expenses_timestamp");
+        }
+
+        @PostMapping
+        public ResponseEntity<String> patchExpense(@RequestBody Expense expense)
+        {
+            IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Expense update request.");
+            return APIController.patchBusinessObject(expense, "expenses", "expenses_timestamp");
         }
 }

@@ -39,20 +39,13 @@ public class QuoteRep extends BusinessObject
     }
 
     @Override
-    public boolean isValid()
+    public String[] isValid()
     {
         if(getUsr()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid usr value.");
-            return false;
-        }
+            return new String[]{"false", "invalid usr value."};
         if(getQuote_id()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid quote_id value.");
-            return false;
-        }
+            return new String[]{"false", "invalid quote_id value."};
 
-        IO.log(getClass().getName(), IO.TAG_INFO,  "valid " + getClass().getName() + " object.");
         return super.isValid();
     }
 
@@ -70,7 +63,7 @@ public class QuoteRep extends BusinessObject
                     usr = String.valueOf(val);
                     break;
                 default:
-                    System.err.println("Unknown "+getClass().getName()+" attribute '" + var + "'.");
+                    IO.log(getClass().getName(), IO.TAG_ERROR, "Unknown "+getClass().getName()+" attribute '" + var + "'.");
                     break;
             }
         } catch (NumberFormatException e)

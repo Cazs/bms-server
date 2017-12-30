@@ -15,7 +15,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import server.auxilary.IO;
 import server.model.BusinessObject;
+import server.model.Leave;
 import server.model.Overtime;
+import server.model.PurchaseOrder;
 import server.repositories.OvertimeRepository;
 
 import java.util.LinkedList;
@@ -25,39 +27,43 @@ import java.util.List;
 @RequestMapping("/overtime_records")
 public class OvertimeController
 {
-        private PagedResourcesAssembler<Overtime> pagedAssembler;
-        @Autowired
-        private OvertimeRepository overtimeRepository;
+    private PagedResourcesAssembler<Overtime> pagedAssembler;
+    @Autowired
+    private OvertimeRepository overtimeRepository;
 
-        @Autowired
-        public OvertimeController(PagedResourcesAssembler<Overtime> pagedAssembler)
-        {
-            this.pagedAssembler = pagedAssembler;
-        }
+    @Autowired
+    public OvertimeController(PagedResourcesAssembler<Overtime> pagedAssembler)
+    {
+        this.pagedAssembler = pagedAssembler;
+    }
 
-        @GetMapping(path="/{id}", produces = "application/hal+json")
-        public ResponseEntity<Page<Overtime>> getOvertime(@PathVariable("id") String id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
-        {
-            IO.log(getClass().getName(), IO.TAG_INFO, "handling Overtime GET request id: "+ id);
-            List<Overtime> contents = IO.getInstance().mongoOperations().find(new Query(Criteria.where("_id").is(id)), Overtime.class, "overtime_applications");
-            return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
-        }
+    @GetMapping(path="/{id}", produces = "application/hal+json")
+    public ResponseEntity<Page<Overtime>> getOvertime(@PathVariable("id") String id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    {
+        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Overtime GET request id: "+ id);
+        List<Overtime> contents = IO.getInstance().mongoOperations().find(new Query(Criteria.where("_id").is(id)), Overtime.class, "overtime_applications");
+        return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
+    }
 
-        @GetMapping
-        public ResponseEntity<Page<Overtime>> getOvertimes(Pageable pageRequest, PersistentEntityResourceAssembler assembler)
-        {
-            IO.log(getClass().getName(), IO.TAG_INFO, "handling Overtime GET request {all}");
-            List<Overtime> contents =  IO.getInstance().mongoOperations().findAll(Overtime.class, "overtime_applications");
-            return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
-        }
+    @GetMapping
+    public ResponseEntity<Page<Overtime>> getOvertimeRecords(Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    {
+        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Overtime GET request {all}");
+        List<Overtime> contents =  IO.getInstance().mongoOperations().findAll(Overtime.class, "overtime_applications");
+        return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
+    }
 
-        @PostMapping
-        @PutMapping
-        public ResponseEntity<Page<Overtime>> addOvertime(@RequestBody Overtime overtime, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
-        {
-            IO.log(getClass().getName(), IO.TAG_INFO, "handling Overtime creation request.");
-            List<BusinessObject> contents = new LinkedList<>();
-            contents.add(overtime);
-            return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
-        }
+    @PutMapping
+    public ResponseEntity<String> addOvertimeRecords(@RequestBody Overtime overtime)
+    {
+        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Overtime record creation request");
+        return APIController.putBusinessObject(overtime, "overtime_records", "overtime_records_timestamp");
+    }
+
+    @PostMapping
+    public ResponseEntity<String> patchOvertime(@RequestBody Overtime overtime)
+    {
+        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Overtime record update request.");
+        return APIController.patchBusinessObject(overtime, "overtime_records", "overtime_records_timestamp");
+    }
 }

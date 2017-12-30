@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import server.auxilary.IO;
 import server.model.BusinessObject;
 import server.model.Leave;
+import server.model.PurchaseOrder;
 import server.repositories.LeaveRepository;
 
 import java.util.LinkedList;
@@ -25,39 +26,43 @@ import java.util.List;
 @RequestMapping("/leave_records")
 public class LeaveController
 {
-        private PagedResourcesAssembler<Leave> pagedAssembler;
-        @Autowired
-        private LeaveRepository leaveRepository;
+    private PagedResourcesAssembler<Leave> pagedAssembler;
+    @Autowired
+    private LeaveRepository leaveRepository;
 
-        @Autowired
-        public LeaveController(PagedResourcesAssembler<Leave> pagedAssembler)
-        {
-            this.pagedAssembler = pagedAssembler;
-        }
+    @Autowired
+    public LeaveController(PagedResourcesAssembler<Leave> pagedAssembler)
+    {
+        this.pagedAssembler = pagedAssembler;
+    }
 
-        @GetMapping(path="/{id}", produces = "application/hal+json")
-        public ResponseEntity<Page<Leave>> getLeave(@PathVariable("id") String id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
-        {
-            IO.log(getClass().getName(), IO.TAG_INFO, "handling Leave GET request id: "+ id);
-            List<Leave> contents = IO.getInstance().mongoOperations().find(new Query(Criteria.where("_id").is(id)), Leave.class, "leave_applications");
-            return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
-        }
+    @GetMapping(path="/{id}", produces = "application/hal+json")
+    public ResponseEntity<Page<Leave>> getLeave(@PathVariable("id") String id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    {
+        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Leave GET request id: "+ id);
+        List<Leave> contents = IO.getInstance().mongoOperations().find(new Query(Criteria.where("_id").is(id)), Leave.class, "leave_applications");
+        return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
+    }
 
-        @GetMapping
-        public ResponseEntity<Page<Leave>> getLeaves(Pageable pageRequest, PersistentEntityResourceAssembler assembler)
-        {
-            IO.log(getClass().getName(), IO.TAG_INFO, "handling Leave GET request {all}");
-            List<Leave> contents =  IO.getInstance().mongoOperations().findAll(Leave.class, "leave_applications");
-            return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
-        }
+    @GetMapping
+    public ResponseEntity<Page<Leave>> getLeaveRecords(Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    {
+        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Leave GET request {all}");
+        List<Leave> contents =  IO.getInstance().mongoOperations().findAll(Leave.class, "leave_applications");
+        return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
+    }
 
-        @PostMapping
-        @PutMapping
-        public ResponseEntity<Page<Leave>> addLeave(@RequestBody Leave leave, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
-        {
-            IO.log(getClass().getName(), IO.TAG_INFO, "handling Leave creation request.");
-            List<BusinessObject> contents = new LinkedList<>();
-            contents.add(leave);
-            return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
-        }
+    @PutMapping
+    public ResponseEntity<String> addLeaveRecord(@RequestBody Leave leave)
+    {
+        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Leave record creation request");
+        return APIController.putBusinessObject(leave, "leave_records", "leave_records_timestamp");
+    }
+
+    @PostMapping
+    public ResponseEntity<String> patchLeaveRecord(@RequestBody Leave leave)
+    {
+        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Leave record update request.");
+        return APIController.patchBusinessObject(leave, "leave_records", "leave_records_timestamp");
+    }
 }

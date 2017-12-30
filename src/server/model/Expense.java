@@ -73,47 +73,20 @@ public class Expense extends BusinessObject
     }
 
     @Override
-    public boolean isValid()
+    public String[] isValid()
     {
-        super.isValid();
         if(getExpense_title()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid title value.");
-            return false;
-        }
+            return new String[]{"false", "invalid title value."};
         if(getExpense_description()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid expense_description value.");
-            return false;
-        }
-        if(getCreator()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid creator value.");
-            return false;
-        }
+            return new String[]{"false", "invalid expense_description value."};
         if(getExpense_value()<=0)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid expense_value value.");
-            return false;
-        }
+            return new String[]{"false", "invalid expense_value value."};
         if(getAccount()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid account value.");
-            return false;
-        }
+            return new String[]{"false", "invalid account value."};
         if(getSupplier()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid supplier value.");
-            return false;
-        }
-        if(getDate_logged()<=0)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid date_logged value.");
-            return false;
-        }
+            return new String[]{"false", "invalid supplier value."};
 
-        IO.log(getClass().getName(), IO.TAG_INFO,  "valid " + getClass().getName() + " object.");
-        return true;
+        return super.isValid();
     }
 
     @Override

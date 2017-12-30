@@ -14,10 +14,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import server.auxilary.IO;
+import server.auxilary.RemoteComms;
+import server.exceptions.InvalidBusinessObjectException;
 import server.model.BusinessObject;
 import server.model.Invoice;
+import server.model.Leave;
 import server.repositories.InvoiceRepository;
 
+import java.rmi.Remote;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -25,39 +29,43 @@ import java.util.List;
 @RequestMapping("/invoices")
 public class InvoiceController
 {
-        private PagedResourcesAssembler<Invoice> pagedAssembler;
-        @Autowired
-        private InvoiceRepository invoiceRepository;
+    private PagedResourcesAssembler<Invoice> pagedAssembler;
+    @Autowired
+    private InvoiceRepository invoiceRepository;
 
-        @Autowired
-        public InvoiceController(PagedResourcesAssembler<Invoice> pagedAssembler)
-        {
-            this.pagedAssembler = pagedAssembler;
-        }
+    @Autowired
+    public InvoiceController(PagedResourcesAssembler<Invoice> pagedAssembler)
+    {
+        this.pagedAssembler = pagedAssembler;
+    }
 
-        @GetMapping(path="/{id}", produces = "application/hal+json")
-        public ResponseEntity<Page<Invoice>> getInvoice(@PathVariable("id") String id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
-        {
-            IO.log(getClass().getName(), IO.TAG_INFO, "handling Invoice GET request id: "+ id);
-            List<Invoice> contents = IO.getInstance().mongoOperations().find(new Query(Criteria.where("_id").is(id)), Invoice.class, "invoices");
-            return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
-        }
+    @GetMapping(path="/{id}", produces = "application/hal+json")
+    public ResponseEntity<Page<Invoice>> getInvoice(@PathVariable("id") String id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    {
+        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Invoice GET request id: "+ id);
+        List<Invoice> contents = IO.getInstance().mongoOperations().find(new Query(Criteria.where("_id").is(id)), Invoice.class, "invoices");
+        return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
+    }
 
-        @GetMapping
-        public ResponseEntity<Page<Invoice>> getInvoices(Pageable pageRequest, PersistentEntityResourceAssembler assembler)
-        {
-            IO.log(getClass().getName(), IO.TAG_INFO, "handling Invoice GET request {all}");
-            List<Invoice> contents =  IO.getInstance().mongoOperations().findAll(Invoice.class, "invoices");
-            return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
-        }
+    @GetMapping
+    public ResponseEntity<Page<Invoice>> getInvoices(Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    {
+        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Invoice GET request {all}");
+        List<Invoice> contents =  IO.getInstance().mongoOperations().findAll(Invoice.class, "invoices");
+        return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
+    }
 
-        @PostMapping
-        @PutMapping
-        public ResponseEntity<Page<Invoice>> addInvoice(@RequestBody Invoice invoice, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
-        {
-            IO.log(getClass().getName(), IO.TAG_INFO, "handling Invoice creation request.");
-            List<BusinessObject> contents = new LinkedList<>();
-            contents.add(invoice);
-            return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
-        }
+    @PutMapping
+    public ResponseEntity<String> addInvoice(@RequestBody Invoice invoice)
+    {
+        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Invoice creation request");
+        return APIController.putBusinessObject(invoice, "invoices", "invoices_timestamp");
+    }
+
+    @PostMapping
+    public ResponseEntity<String> patchInvoice(@RequestBody Invoice invoice)
+    {
+        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Invoice update request.");
+        return APIController.patchBusinessObject(invoice, "invoices", "invoices_timestamp");
+    }
 }

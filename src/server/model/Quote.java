@@ -114,67 +114,33 @@ public class Quote extends BusinessObject
     }
 
     @Override
-    public boolean isValid()
+    public String[] isValid()
     {
         if(getClient_id()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid client_id value.");
-            return false;
-        }
+            return new String[]{"false", "invalid client_id value."};
         /*if(getParent_id()==null)
         {
             IO.log(getClass().getName(), IO.TAG_ERROR, "invalid parent_id value.");
             return false;
         }*/
         if(getRequest()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid request value.");
-            return false;
-        }
+            return new String[]{"false", "invalid request value."};
         if(getSitename()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid sitename value.");
-            return false;
-        }
+            return new String[]{"false", "invalid sitename value."};
         if(getContact_person_id()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid contact_person_id value.");
-            return false;
-        }
+            return new String[]{"false", "invalid contact_person_id value."};
         if(getCreator()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid creator value.");
-            return false;
-        }
+            return new String[]{"false", "invalid creator value."};
         if(getAccount_name()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid account_name value.");
-            return false;
-        }
+            return new String[]{"false", "invalid account_name value."};
         if(getVat()<0)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid VAT value.");
-            return false;
-        }
+            return new String[]{"false", "invalid VAT value."};
         if(getStatus()<0)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid status value.");
-            return false;
-        }
+            return new String[]{"false", "invalid status value."};
         if(getRevision()<0)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid revision value.");
-            return false;
-        }
+            return new String[]{"false", "invalid revision value."};
 
-        IO.log(getClass().getName(), IO.TAG_INFO,  "valid " + getClass().getName() + " object.");
         return super.isValid();
-    }
-
-    @Override
-    public String toString()
-    {
-        return get_id();
     }
 
     @Override
@@ -247,5 +213,11 @@ public class Quote extends BusinessObject
                 return revision;
         }
         return super.get(var);
+    }
+
+    @Override
+    public String toString()
+    {
+        return get_id();
     }
 }

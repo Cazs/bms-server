@@ -87,46 +87,22 @@ public class Leave extends BusinessObject
     }
 
     @Override
-    public boolean isValid()
+    public String[] isValid()
     {
         if(getUsr()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid usr value.");
-            return false;
-        }
+            return new String[]{"false", "invalid usr value."};
         if(getType()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid type value.");
-            return false;
-        }
-        if(getDate_logged()<=0)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid date_logged value.");
-            return false;
-        }
+            return new String[]{"false", "invalid type value."};
         if(getStart_date()<=0)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid start_date value.");
-            return false;
-        }
+            return new String[]{"false", "invalid start_date value."};
         if(getEnd_date()<=0)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid end_date value.");
-            return false;
-        }
+            return new String[]{"false", "invalid end_date value."};
         if(getReturn_date()<=0)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid return_date value.");
-            return false;
-        }
-        if(getStatus()<0)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid status value.");
-            return false;
-        }
+            return new String[]{"false", "invalid return_date value."};
+        /*if(getStatus()<0)
+            return new String[]{"false", "invalid status value."};*/
 
-        IO.log(getClass().getName(), IO.TAG_INFO,  "valid " + getClass().getName() + " object.");
-        return true;
+        return super.isValid();
     }
 
     @Override

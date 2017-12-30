@@ -88,51 +88,24 @@ public abstract class PurchaseOrderItem extends BusinessObject
     }
 
     @Override
-    public boolean isValid()
+    public String[] isValid()
     {
         if(getItem_id()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid item_id value.");
-            return false;
-        }
+            return new String[]{"false", "invalid item_id value."};
         if(getItem_number()<0)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid item_number value.");
-            return false;
-        }
+            return new String[]{"false", "invalid item_number value."};
         if(getPurchase_order_id()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid purchase_order_id value.");
-            return false;
-        }
+            return new String[]{"false", "invalid purchase_order_id value."};
         if(getType()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid type value.");
-            return false;
-        }
-        if(getDate_logged()<=0)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid date_logged value.");
-            return false;
-        }
+            return new String[]{"false", "invalid type value."};
         if(getCost()<0)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid cost value.");
-            return false;
-        }
+            return new String[]{"false", "invalid cost value."};
         if(getDiscount()<0)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid discount value.");
-            return false;
-        }
+            return new String[]{"false", "invalid discount value."};
         if(getQuantity()<=0)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid quantity value.");
-            return false;
-        }
+            return new String[]{"false", "invalid quantity value."};
 
-        IO.log(getClass().getName(), IO.TAG_INFO,  "valid " + getClass().getName() + " object.");
-        return true;
+        return super.isValid();
     }
 
     @Override

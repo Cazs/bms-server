@@ -157,65 +157,31 @@ public class Supplier extends BusinessObject
     }
 
     @Override
-    public boolean isValid()
+    public String[] isValid()
     {
         if(getSupplier_name()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid supplier_name value.");
-            return false;
-        }
+            return new String[]{"false", "invalid supplier_name value."};
         if(getContact_email()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid contact_email value.");
-            return false;
-        }
+            return new String[]{"false", "invalid contact_email value."};
         if(getTel()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid tel value.");
-            return false;
-        }
+            return new String[]{"false", "invalid tel value."};
         if(getDate_partnered()<=0)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid date_partnered value.");
-            return false;
-        }
+            return new String[]{"false", "invalid date_partnered value."};
         if(getAccount_name()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid account_name value.");
-            return false;
-        }
+            return new String[]{"false", "invalid account_name value."};
         if(getWebsite()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid website value.");
-            return false;
-        }
+            return new String[]{"false", "invalid website value."};
         if(getPhysical_address()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid physical_address value.");
-            return false;
-        }
+            return new String[]{"false", "invalid physical_address value."};
         if(getPostal_address()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid postal_address value.");
-            return false;
-        }
+            return new String[]{"false", "invalid postal_address value."};
         if(getSpeciality()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid specialty value.");
-            return false;
-        }
+            return new String[]{"false", "invalid speciality value."};
         if(getRegistration_number()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid registration_number value.");
-            return false;
-        }
+            return new String[]{"false", "invalid registration_number value."};
         if(getVat_number()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid vat_number value.");
-            return false;
-        }
+            return new String[]{"false", "invalid vat_number value."};
 
-        IO.log(getClass().getName(), IO.TAG_INFO,  "valid " + getClass().getName() + " object.");
         return super.isValid();
     }
 

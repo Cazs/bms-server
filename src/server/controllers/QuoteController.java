@@ -14,11 +14,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import server.auxilary.IO;
+import server.auxilary.RemoteComms;
+import server.exceptions.InvalidBusinessObjectException;
 import server.exceptions.InvalidQuoteException;
 import server.model.Counter;
+import server.model.Job;
 import server.model.Quote;
 import server.repositories.QuoteRepository;
 
+import java.rmi.Remote;
 import java.util.List;
 
 @RepositoryRestController
@@ -46,7 +50,7 @@ public class QuoteController
     @GetMapping("/quotes")
     public ResponseEntity<Page<Quote>> getQuotes(Pageable pageRequest, PersistentEntityResourceAssembler assembler)
     {
-        IO.log(getClass().getName(), IO.TAG_INFO, "handling Quote GET request {all}");
+        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Quote GET request {all}");
         List<Quote> contents =  IO.getInstance().mongoOperations().findAll(Quote.class, "quotes");
         return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
     }
@@ -55,24 +59,15 @@ public class QuoteController
     @PutMapping("/quotes")
     public ResponseEntity<String> addQuote(@RequestBody Quote quote)
     {
-        IO.log(getClass().getName(), IO.TAG_INFO, "handling Quote creation request.");
+        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Quote creation request.");
         //HttpHeaders headers = new HttpHeaders();
-        if(quote!=null)
-        {
-            long date_logged = System.currentTimeMillis();
-            quote.setDate_logged(date_logged);
-            if (quote.isValid())
-            {
-                IO.log(getClass().getName(),IO.TAG_INFO, "creating new Quote addressed to: ["+quote.getClient_id()+"]");
-                //commit Quote data to DB server
-                IO.getInstance().mongoOperations().insert(quote, "quotes");
-                IO.log(getClass().getName(),IO.TAG_INFO, "created quote: "+quote.get_id());
-                //update respective timestamp
-                CounterController.updateCounter(new Counter("quotes_timestamp", date_logged));
-                return new ResponseEntity<>(quote.get_id(), HttpStatus.OK);
-            } else throw new InvalidQuoteException();
-        }
-        IO.log(getClass().getName(),IO.TAG_ERROR, "invalid quote");
-        return new ResponseEntity<>(HttpStatus.CONFLICT);
+        return APIController.putBusinessObject(quote, "quotes", "quotes_timestamp");
+    }
+
+    @PostMapping("/quotes")
+    public ResponseEntity<String> patchQuote(@RequestBody Quote quote)
+    {
+        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Quote update request.");
+        return APIController.patchBusinessObject(quote, "quotes", "quotes_timestamp");
     }
 }

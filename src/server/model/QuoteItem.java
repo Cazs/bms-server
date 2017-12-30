@@ -145,40 +145,21 @@ public class QuoteItem extends BusinessObject
     }
 
     @Override
-    public boolean isValid()
+    public String[] isValid()
     {
         if(getResource_id()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid resource_id value.");
-            return false;
-        }
+            return new String[]{"false", "invalid resource_id value."};
         if(getItem_number()<0)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid item_number value.");
-            return false;
-        }
+            return new String[]{"false", "invalid item_number value."};
         if(getQuote_id()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid quote_id value.");
-            return false;
-        }
+            return new String[]{"false", "invalid quote_id value."};
         if(getUnitCost()<0)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid unit_cost value.");
-            return false;
-        }
+            return new String[]{"false", "invalid unit_cost value."};
         if(getQuantity()<=0)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid quantity value.");
-            return false;
-        }
+            return new String[]{"false", "invalid quantity value."};
         if(getMarkup()<0)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid markup value.");
-            return false;
-        }
+            return new String[]{"false", "invalid markup value."};
 
-        IO.log(getClass().getName(), IO.TAG_INFO,  "valid " + getClass().getName() + " object.");
         return super.isValid();
     }
 

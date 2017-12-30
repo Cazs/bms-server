@@ -47,9 +47,9 @@ public class CounterController
             if(db_counter!=null)
             {
                 db_counter.setCount(counter.getCount());
-                IO.log(RemoteComms.class.getName(), IO.TAG_INFO, "updating counter[" + counter
-                        .getCounter_name() + "] to: [" + counter.getCount() + "]");
                 IO.getInstance().mongoOperations().save(db_counter, "counters");
+                IO.log(RemoteComms.class.getName(), IO.TAG_INFO, "updated counter[" +
+                        counter.getCounter_name() + "] to: [" + counter.getCount() + "]\n");
                 return db_counter;
             } else IO.log(CounterController.class.getName(), IO.TAG_ERROR, "could not find counter["+counter.getCounter_name()+"] on database.");
         } else IO.log(CounterController.class.getName(), IO.TAG_ERROR, "invalid counter.");
@@ -59,7 +59,7 @@ public class CounterController
     @GetMapping("/{counter_name}")
     public String getCounterRouteHandler(@RequestParam String counter_name)
     {
-        IO.log(getClass().getName(), IO.TAG_INFO, "handling Counter GET request ["+counter_name+"].");
+        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Counter GET request ["+counter_name+"].");
         return String.valueOf(CounterController.getCount(counter_name));
     }
 }

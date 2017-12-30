@@ -263,24 +263,32 @@ public class RemoteComms
     {
         if(businessObject!=null)
         {
-            long date_logged = System.currentTimeMillis();
-            businessObject.setDate_logged(date_logged);
-            if (businessObject.isValid())
+            String[] is_valid = businessObject.isValid();
+            if(is_valid==null)
             {
-                IO.log(RemoteComms.class.getName(),IO.TAG_INFO, "creating new BusinessObject{"+businessObject.getClass().getName()+"}: "+businessObject.toString());
+                IO.log(RemoteComms.class.getName(),IO.TAG_INFO, "invalid isValid() response from BusinessObject{"+businessObject.getClass().getName()+"}");
+                return null;
+            }
+            if(is_valid.length!=2)
+            {
+                IO.log(RemoteComms.class.getName(),IO.TAG_INFO, "invalid isValid() response array length from BusinessObject{"+businessObject.getClass().getName()+"}");
+                return null;
+            }
+            if (is_valid[0].toLowerCase().equals("true"))
+            {
+                IO.log(RemoteComms.class.getName(),IO.TAG_INFO, is_valid[1]);//print message from isValid() call
+                IO.log(RemoteComms.class.getName(),IO.TAG_INFO, "committing BusinessObject{"+businessObject.getClass().getName()+"}: "+businessObject.toString());
                 //commit BusinessObject data to DB server
                 if(collection!=null)
-                    IO.getInstance().mongoOperations().insert(businessObject, collection);
+                    IO.getInstance().mongoOperations().save(businessObject, collection);
                 else return null;
-                IO.log(RemoteComms.class.getName(),IO.TAG_INFO, "committed business object: ["+businessObject.get_id()+"]");
+                IO.log(RemoteComms.class.getName(),IO.TAG_INFO, "committed BusinessObject:{"+businessObject.getClass().getName()+"} ["+businessObject.get_id()+"]");
                 //update respective timestamp
                 if(timestamp_name!=null)
-                    CounterController.updateCounter(new Counter(timestamp_name, date_logged));
+                    CounterController.updateCounter(new Counter(timestamp_name, System.currentTimeMillis()));
                 else return null;
                 return businessObject.get_id();
-            } else throw new InvalidBusinessObjectException();
-        }
-        IO.log(Remote.class.getName(),IO.TAG_ERROR, "invalid Business Object.");
-        return null;
+            } else throw new InvalidBusinessObjectException(is_valid[1]);
+        } else throw new InvalidBusinessObjectException("invalid[null] BusinessObject.");
     }
 }

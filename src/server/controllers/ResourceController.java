@@ -25,39 +25,44 @@ import java.util.List;
 @RequestMapping("/resources")
 public class ResourceController
 {
-        private PagedResourcesAssembler<Resource> pagedAssembler;
-        @Autowired
-        private ResourceRepository resourceRepository;
+    private PagedResourcesAssembler<Resource> pagedAssembler;
+    @Autowired
+    private ResourceRepository resourceRepository;
 
-        @Autowired
-        public ResourceController(PagedResourcesAssembler<Resource> pagedAssembler)
-        {
-            this.pagedAssembler = pagedAssembler;
-        }
+    @Autowired
+    public ResourceController(PagedResourcesAssembler<Resource> pagedAssembler)
+    {
+        this.pagedAssembler = pagedAssembler;
+    }
 
-        @GetMapping(path="/{id}", produces = "application/hal+json")
-        public ResponseEntity<Page<Resource>> getResource(@PathVariable("id") String id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
-        {
-            IO.log(getClass().getName(), IO.TAG_INFO, "handling Resource GET request id: "+ id);
-            List<Resource> contents = IO.getInstance().mongoOperations().find(new Query(Criteria.where("_id").is(id)), Resource.class, "resources");
-            return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
-        }
+    @GetMapping(path="/{id}", produces = "application/hal+json")
+    public ResponseEntity<Page<Resource>> getResource(@PathVariable("id") String id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    {
+        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Resource GET request id: "+ id);
+        List<Resource> contents = IO.getInstance().mongoOperations().find(new Query(Criteria.where("_id").is(id)), Resource.class, "resources");
+        return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
+    }
 
-        @GetMapping
-        public ResponseEntity<Page<Resource>> getResources(Pageable pageRequest, PersistentEntityResourceAssembler assembler)
-        {
-            IO.log(getClass().getName(), IO.TAG_INFO, "handling Resource GET request {all}");
-            List<Resource> contents =  IO.getInstance().mongoOperations().findAll(Resource.class, "resources");
-            return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
-        }
+    @GetMapping
+    public ResponseEntity<Page<Resource>> getResources(Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    {
+        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Resource GET request {all}");
+        List<Resource> contents =  IO.getInstance().mongoOperations().findAll(Resource.class, "resources");
+        return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
+    }
 
-        @PostMapping
-        @PutMapping
-        public ResponseEntity<Page<Resource>> addResource(@RequestBody Resource resource, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
-        {
-            IO.log(getClass().getName(), IO.TAG_INFO, "handling Resource creation request.");
-            List<BusinessObject> contents = new LinkedList<>();
-            contents.add(resource);
-            return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
-        }
+    @PutMapping
+    public ResponseEntity<String> addResource(@RequestBody Resource resource)
+    {
+        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Resource creation request.");
+        //HttpHeaders headers = new HttpHeaders();
+        return APIController.putBusinessObject(resource, "resources", "resources_timestamp");
+    }
+
+    @PostMapping
+    public ResponseEntity<String> patchResource(@RequestBody Resource resource)
+    {
+        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Resource update request.");
+        return APIController.patchBusinessObject(resource, "resources", "resources_timestamp");
+    }
 }

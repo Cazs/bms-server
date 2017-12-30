@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import server.auxilary.IO;
 import server.model.BusinessObject;
+import server.model.Resource;
 import server.model.ResourceType;
 import server.repositories.ResourceTypeRepository;
 
@@ -25,39 +26,44 @@ import java.util.List;
 @RequestMapping("/resources/types")
 public class ResourceTypeController
 {
-        private PagedResourcesAssembler<ResourceType> pagedAssembler;
-        @Autowired
-        private ResourceTypeRepository resource_typeRepository;
+    private PagedResourcesAssembler<ResourceType> pagedAssembler;
+    @Autowired
+    private ResourceTypeRepository resource_typeRepository;
 
-        @Autowired
-        public ResourceTypeController(PagedResourcesAssembler<ResourceType> pagedAssembler)
-        {
-            this.pagedAssembler = pagedAssembler;
-        }
+    @Autowired
+    public ResourceTypeController(PagedResourcesAssembler<ResourceType> pagedAssembler)
+    {
+        this.pagedAssembler = pagedAssembler;
+    }
 
-        @GetMapping(path="/{id}", produces = "application/hal+json")
-        public ResponseEntity<Page<ResourceType>> getResourceType(@PathVariable("id") String id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
-        {
-            IO.log(getClass().getName(), IO.TAG_INFO, "handling ResourceType GET request id: "+ id);
-            List<ResourceType> contents = IO.getInstance().mongoOperations().find(new Query(Criteria.where("_id").is(id)), ResourceType.class, "resource_types");
-            return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
-        }
+    @GetMapping(path="/{id}", produces = "application/hal+json")
+    public ResponseEntity<Page<ResourceType>> getResourceType(@PathVariable("id") String id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    {
+        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling ResourceType GET request id: "+ id);
+        List<ResourceType> contents = IO.getInstance().mongoOperations().find(new Query(Criteria.where("_id").is(id)), ResourceType.class, "resource_types");
+        return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
+    }
 
-        @GetMapping
-        public ResponseEntity<Page<ResourceType>> getResourceTypes(Pageable pageRequest, PersistentEntityResourceAssembler assembler)
-        {
-            IO.log(getClass().getName(), IO.TAG_INFO, "handling ResourceType GET request {all}");
-            List<ResourceType> contents =  IO.getInstance().mongoOperations().findAll(ResourceType.class, "resource_types");
-            return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
-        }
+    @GetMapping
+    public ResponseEntity<Page<ResourceType>> getResourceTypes(Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    {
+        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling ResourceType GET request {all}");
+        List<ResourceType> contents =  IO.getInstance().mongoOperations().findAll(ResourceType.class, "resource_types");
+        return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
+    }
 
-        @PostMapping
-        @PutMapping
-        public ResponseEntity<Page<ResourceType>> addResourceType(@RequestBody ResourceType resource_type, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
-        {
-            IO.log(getClass().getName(), IO.TAG_INFO, "handling ResourceType creation request.");
-            List<BusinessObject> contents = new LinkedList<>();
-            contents.add(resource_type);
-            return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
-        }
+    @PutMapping
+    public ResponseEntity<String> addResourceType(@RequestBody ResourceType resource_type)
+    {
+        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling ResourceType creation request.");
+        //HttpHeaders headers = new HttpHeaders();
+        return APIController.putBusinessObject(resource_type, "resource_types", "resources_timestamp");
+    }
+
+    @PostMapping
+    public ResponseEntity<String> patchResource(@RequestBody ResourceType resource_type)
+    {
+        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling ResourceType update request.");
+        return APIController.patchBusinessObject(resource_type, "resource_types", "resources_timestamp");
+    }
 }

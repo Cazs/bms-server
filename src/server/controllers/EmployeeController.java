@@ -14,10 +14,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import server.auxilary.IO;
+import server.auxilary.RemoteComms;
 import server.exceptions.InvalidEmployeeException;
 import server.model.BusinessObject;
 import server.model.Employee;
 import server.model.Job;
+import server.model.Resource;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -37,7 +39,7 @@ public class EmployeeController
     @GetMapping(path="/{id}", produces = "application/hal+json")
     public ResponseEntity<Page<Employee>> getEmployeeById(@PathVariable("id") String id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
     {
-        IO.log(getClass().getName(), IO.TAG_INFO, "handling GET request for Employee: "+ id);
+        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling GET request for Employee: "+ id);
         List<Employee> contents = IO.getInstance().mongoOperations().find(new Query(Criteria.where("_id").is(id)), Employee.class, "employees");
         if(contents!=null)//if not found by id, try by usr
         {
@@ -54,36 +56,23 @@ public class EmployeeController
     @GetMapping
     public ResponseEntity<Page<Employee>> getAllEmployees(Pageable pageRequest, PersistentEntityResourceAssembler assembler)
     {
-        IO.log(getClass().getName(), IO.TAG_INFO, "handling Employee get request {all}");
+        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Employee get request {all}");
         List<Employee> contents =  IO.getInstance().mongoOperations().findAll(Employee.class, "employees");
         return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
     }
 
-    //return new ResponseEntity < String > ("Response from POST method", HttpStatus.OK);
     @PutMapping
-    public ResponseEntity<Page<Employee>> addEmployee(@RequestBody Employee employee, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    public ResponseEntity<String> addEmployee(@RequestBody Employee employee)
     {
-        IO.log(getClass().getName(), IO.TAG_INFO, "handling Employee creation request.");
-        List<BusinessObject> contents = new LinkedList<>();
-        if(employee!=null)
-        {
-            employee.setDate_logged(System.currentTimeMillis());
-            if (employee.isValid())
-            {
-                IO.getInstance().mongoOperations().save(employee, "employees");
-                List<Employee> employees = IO.getInstance().mongoOperations()
-                        .find(new Query(Criteria.where("usr").is(employee.getUsr())), Employee.class, "employees");
-                if (employees != null)
-                {
-                    if (!employees.isEmpty())
-                        contents.add(employees.get(0));
-                    else IO.log(getClass().getName(), IO.TAG_ERROR, "could not find added Employee object in the database.");
-                } else
-                    IO.log(getClass().getName(), IO.TAG_ERROR, "MongoDB operation returned null Employee object.");
-            } else
-                throw new InvalidEmployeeException();
-        }
-        return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents
-                .size()), (ResourceAssembler) assembler), HttpStatus.OK);
+        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Employee creation request.");
+        //HttpHeaders headers = new HttpHeaders();
+        return APIController.putBusinessObject(employee, "employees", "employees_timestamp");
+    }
+
+    @PostMapping
+    public ResponseEntity<String> patchEmployee(@RequestBody Employee employee)
+    {
+        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Employee update request.");
+        return APIController.patchBusinessObject(employee, "employees", "employees_timestamp");
     }
 }

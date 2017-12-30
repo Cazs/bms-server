@@ -88,45 +88,21 @@ public class Overtime extends BusinessObject
     }
 
     @Override
-    public boolean isValid()
+    public String[] isValid()
     {
         if(getUsr()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid usr value.");
-            return false;
-        }
+            return new String[]{"false", "invalid usr value."};
         if(getJob_id()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid job_id value.");
-            return false;
-        }
-        if(getDate_logged()<=0)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid date_logged value.");
-            return false;
-        }
+            return new String[]{"false", "invalid job_id value."};
         if(getDate()<=0)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid date value.");
-            return false;
-        }
+            return new String[]{"false", "invalid date value."};
         if(getTime_in()<=0)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid time_in value.");
-            return false;
-        }
+            return new String[]{"false", "invalid time_in value."};
         if(getTime_out()<=0)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid time_out value.");
-            return false;
-        }
-        if(getStatus()<0)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid status value.");
-            return false;
-        }
+            return new String[]{"false", "invalid time_out value."};
+        /*if(getStatus()<0)
+            return new String[]{"false", "invalid status value."};*/
 
-        IO.log(getClass().getName(), IO.TAG_INFO,  "valid " + getClass().getName() + " object.");
         return super.isValid();
     }
 

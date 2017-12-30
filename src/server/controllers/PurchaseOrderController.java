@@ -15,49 +15,51 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import server.auxilary.IO;
 import server.model.PurchaseOrder;
-import server.model.BusinessObject;
 import server.repositories.PurchaseOrderRepository;
 
-import java.util.LinkedList;
 import java.util.List;
 
 @RepositoryRestController
 @RequestMapping("/purchaseorders")
 public class PurchaseOrderController
 {
-        private PagedResourcesAssembler<PurchaseOrder> pagedAssembler;
-        @Autowired
-        private PurchaseOrderRepository purchase_orderRepository;
+    private PagedResourcesAssembler<PurchaseOrder> pagedAssembler;
+    @Autowired
+    private PurchaseOrderRepository purchase_orderRepository;
 
-        @Autowired
-        public PurchaseOrderController(PagedResourcesAssembler<PurchaseOrder> pagedAssembler)
-        {
-            this.pagedAssembler = pagedAssembler;
-        }
+    @Autowired
+    public PurchaseOrderController(PagedResourcesAssembler<PurchaseOrder> pagedAssembler)
+    {
+        this.pagedAssembler = pagedAssembler;
+    }
 
-        @GetMapping(path="/{id}", produces = "application/hal+json")
-        public ResponseEntity<Page<PurchaseOrder>> getPurchaseOrder(@PathVariable("id") String id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
-        {
-            IO.log(getClass().getName(), IO.TAG_INFO, "handling PurchaseOrder GET request id: "+ id);
-            List<PurchaseOrder> contents = IO.getInstance().mongoOperations().find(new Query(Criteria.where("_id").is(id)), PurchaseOrder.class, "purchase_orders");
-            return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
-        }
+    @GetMapping(path="/{id}", produces = "application/hal+json")
+    public ResponseEntity<Page<PurchaseOrder>> getPurchaseOrder(@PathVariable("id") String id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    {
+        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling PurchaseOrder GET request id: "+ id);
+        List<PurchaseOrder> contents = IO.getInstance().mongoOperations().find(new Query(Criteria.where("_id").is(id)), PurchaseOrder.class, "purchase_orders");
+        return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
+    }
 
-        @GetMapping
-        public ResponseEntity<Page<PurchaseOrder>> getPurchaseOrders(Pageable pageRequest, PersistentEntityResourceAssembler assembler)
-        {
-            IO.log(getClass().getName(), IO.TAG_INFO, "handling PurchaseOrder GET request {all}");
-            List<PurchaseOrder> contents =  IO.getInstance().mongoOperations().findAll(PurchaseOrder.class, "purchase_orders");
-            return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
-        }
+    @GetMapping
+    public ResponseEntity<Page<PurchaseOrder>> getPurchaseOrders(Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    {
+        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling PurchaseOrder GET request {all}");
+        List<PurchaseOrder> contents =  IO.getInstance().mongoOperations().findAll(PurchaseOrder.class, "purchase_orders");
+        return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
+    }
 
-        @PostMapping
-        @PutMapping
-        public ResponseEntity<Page<PurchaseOrder>> addPurchaseOrder(@RequestBody PurchaseOrder purchase_order, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
-        {
-            IO.log(getClass().getName(), IO.TAG_INFO, "handling PurchaseOrder creation request");
-            List<BusinessObject> contents = new LinkedList<>();
-            contents.add(purchase_order);
-            return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
-        }
+    @PutMapping
+    public ResponseEntity<String> addPurchaseOrder(@RequestBody PurchaseOrder purchase_order)
+    {
+        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling PurchaseOrder creation request");
+        return APIController.putBusinessObject(purchase_order, "purchase_orders", "purchase_orders_timestamp");
+    }
+
+    @PostMapping
+    public ResponseEntity<String> patchPurchaseOrder(@RequestBody PurchaseOrder purchase_order)
+    {
+        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling PurchaseOrder update request.");
+        return APIController.patchBusinessObject(purchase_order, "purchase_orders", "purchase_orders_timestamp");
+    }
 }

@@ -42,25 +42,13 @@ public class Invoice extends BusinessObject
     }
 
     @Override
-    public boolean isValid()
+    public String[] isValid()
     {
         if(getJob_id()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid job_id value.");
-            return false;
-        }
-        if(getCreator()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid creator value.");
-            return false;
-        }
+            return new String[]{"false", "invalid job_id value."};
         if(getReceivable()<0)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid receivable value.");
-            return false;
-        }
+            return new String[]{"false", "invalid receivable value."};
 
-        IO.log(getClass().getName(), IO.TAG_INFO,  "valid " + getClass().getName() + " object.");
         return super.isValid();
     }
 

@@ -36,22 +36,14 @@ public class Type extends BusinessObject
     }
 
     @Override
-    public boolean isValid()
+    public String[] isValid()
     {
-        super.isValid();
         if(getType_name()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid type_name value.");
-            return false;
-        }
+            return new String[]{"false", "invalid type_name value."};
         if(getType_description()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid type_description value.");
-            return false;
-        }
+            return new String[]{"false", "invalid type_description value."};
 
-        IO.log(getClass().getName(), IO.TAG_INFO,  "valid " + getClass().getName() + " object.");
-        return true;
+        return super.isValid();
     }
 
     @Override

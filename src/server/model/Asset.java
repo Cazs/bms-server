@@ -116,46 +116,24 @@ public class Asset extends BusinessObject
     }
 
     @Override
-    public boolean isValid()
+    public String[] isValid()
     {
         if(getAsset_name()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid asset_name value.");
-            return false;
-        }
+            return new String[]{"false", "invalid asset_name value."};
         if(getAsset_description()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid asset_description value.");
-            return false;
-        }
+            return new String[]{"false", "invalid asset_description value."};
         if(getAsset_value()<=0)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid asset_value value.");
-            return false;
-        }
+            return new String[]{"false", "invalid asset_value."};
         if(getDate_acquired()<=0)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid date_acquired value.");
-            return false;
-        }
-        if(getDate_exhausted()<=0)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid date_exhausted value.");
-            return false;
-        }
+            return new String[]{"false", "invalid date_acquired value."};
+        /*if(getDate_exhausted()<=0)
+            return new String[]{"false", "invalid date_exhausted."};*/
         if(getQuantity()<0)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid quantity value.");
-            return false;
-        }
+            return new String[]{"false", "invalid quantity value."};
         if(getUnit()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid unit value.");
-            return false;
-        }
+            return new String[]{"false", "invalid unit value."};
 
-        IO.log(getClass().getName(), IO.TAG_INFO,  "valid " + getClass().getName() + " object.");
-        return true;
+        return super.isValid();
     }
 
     @Override

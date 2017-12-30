@@ -38,25 +38,13 @@ public class JobEmployee extends BusinessObject
     }
 
     @Override
-    public boolean isValid()
+    public String[] isValid()
     {
         if(getUsr()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid usr value.");
-            return false;
-        }
+            return new String[]{"false", "invalid usr value."};
         if(getJob_id()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid job_id value.");
-            return false;
-        }
-        if(getDate_logged()<=0)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid date_logged value.");
-            return false;
-        }
+            return new String[]{"false", "invalid job_id value."};
 
-        IO.log(getClass().getName(), IO.TAG_INFO,  "valid " + getClass().getName() + " object.");
         return super.isValid();
     }
 

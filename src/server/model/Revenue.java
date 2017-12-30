@@ -59,40 +59,17 @@ public class Revenue extends BusinessObject
     }
 
     @Override
-    public boolean isValid()
+    public String[] isValid()
     {
         if(getRevenue_title()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid revenue_title value.");
-            return false;
-        }
+            return new String[]{"false", "invalid revenue_title value."};
         if(getRevenue_description()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid revenue_description value.");
-            return false;
-        }
+            return new String[]{"false", "invalid revenue_description value."};
         if(getRevenue_value()<0)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid revenue_value value.");
-            return false;
-        }
-        if(getCreator()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid creator value.");
-            return false;
-        }
+            return new String[]{"false", "invalid revenue_value."};
         if(getAccount_name()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid account_name value.");
-            return false;
-        }
-        if(getDate_logged()<=0)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid date_logged value.");
-            return false;
-        }
+            return new String[]{"false", "invalid account_name value."};
 
-        IO.log(getClass().getName(), IO.TAG_INFO,  "valid " + getClass().getName() + " object.");
         return super.isValid();
     }
 

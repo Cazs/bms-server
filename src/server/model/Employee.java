@@ -132,62 +132,28 @@ public class Employee extends BusinessObject
     }
 
     @Override
-    public boolean isValid()
+    public String[] isValid()
     {
-        super.isValid();
         if(getUsr()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid usr value.");
-            return false;
-        }
+            return new String[]{"false", "invalid usr value."};
         if(getPwd()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid pwd value.");
-            return false;
-        }
+            return new String[]{"false", "invalid pwd value."};
         if(getFirstname()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid firstname value.");
-            return false;
-        }
+            return new String[]{"false", "invalid firstname value."};
         if(getLastname()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid lastname value.");
-            return false;
-        }
+            return new String[]{"false", "invalid lastname value."};
         if(getCell()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid cell value.");
-            return false;
-        }
+            return new String[]{"false", "invalid cell value."};
         if(getTel()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid tel value.");
-            return false;
-        }
+            return new String[]{"false", "invalid tel value."};
         if(getEmail()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid email value.");
-            return false;
-        }
+            return new String[]{"false", "invalid email value."};
         if(getGender()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid gender value.");
-            return false;
-        }
-        if(getPwd()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid pwd value.");
-            return false;
-        }
+            return new String[]{"false", "invalid gender value."};
         if(getAccessLevel()<0)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid access_level value.");
-            return false;
-        }
+            return new String[]{"false", "invalid access_level value."};
 
-        IO.log(getClass().getName(), IO.TAG_INFO,  "valid " + getClass().getName() + " object.");
-        return true;
+        return super.isValid();
     }
 
     @Override

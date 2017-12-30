@@ -152,62 +152,30 @@ public class Client extends BusinessObject
     }
 
     @Override
-    public boolean isValid()
+    public String[] isValid()
     {
-        super.isValid();
         if(getClient_name()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid client_name value.");
-            return false;
-        }
+            return new String[]{"false", "invalid client_name value."};
         if(getContact_email()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid contact_email value.");
-            return false;
-        }
+            return new String[]{"false", "invalid contact_email value."};
         if(getTel()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid tel value.");
-            return false;
-        }
+            return new String[]{"false", "invalid tel value."};
         if(getDate_partnered()<=0)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid date_partnered value.");
-            return false;
-        }
+            return new String[]{"false", "invalid date_partnered value."};
         if(getAccount_name()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid account_name value.");
-            return false;
-        }
+            return new String[]{"false", "invalid account_name value."};
         if(getWebsite()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid website value.");
-            return false;
-        }
+            return new String[]{"false", "invalid website value."};
         if(getPhysical_address()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid physical_address value.");
-            return false;
-        }
+            return new String[]{"false", "invalid physical_address value."};
         if(getPostal_address()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid postal_address value.");
-            return false;
-        }
+            return new String[]{"false", "invalid postal_address value."};
         if(getRegistration_number()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid registration_number value.");
-            return false;
-        }
+            return new String[]{"false", "invalid registration_number value."};
         if(getVat_number()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid vat_number value.");
-            return false;
-        }
+            return new String[]{"false", "invalid vat_number value."};
 
-        IO.log(getClass().getName(), IO.TAG_INFO,  "valid " + getClass().getName() + " object.");
-        return true;
+        return super.isValid();
     }
 
     @Override
@@ -311,6 +279,26 @@ public class Client extends BusinessObject
     @Override
     public String toString()
     {
-        return client_name;
+        String json_obj = "{"+(get_id()!=null?"\"_id\":\""+get_id()+"\",":"")
+                +"\"client_name\":\""+getClient_name()+"\""
+                +",\"tel\":\""+getTel()+"\""
+                +",\"fax\":\""+getFax()+"\""
+                +",\"physical_address\":\""+getPhysical_address()+"\""
+                +",\"postal_address\":\""+getPostal_address()+"\""
+                +",\"contact_email\":\""+getContact_email()+"\""
+                +",\"website\":\""+getWebsite()+"\""
+                +",\"account_name\":\""+getAccount_name()+"\""
+                +",\"registration_number\":\""+getRegistration_number()+"\""
+                +",\"vat_number\":\""+getVat_number()+"\"";
+        if(getDate_partnered()>0)
+            json_obj+=",\"date_partnered\":\""+getDate_logged()+"\"";
+        if(getCreator()!=null)
+            json_obj+=",\"creator\":\""+getCreator()+"\"";
+        if(getDate_logged()>0)
+            json_obj+=",\"date_logged\":\""+getDate_logged()+"\"";
+        json_obj+=",\"other\":\""+getOther()+"\"}";
+
+        IO.log(getClass().getName(),IO.TAG_INFO, json_obj);
+        return json_obj;
     }
 }

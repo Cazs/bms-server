@@ -15,9 +15,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import server.auxilary.IO;
 import server.auxilary.RemoteComms;
+import server.exceptions.InvalidBusinessObjectException;
 import server.model.BusinessObject;
 import server.model.JobEmployee;
 import server.repositories.JobEmployeeRepository;
+
+import java.rmi.Remote;
 import java.util.List;
 
 @RepositoryRestController
@@ -38,7 +41,7 @@ public class JobEmployeeController
     @GetMapping(path="/jobs/employees/{id}", produces = "application/hal+json")
     public ResponseEntity<Page<JobEmployee>> getJobEmployee(@PathVariable("id") String id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
     {
-        IO.log(getClass().getName(), IO.TAG_INFO, "handling JobEmployees GET request job_id: ["+ id+"]");
+        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling JobEmployees GET request job_id: ["+ id+"]");
         List<JobEmployee> contents = IO.getInstance().mongoOperations().find(new Query(Criteria.where("job_id").is(id)), JobEmployee.class, "job_employees");
         return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
     }
@@ -46,7 +49,7 @@ public class JobEmployeeController
     @GetMapping("/jobs/employees")
     public ResponseEntity<Page<JobEmployee>> getJobEmployees(Pageable pageRequest, PersistentEntityResourceAssembler assembler)
     {
-        IO.log(getClass().getName(), IO.TAG_INFO, "handling JobEmployee GET request {all}");
+        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling JobEmployee GET request {all}");
         List<JobEmployee> contents =  IO.getInstance().mongoOperations().findAll(JobEmployee.class, "job_employees");
         return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
     }
@@ -54,13 +57,19 @@ public class JobEmployeeController
     @PutMapping("/jobs/employees")
     public ResponseEntity<String> addJobEmployee(@RequestBody JobEmployee job_employee)
     {
-        IO.log(getClass().getName(), IO.TAG_INFO, "handling JobEmployee creation request: ");
+        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling JobEmployee creation request: ");
         if(job_employee!=null)
         {
-            job_employee.setDate_logged(System.currentTimeMillis());
-            String new_job_employee_id = RemoteComms.commitBusinessObjectToDatabase(job_employee, "job_employees", "jobs_timestamp");
-            return new ResponseEntity<>(new_job_employee_id, HttpStatus.OK);
+            try
+            {
+                String new_job_employee_id = RemoteComms.commitBusinessObjectToDatabase(job_employee, "job_employees", "jobs_timestamp");
+                return new ResponseEntity<>(new_job_employee_id, HttpStatus.OK);
+            } catch (InvalidBusinessObjectException e)
+            {
+                IO.log(Remote.class.getName(),IO.TAG_ERROR, "invalid JobEmployee object: {"+e.getMessage()+"}");
+                return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+            }
         }
-        return null;
+        return new ResponseEntity<>("I\nnvalid job_employee", HttpStatus.CONFLICT);
     }
 }

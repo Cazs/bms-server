@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import server.auxilary.IO;
 import server.model.BusinessObject;
+import server.model.Client;
 import server.model.Supplier;
 import server.repositories.SupplierRepository;
 
@@ -25,39 +26,43 @@ import java.util.List;
 @RequestMapping("/suppliers")
 public class SupplierController
 {
-        private PagedResourcesAssembler<Supplier> pagedAssembler;
-        @Autowired
-        private SupplierRepository supplierRepository;
+    private PagedResourcesAssembler<Supplier> pagedAssembler;
+    @Autowired
+    private SupplierRepository supplierRepository;
 
-        @Autowired
-        public SupplierController(PagedResourcesAssembler<Supplier> pagedAssembler)
-        {
-            this.pagedAssembler = pagedAssembler;
-        }
+    @Autowired
+    public SupplierController(PagedResourcesAssembler<Supplier> pagedAssembler)
+    {
+        this.pagedAssembler = pagedAssembler;
+    }
 
-        @GetMapping(path="/{id}", produces = "application/hal+json")
-        public ResponseEntity<Page<Supplier>> getSupplier(@PathVariable("id") String id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
-        {
-            IO.log(getClass().getName(), IO.TAG_INFO, "handling Supplier GET request id: "+ id);
-            List<Supplier> contents = IO.getInstance().mongoOperations().find(new Query(Criteria.where("_id").is(id)), Supplier.class, "suppliers");
-            return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
-        }
+    @GetMapping(path="/{id}", produces = "application/hal+json")
+    public ResponseEntity<Page<Supplier>> getSupplier(@PathVariable("id") String id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    {
+        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Supplier GET request id: "+ id);
+        List<Supplier> contents = IO.getInstance().mongoOperations().find(new Query(Criteria.where("_id").is(id)), Supplier.class, "suppliers");
+        return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
+    }
 
-        @GetMapping
-        public ResponseEntity<Page<Supplier>> getSuppliers(Pageable pageRequest, PersistentEntityResourceAssembler assembler)
-        {
-            IO.log(getClass().getName(), IO.TAG_INFO, "handling Supplier GET request {all}");
-            List<Supplier> contents =  IO.getInstance().mongoOperations().findAll(Supplier.class, "suppliers");
-            return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
-        }
+    @GetMapping
+    public ResponseEntity<Page<Supplier>> getSuppliers(Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    {
+        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Supplier GET request {all}");
+        List<Supplier> contents =  IO.getInstance().mongoOperations().findAll(Supplier.class, "suppliers");
+        return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
+    }
 
-        @PostMapping
-        @PutMapping
-        public ResponseEntity<Page<Supplier>> addSupplier(@RequestBody Supplier supplier, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
-        {
-            IO.log(getClass().getName(), IO.TAG_INFO, "handling Supplier creation request.");
-            List<BusinessObject> contents = new LinkedList<>();
-            contents.add(supplier);
-            return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
-        }
+    @PutMapping
+    public ResponseEntity<String> addSupplier(@RequestBody Supplier supplier)
+    {
+        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Supplier creation request.");
+        return APIController.putBusinessObject(supplier, "suppliers", "suppliers_timestamp");
+    }
+
+    @PostMapping
+    public ResponseEntity<String> patchSupplier(@RequestBody Supplier supplier)
+    {
+        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Supplier update request.");
+        return APIController.patchBusinessObject(supplier, "suppliers", "suppliers_timestamp");
+    }
 }

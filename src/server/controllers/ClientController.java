@@ -14,10 +14,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import server.auxilary.IO;
-import server.exceptions.InvalidEmployeeException;
+import server.auxilary.RemoteComms;
 import server.model.BusinessObject;
 import server.model.Client;
-import server.model.Employee;
+import server.model.Quote;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -45,26 +45,22 @@ public class ClientController
     @GetMapping
     public ResponseEntity<Page<Client>> getAllClients(Pageable pageRequest, PersistentEntityResourceAssembler assembler)
     {
-        IO.log(getClass().getName(), IO.TAG_INFO, "handling Client GET request {all}");
+        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Client GET request {all}");
         List<Client> contents =  IO.getInstance().mongoOperations().findAll(Client.class, "clients");
         return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
     }
 
     @PutMapping
-    public ResponseEntity<Page<Client>> addClient(@RequestBody Client client, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    public ResponseEntity<String> addClient(@RequestBody Client client)
     {
-        IO.log(getClass().getName(), IO.TAG_INFO, "handling Client PUT request.");
-        List<BusinessObject> contents = new LinkedList<>();
-        if(client!=null)
-        {
-            if (client.isValid())
-            {
-                System.out.println(">>>>>>>>>>>>>creating client: "+client.toString());
-                IO.getInstance().mongoOperations().save(client, "clients");
-            } else
-                throw new InvalidEmployeeException();
-        }
-        return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents
-                .size()), (ResourceAssembler) assembler), HttpStatus.OK);
+        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Client PUT request.");
+        return APIController.putBusinessObject(client, "clients", "clients_timestamp");
+    }
+
+    @PostMapping
+    public ResponseEntity<String> patchClient(@RequestBody Client client)
+    {
+        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Client update request.");
+        return APIController.patchBusinessObject(client, "clients", "clients_timestamp");
     }
 }
