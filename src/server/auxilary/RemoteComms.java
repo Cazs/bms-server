@@ -285,7 +285,7 @@ public class RemoteComms
                 IO.log(RemoteComms.class.getName(),IO.TAG_INFO, "committed BusinessObject:{"+businessObject.getClass().getName()+"} ["+businessObject.get_id()+"]");
                 //update respective timestamp
                 if(timestamp_name!=null)
-                    CounterController.updateCounter(new Counter(timestamp_name, System.currentTimeMillis()));
+                    CounterController.commitCounter(new Counter(timestamp_name, System.currentTimeMillis()));
                 else return null;
                 return businessObject.get_id();
             } else throw new InvalidBusinessObjectException(is_valid[1]);

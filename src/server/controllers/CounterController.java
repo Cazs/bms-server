@@ -34,7 +34,7 @@ public class CounterController
         return null;
     }
 
-    public static Counter updateCounter(Counter counter)
+    public static Counter commitCounter(Counter counter)
     {
         if(counter!=null)
         {
@@ -43,16 +43,38 @@ public class CounterController
                 IO.log(CounterController.class.getName(), IO.TAG_ERROR, "invalid counter {name:"+counter.getCounter_name()+", count:"+counter.getCount()+"}");
                 return null;
             }
+            //get Counter record from DB
             Counter db_counter = getCounter(counter.getCounter_name());
             if(db_counter!=null)
             {
+                //exists so update Counter
                 db_counter.setCount(counter.getCount());
                 IO.getInstance().mongoOperations().save(db_counter, "counters");
                 IO.log(RemoteComms.class.getName(), IO.TAG_INFO, "updated counter[" +
                         counter.getCounter_name() + "] to: [" + counter.getCount() + "]\n");
                 return db_counter;
-            } else IO.log(CounterController.class.getName(), IO.TAG_ERROR, "could not find counter["+counter.getCounter_name()+"] on database.");
+            } else {
+                //create new counter document
+                return createCounter(counter);
+            }
         } else IO.log(CounterController.class.getName(), IO.TAG_ERROR, "invalid counter.");
+        return null;
+    }
+
+    public static Counter createCounter(Counter counter)
+    {
+        if(counter!=null)
+        {
+            if(counter.getCounter_name()==null)
+            {
+                IO.log(CounterController.class.getName(), IO.TAG_ERROR, "invalid counter {name:"+counter.getCounter_name()+", count:"+counter.getCount()+"}");
+                return null;
+            }
+            IO.getInstance().mongoOperations().insert(counter, "counters");
+            IO.log(RemoteComms.class.getName(), IO.TAG_INFO, "created new counter["+counter.getCounter_name() + "] to: [" + counter.getCount() + "]\n");
+            return counter;
+        }
+        IO.log(CounterController.class.getName(), IO.TAG_ERROR, "invalid counter.");
         return null;
     }
 
