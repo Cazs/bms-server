@@ -12,4 +12,9 @@ import java.net.URLEncoder;
  */
 public class ResourceType extends Type
 {
+    @Override
+    public String apiEndpoint()
+    {
+        return "/resources/types";
+    }
 }

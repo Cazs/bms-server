@@ -18,7 +18,9 @@ import server.auxilary.RemoteComms;
 import server.exceptions.InvalidBusinessObjectException;
 import server.exceptions.InvalidJobException;
 import server.model.Counter;
+import server.model.FileMetadata;
 import server.model.Job;
+import server.model.Quote;
 import server.repositories.JobRepository;
 
 import java.rmi.Remote;
@@ -78,5 +80,21 @@ public class JobController
     {
         IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Job update request.");
         return APIController.patchBusinessObject(job, "jobs", "jobs_timestamp");
+    }
+
+    @PostMapping(value = "/jobs/approval_request")//, consumes = "text/plain"//value =//, produces = "application/pdf"
+    public ResponseEntity<String> requestJobApproval(@RequestHeader String job_id, @RequestHeader String session_id,
+                                                       @RequestHeader String message, @RequestHeader String subject,
+                                                       @RequestBody FileMetadata fileMetadata)//, @RequestParam("file") MultipartFile file
+    {
+        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Job approval request.");
+        return APIController.requestBusinessObjectApproval(job_id, session_id, message, subject, fileMetadata, new Job().apiEndpoint(), Job.class);
+    }
+
+    @GetMapping("/jobs/approve/{job_id}/{vericode}")
+    public ResponseEntity<String> approveJob(@PathVariable("job_id") String job_id, @PathVariable("vericode") String vericode)
+    {
+        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Job "+job_id+" approval request by Vericode.");
+        return APIController.approveBusinessObjectByVericode(job_id, vericode, "jobs", "jobs_timestamp", Job.class);
     }
 }

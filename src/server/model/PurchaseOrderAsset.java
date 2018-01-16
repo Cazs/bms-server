@@ -6,4 +6,10 @@ package server.model;
 public class PurchaseOrderAsset extends PurchaseOrderItem
 {
     public static final String TAG = "PurchaseOrderAsset";
+
+    @Override
+    public String apiEndpoint()
+    {
+        return "/purchaseorders/assets";
+    }
 }

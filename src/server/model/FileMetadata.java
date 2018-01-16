@@ -18,6 +18,7 @@ public class FileMetadata extends BusinessObject
     private String label;
     private String path;
     private String content_type;
+    private String file;//Base64 String representation of file
     //TODO: private String extra;//{"logo_options":{}, "required":false}
     public static final String TAG = "FileMetadata";
 
@@ -61,6 +62,16 @@ public class FileMetadata extends BusinessObject
         this.content_type = type;
     }
 
+    public String getFile()
+    {
+        return file;
+    }
+
+    public void setFile(String file)
+    {
+        this.file = file;
+    }
+
     @Override
     public String[] isValid()
     {
@@ -94,6 +105,9 @@ public class FileMetadata extends BusinessObject
             case "content_type":
                 content_type=(String)val;
                 break;
+            case "file":
+                file=(String)val;
+                break;
             default:
                 IO.log(TAG, IO.TAG_ERROR, "unknown "+TAG+" attribute '" + var + "'");
                 break;
@@ -116,10 +130,17 @@ public class FileMetadata extends BusinessObject
                     return path;
                 case "content_type":
                     return content_type;
+                case "file":
+                    return file;
                 default:
                     return null;
             }
         } else return val;
     }
-}
 
+    @Override
+    public String apiEndpoint()
+    {
+        return "/files";
+    }
+}

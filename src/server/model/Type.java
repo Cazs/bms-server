@@ -10,7 +10,7 @@ import java.net.URLEncoder;
 /**
  * Created by ghost on 2017/01/13.
  */
-public class Type extends BusinessObject
+public abstract class Type extends BusinessObject
 {
     private String type_name;
     private String type_description;

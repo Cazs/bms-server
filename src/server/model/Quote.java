@@ -22,9 +22,6 @@ public class Quote extends BusinessObject
     private double revision;
     private int status;
     public static final String TAG = "Quote";
-    public static final int STATUS_PENDING =0;
-    public static final int STATUS_APPROVED =1;
-    public static final int STATUS_ARCHIVED =2;
 
     public String getClient_id()
     {
@@ -219,5 +216,11 @@ public class Quote extends BusinessObject
     public String toString()
     {
         return get_id();
+    }
+
+    @Override
+    public String apiEndpoint()
+    {
+        return "/quotes";
     }
 }

@@ -14,6 +14,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import server.auxilary.IO;
+import server.model.FileMetadata;
+import server.model.Job;
 import server.model.PurchaseOrder;
 import server.repositories.PurchaseOrderRepository;
 
@@ -61,5 +63,21 @@ public class PurchaseOrderController
     {
         IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling PurchaseOrder update request.");
         return APIController.patchBusinessObject(purchase_order, "purchase_orders", "purchase_orders_timestamp");
+    }
+
+    @PostMapping("/approval_request")//, consumes = "text/plain"//value =//, produces = "application/pdf"
+    public ResponseEntity<String> requestPurchaseOrderApproval(@RequestHeader String purchaseorder_id, @RequestHeader String session_id,
+                                                     @RequestHeader String message, @RequestHeader String subject,
+                                                     @RequestBody FileMetadata fileMetadata)//, @RequestParam("file") MultipartFile file
+    {
+        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling PurchaseOrder approval request.");
+        return APIController.requestBusinessObjectApproval(purchaseorder_id, session_id, message, subject, fileMetadata, new PurchaseOrder().apiEndpoint(), PurchaseOrder.class);
+    }
+
+    @GetMapping("/approve/{purchaseorder_id}/{vericode}")
+    public ResponseEntity<String> approvePurchaseOrder(@PathVariable("purchaseorder_id") String purchaseorder_id, @PathVariable("vericode") String vericode)
+    {
+        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling PurchaseOrder "+purchaseorder_id+" approval request by Vericode.");
+        return APIController.approveBusinessObjectByVericode(purchaseorder_id, vericode, "purchase_orders", "purchase_orders_timestamp", PurchaseOrder.class);
     }
 }

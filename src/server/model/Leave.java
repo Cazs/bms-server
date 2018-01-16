@@ -162,4 +162,10 @@ public class Leave extends BusinessObject
         }
         return super.get(var);
     }
+
+    @Override
+    public String apiEndpoint()
+    {
+        return "/leave_records";
+    }
 }

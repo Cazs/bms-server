@@ -122,7 +122,7 @@ public class PurchaseOrder extends BusinessObject
                     setDate_logged(Long.valueOf((String)val));
                     break;
                 case "status":
-                    setStatus(Integer.valueOf((String)val));
+                    setStatus(Integer.valueOf(String.valueOf(val)));
                     break;
                 case "creator":
                     setCreator((String)val);
@@ -160,5 +160,11 @@ public class PurchaseOrder extends BusinessObject
                 return getStatus();
         }
         return super.get(var);
+    }
+
+    @Override
+    public String apiEndpoint()
+    {
+        return "/purchaseorders";
     }
 }

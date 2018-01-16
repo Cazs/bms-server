@@ -253,4 +253,10 @@ public class Employee extends BusinessObject
     }
 
     public String getInitials(){return new String(firstname.substring(0,1) + lastname.substring(0,1));}
+
+    @Override
+    public String apiEndpoint()
+    {
+        return "/employees";
+    }
 }

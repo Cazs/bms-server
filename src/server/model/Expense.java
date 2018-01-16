@@ -152,4 +152,10 @@ public class Expense extends BusinessObject
     {
         return this.expense_title;
     }
+
+    @Override
+    public String apiEndpoint()
+    {
+        return "/expenses";
+    }
 }

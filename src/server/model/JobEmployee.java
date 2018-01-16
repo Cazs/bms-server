@@ -84,4 +84,10 @@ public class JobEmployee extends BusinessObject
         }
         return super.get(var);
     }
+
+    @Override
+    public String apiEndpoint()
+    {
+        return "/jobs/employees";
+    }
 }

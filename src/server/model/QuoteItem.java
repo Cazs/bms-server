@@ -224,4 +224,10 @@ public class QuoteItem extends BusinessObject
         }
         return super.get(var);
     }
+
+    @Override
+    public String apiEndpoint()
+    {
+        return "/quotes/resources";
+    }
 }

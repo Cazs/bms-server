@@ -5,4 +5,9 @@ package server.model;
  */
 public class AssetType extends Type
 {
+    @Override
+    public String apiEndpoint()
+    {
+        return "/assets/types";
+    }
 }

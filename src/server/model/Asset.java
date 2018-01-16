@@ -217,4 +217,10 @@ public class Asset extends BusinessObject
     {
         return getAsset_name();
     }
+
+    @Override
+    public String apiEndpoint()
+    {
+        return "/assets";
+    }
 }

@@ -18,6 +18,9 @@ public abstract class BusinessObject implements Serializable
     private String creator;
     private String other;
     private boolean marked;
+    public static final int STATUS_PENDING =0;
+    public static final int STATUS_APPROVED =1;
+    public static final int STATUS_ARCHIVED =2;
 
     public String get_id()
     {
@@ -121,4 +124,6 @@ public abstract class BusinessObject implements Serializable
         return new String[]{"true", "valid "+getClass().getName()+" object."};
     }
     //TODO: public abstract String asURLEncodedString();//TODO: check if models comply
+
+    public abstract String apiEndpoint();
 }

@@ -21,8 +21,7 @@ public class Job extends BusinessObject
     private long job_number;
     private String invoice_id;
     private String quote_id;
-    private boolean signed;
-    private String signed_job;
+    private int status;
     private Employee[] assigned_employees;
     private FileMetadata[] safety_catalogue;
 
@@ -75,32 +74,6 @@ public class Job extends BusinessObject
         return (date_completed>0);
     }
 
-    public void setSigned(boolean signed)
-    {
-        this.signed=signed;
-    }
-
-    public boolean isSigned()
-    {
-        return signed;
-    }
-
-    /**
-     * @return base64 encoded string of signed Job
-     */
-    public String getSigned_job()
-    {
-        return signed_job;
-    }
-
-    /**
-     * @param signed_job Base64 representation of signed Job
-     */
-    public void setSigned_job(String signed_job)
-    {
-        this.signed_job = signed_job;
-    }
-
     public String getQuote_id()
     {
         return quote_id;
@@ -119,6 +92,16 @@ public class Job extends BusinessObject
     public void setInvoice_id(String invoice_id) 
     {
         this.invoice_id = invoice_id;
+    }
+
+    public int getStatus()
+    {
+        return status;
+    }
+
+    public void setStatus(int status)
+    {
+        this.status = status;
     }
 
     @Override
@@ -169,11 +152,8 @@ public class Job extends BusinessObject
                 case "quote_id":
                     quote_id = (String)val;
                     break;
-                case "signed":
-                    signed = (Boolean) val;
-                    break;
-                case "signed_job":
-                    signed_job = (String) val;
+                case "status":
+                    status = Integer.parseInt(String.valueOf(val));
                     break;
                 case "planned_start_date":
                     planned_start_date = Long.parseLong(String.valueOf(val));
@@ -222,10 +202,8 @@ public class Job extends BusinessObject
                 return getJob_number();
             case "quote_id":
                 return getQuote_id();
-            case "signed":
-                return isSigned();
-            case "signed_job":
-                return getSigned_job();
+            case "status":
+                return getStatus();
             case "planned_start_date":
                 return getPlanned_start_date();
             case "date_assigned":
@@ -245,11 +223,9 @@ public class Job extends BusinessObject
     {
         String json_obj = "{\"_id\":\""+get_id()+"\"";
         json_obj+=",\"quote_id\":\""+quote_id+"\""
-                +",\"signed\":\""+signed+"\""
+                +",\"status\":\""+status+"\""
                 +",\"creator\":\""+getCreator()+"\""
                 +",\"date_logged\":\""+getDate_logged()+"\"";
-        if(signed_job!=null)
-            json_obj+=",\"signed_job\":\""+signed_job+"\"";
         if(date_assigned>0)
             json_obj+=",\"date_assigned\":\""+date_assigned+"\"";
         if(planned_start_date>0)
@@ -264,5 +240,11 @@ public class Job extends BusinessObject
 
         IO.log(getClass().getName(),IO.TAG_INFO, json_obj);
         return json_obj;
+    }
+
+    @Override
+    public String apiEndpoint()
+    {
+        return "/jobs";
     }
 }

@@ -11,6 +11,15 @@ import fadulousbms.exceptions.LoginException;
 import fadulousbms.managers.SessionManager;
 import fadulousbms.model.BusinessObject;
 import fadulousbms.model.Error;*/
+import com.mailjet.client.ClientOptions;
+import com.mailjet.client.MailjetClient;
+import com.mailjet.client.MailjetRequest;
+import com.mailjet.client.MailjetResponse;
+import com.mailjet.client.errors.MailjetException;
+import com.mailjet.client.errors.MailjetSocketTimeoutException;
+import com.mailjet.client.resource.Emailv31;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.http.HttpStatus;
@@ -20,6 +29,8 @@ import server.exceptions.InvalidBusinessObjectException;
 import server.exceptions.InvalidJobException;
 import server.model.BusinessObject;
 import server.model.Counter;
+import server.model.Employee;
+import server.model.FileMetadata;
 import sun.net.www.http.HttpClient;
 
 import javax.swing.*;
@@ -41,12 +52,13 @@ import java.util.List;
  */
 public class RemoteComms
 {
-    public static String host = "http://192.168.43.31:9000";//192.168.0.103//95.85.57.110
+    public static String host = "http://192.168.0.103:8080";//192.168.0.103//95.85.57.110
     public static final String TAG = "RemoteComms";
     public static String DB_IP = "localhost";
     public static int DB_PORT = 27017;
     public static String DB_NAME = "fadulousbms";
     public static int TTL = 60*60*2;//2 hours in sec
+    public static String SYSTEM_EMAIL = "bms@omegafs.co.za";
 
     public static void setHost(String h)
     {
@@ -290,5 +302,55 @@ public class RemoteComms
                 return businessObject.get_id();
             } else throw new InvalidBusinessObjectException(is_valid[1]);
         } else throw new InvalidBusinessObjectException("invalid[null] BusinessObject.");
+    }
+
+    /**
+     *
+     * @param subject email subject
+     * @param message email message
+     * @param recipient_employees recipient Employees
+     * @param fileMetadata email attachment files
+     * @return Mailjet email send response object
+     * @throws MailjetSocketTimeoutException
+     * @throws MailjetException
+     */
+    public static MailjetResponse emailWithAttachment(String subject, String message, Employee[] recipient_employees, FileMetadata[] fileMetadata) throws MailjetSocketTimeoutException, MailjetException
+    {
+        MailjetClient client;
+        MailjetRequest request;
+        MailjetResponse response;
+
+        //setup recipients
+        JSONArray recipients = new JSONArray();
+        for(Employee recipient:recipient_employees)
+            recipients.put(new JSONObject()
+                    .put("Email", recipient.getEmail())
+                    .put("Name", recipient.getFirstname()+" "+recipient.getLastname()));
+
+        //setup files to be emailed
+        JSONArray files = new JSONArray();
+        for(FileMetadata file: fileMetadata)
+            files.put(new JSONObject()
+                    .put("ContentType", file.getContent_type())
+                    .put("Filename", file.getFilename())
+                    .put("Base64Content", file.getFile()));//"VGhpcyBpcyB5b3VyIGF0dGFjaGVkIGZpbGUhISEK"
+
+
+        client = new MailjetClient("f8d3d1d74c95250bb2119063b3697082", "8304b30da4245632c878bf48f1d65d92", new ClientOptions("v3.1"));
+        request = new MailjetRequest(Emailv31.resource)
+                .property(Emailv31.MESSAGES, new JSONArray()
+                        .put(new JSONObject()
+                                .put(Emailv31.Message.FROM, new JSONObject()
+                                        .put("Email", SYSTEM_EMAIL)
+                                        .put("Name", "BMS"))
+                                .put(Emailv31.Message.TO, recipients)
+                                .put(Emailv31.Message.SUBJECT, subject)
+                                //.put(Emailv31.Message.TEXTPART, "Dear passenger 1, welcome to Mailjet! May the delivery force be with you!")
+                                .put(Emailv31.Message.HTMLPART, message)
+                                .put(Emailv31.Message.ATTACHMENTS, files)));
+        response = client.post(request);
+        System.out.println(response.getStatus());
+        System.out.println(response.getData());
+        return response;
     }
 }

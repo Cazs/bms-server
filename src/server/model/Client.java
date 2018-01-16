@@ -301,4 +301,10 @@ public class Client extends BusinessObject
         IO.log(getClass().getName(),IO.TAG_INFO, json_obj);
         return json_obj;
     }
+
+    @Override
+    public String apiEndpoint()
+    {
+        return "/clients";
+    }
 }

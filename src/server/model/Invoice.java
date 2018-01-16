@@ -19,6 +19,7 @@ import java.net.URLEncoder;
 public class Invoice extends BusinessObject
 {
     private String job_id;
+    private String quote_id;
     private double receivable;
 
     public double getReceivable()
@@ -39,6 +40,16 @@ public class Invoice extends BusinessObject
     public void setJob_id(String job_id)
     {
         this.job_id = job_id;
+    }
+
+    public String getQuote_id()
+    {
+        return quote_id;
+    }
+
+    public void setQuote_id(String quote_id)
+    {
+        this.quote_id = quote_id;
     }
 
     @Override
@@ -62,6 +73,9 @@ public class Invoice extends BusinessObject
             {
                 case "job_id":
                     setJob_id(String.valueOf(val));
+                    break;
+                case "quote_id":
+                    setQuote_id(String.valueOf(val));
                     break;
                 case "creator":
                     setCreator(String.valueOf(val));
@@ -89,6 +103,8 @@ public class Invoice extends BusinessObject
             {
                 case "job_id":
                     return getJob_id();
+                case "quote_id":
+                    return getQuote_id();
                 case "receivable":
                     return getReceivable();
                 default:
@@ -97,5 +113,11 @@ public class Invoice extends BusinessObject
                     return null;
             }
         } else return val;
+    }
+
+    @Override
+    public String apiEndpoint()
+    {
+        return "/invoices";
     }
 }

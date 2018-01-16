@@ -222,4 +222,10 @@ public class Resource extends BusinessObject
     {
         return getResource_name();
     }
+
+    @Override
+    public String apiEndpoint()
+    {
+        return "/resources";
+    }
 }

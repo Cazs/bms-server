@@ -125,4 +125,10 @@ public class Revenue extends BusinessObject
     {
         return this.revenue_title;
     }
+
+    @Override
+    public String apiEndpoint()
+    {
+        return "/revenues";
+    }
 }

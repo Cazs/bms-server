@@ -38,14 +38,15 @@ public class SessionManager
             return;
         }
         //if session exists in memory, update creation date, id & ttl
-        Session sess_in_mem = getUserSession(session.getUsr());
+        Session sess_in_mem = getUserSession(session.getSession_id());
         if(sess_in_mem!=null)
         {
             sess_in_mem.setDate(session.getDate());
             sess_in_mem.setSession_id(session.getSession_id());
             sess_in_mem.setTtl(session.getTtl());
         } else {//session DNE
-            sessions.put(session.getUsr(), session);//one Employee, one Session
+            //sessions.put(session.getUsr(), session);//one Employee, one Session
+            sessions.put(session.getSession_id(), session);//add Session to Map
         }
     }
     
@@ -54,10 +55,10 @@ public class SessionManager
         return sessions;
     }
     
-    public Session getUserSession(String usr)
+    public Session getUserSession(String session_id)
     {
         if(getSessions()!=null)
-            return getSessions().get(usr);
+            return getSessions().get(session_id);
         else return null;
     }
 }

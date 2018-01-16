@@ -86,4 +86,10 @@ public class QuoteRep extends BusinessObject
                 return null;
         }
     }
+
+    @Override
+    public String apiEndpoint()
+    {
+        return "/quotes/representatives";
+    }
 }

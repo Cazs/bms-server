@@ -282,4 +282,10 @@ public class Supplier extends BusinessObject
     {
         return supplier_name;
     }
+
+    @Override
+    public String apiEndpoint()
+    {
+        return "/suppliers";
+    }
 }

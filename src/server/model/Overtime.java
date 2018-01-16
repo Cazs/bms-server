@@ -167,4 +167,10 @@ public class Overtime extends BusinessObject
         }
         return super.get(var);
     }
+
+    @Override
+    public String apiEndpoint()
+    {
+        return "/overtime_records";
+    }
 }
