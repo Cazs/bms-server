@@ -60,19 +60,8 @@ public class JobController
     public ResponseEntity<String> addJob(@RequestBody Job job)
     {
         IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Job creation request.");
-        if(job!=null)
-        {
-            try
-            {
-                String new_job_id = RemoteComms.commitBusinessObjectToDatabase(job, "jobs", "jobs_timestamp");
-                return new ResponseEntity<>(new_job_id, HttpStatus.OK);
-            } catch (InvalidBusinessObjectException e)
-            {
-                IO.log(Remote.class.getName(),IO.TAG_ERROR, "invalid Job object: {"+e.getMessage()+"}");
-                return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
-            }
-        }
-        return new ResponseEntity<>("Invalid Job", HttpStatus.CONFLICT);
+        //HttpHeaders headers = new HttpHeaders();
+        return APIController.putBusinessObject(job, "jobs", "jobs_timestamp");
     }
 
     @PostMapping("/jobs")

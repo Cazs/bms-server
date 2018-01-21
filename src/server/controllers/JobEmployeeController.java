@@ -17,6 +17,7 @@ import server.auxilary.IO;
 import server.auxilary.RemoteComms;
 import server.exceptions.InvalidBusinessObjectException;
 import server.model.BusinessObject;
+import server.model.Job;
 import server.model.JobEmployee;
 import server.repositories.JobEmployeeRepository;
 
@@ -57,19 +58,8 @@ public class JobEmployeeController
     @PutMapping("/jobs/employees")
     public ResponseEntity<String> addJobEmployee(@RequestBody JobEmployee job_employee)
     {
-        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling JobEmployee creation request: ");
-        if(job_employee!=null)
-        {
-            try
-            {
-                String new_job_employee_id = RemoteComms.commitBusinessObjectToDatabase(job_employee, "job_employees", "jobs_timestamp");
-                return new ResponseEntity<>(new_job_employee_id, HttpStatus.OK);
-            } catch (InvalidBusinessObjectException e)
-            {
-                IO.log(Remote.class.getName(),IO.TAG_ERROR, "invalid JobEmployee object: {"+e.getMessage()+"}");
-                return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
-            }
-        }
-        return new ResponseEntity<>("I\nnvalid job_employee", HttpStatus.CONFLICT);
+        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling JobEmployee creation request.");
+        //HttpHeaders headers = new HttpHeaders();
+        return APIController.putBusinessObject(job_employee, "job_employees", "jobs_timestamp");
     }
 }
