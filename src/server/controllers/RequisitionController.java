@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import server.auxilary.IO;
+import server.model.FileMetadata;
 import server.model.Requisition;
 import server.model.Requisition;
 import server.repositories.RequisitionRepository;
@@ -62,5 +63,21 @@ public class RequisitionController
     {
         IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Requisition update request.");
         return APIController.patchBusinessObject(requisition, "requisitions", "requisitions_timestamp");
+    }
+
+    @PostMapping(value = "/request_approval")//, consumes = "text/plain"//value =//, produces = "application/pdf"
+    public ResponseEntity<String> requestRequisitionApproval(@RequestHeader String requisition_id, @RequestHeader String session_id,
+                                                       @RequestHeader String message, @RequestHeader String subject,
+                                                       @RequestBody FileMetadata fileMetadata)//, @RequestParam("file") MultipartFile file
+    {
+        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Requisition approval request.");
+        return APIController.requestBusinessObjectApproval(requisition_id, session_id, message, subject, fileMetadata, new Requisition().apiEndpoint(), Requisition.class);
+    }
+
+    @GetMapping("/approve/{requisition_id}/{vericode}")
+    public ResponseEntity<String> approveRequisition(@PathVariable("requisition_id") String requisition_id, @PathVariable("vericode") String vericode)
+    {
+        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Requisition "+requisition_id+" approval request by Vericode.");
+        return APIController.approveBusinessObjectByVericode(requisition_id, vericode, "requisitions", "requisitions_timestamp", Requisition.class);
     }
 }

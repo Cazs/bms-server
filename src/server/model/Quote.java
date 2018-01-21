@@ -12,6 +12,7 @@ import java.net.URLEncoder;
  */
 public class Quote extends BusinessObject
 {
+    private String requisition_id;//optional
     private String client_id;
     private String contact_person_id;
     private String parent_id;
@@ -22,6 +23,16 @@ public class Quote extends BusinessObject
     private double revision;
     private int status;
     public static final String TAG = "Quote";
+
+    public String getRequisition_id()
+    {
+        return requisition_id;
+    }
+
+    public void setRequisition_id(String requisition_id)
+    {
+        this.requisition_id = requisition_id;
+    }
 
     public String getClient_id()
     {
