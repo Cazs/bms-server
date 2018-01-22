@@ -8,14 +8,15 @@ import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.SimpleMongoDbFactory;
 import org.springframework.data.rest.core.config.RepositoryRestConfiguration;
+import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurerAdapter;
 import org.springframework.data.rest.webmvc.config.RepositoryRestMvcConfiguration;
 import server.auxilary.RemoteComms;
-import server.model.Employee;
+import server.model.*;
 
 import java.net.UnknownHostException;
 
 @Configuration
-public class AppConfig
+public class AppConfig  extends RepositoryRestConfigurerAdapter
 {
     @Bean
     public MongoDbFactory mongoDbFactory()
@@ -27,6 +28,30 @@ public class AppConfig
     public MongoOperations mongoOperations() throws UnknownHostException
     {
         return new MongoTemplate(mongoDbFactory());
+    }
+
+    @Override
+    public void configureRepositoryRestConfiguration(RepositoryRestConfiguration config)
+    {
+        config.exposeIdsFor(Employee.class);
+        config.exposeIdsFor(Client.class);
+        config.exposeIdsFor(Supplier.class);
+        config.exposeIdsFor(Asset.class);
+        config.exposeIdsFor(Resource.class);
+        config.exposeIdsFor(ResourceType.class);
+        config.exposeIdsFor(Requisition.class);
+        config.exposeIdsFor(Quote.class);
+        config.exposeIdsFor(QuoteItem.class);
+        config.exposeIdsFor(Job.class);
+        config.exposeIdsFor(JobEmployee.class);
+        config.exposeIdsFor(Invoice.class);
+        config.exposeIdsFor(Revenue.class);
+        config.exposeIdsFor(Expense.class);
+        config.exposeIdsFor(PurchaseOrder.class);
+        config.exposeIdsFor(PurchaseOrderResource.class);
+        config.exposeIdsFor(PurchaseOrderAsset.class);
+        config.exposeIdsFor(Leave.class);
+        config.exposeIdsFor(Overtime.class);
     }
 
     /*@Bean

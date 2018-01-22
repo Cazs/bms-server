@@ -16,9 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import server.auxilary.IO;
 import server.auxilary.RemoteComms;
 import server.exceptions.InvalidBusinessObjectException;
-import server.model.BusinessObject;
-import server.model.Invoice;
-import server.model.Leave;
+import server.model.*;
 import server.repositories.InvoiceRepository;
 
 import java.rmi.Remote;
@@ -67,5 +65,21 @@ public class InvoiceController
     {
         IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Invoice update request.");
         return APIController.patchBusinessObject(invoice, "invoices", "invoices_timestamp");
+    }
+
+    @PostMapping(value = "/approval_request")//, consumes = "text/plain"//value =//, produces = "application/pdf"
+    public ResponseEntity<String> requestInvoiceApproval(@RequestHeader String invoice_id, @RequestHeader String session_id,
+                                                     @RequestHeader String message, @RequestHeader String subject,
+                                                     @RequestBody FileMetadata fileMetadata)//, @RequestParam("file") MultipartFile file
+    {
+        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Invoice approval request.");
+        return APIController.requestBusinessObjectApproval(invoice_id, session_id, message, subject, fileMetadata, new Invoice().apiEndpoint(), Invoice.class);
+    }
+
+    @GetMapping("/approve/{invoice_id}/{vericode}")
+    public ResponseEntity<String> approveInvoice(@PathVariable("invoice_id") String invoice_id, @PathVariable("vericode") String vericode)
+    {
+        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Invoice "+invoice_id+" approval request by Vericode.");
+        return APIController.approveBusinessObjectByVericode(invoice_id, vericode, "invoices", "invoices_timestamp", Invoice.class);
     }
 }
