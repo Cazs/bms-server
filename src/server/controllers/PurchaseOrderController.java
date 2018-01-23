@@ -65,6 +65,15 @@ public class PurchaseOrderController
         return APIController.patchBusinessObject(purchase_order, "purchase_orders", "purchase_orders_timestamp");
     }
 
+    @PostMapping(value = "/mailto")//, consumes = "text/plain"//value =//, produces = "application/pdf"
+    public ResponseEntity<String> emailPurchaseOrder(@RequestHeader String _id, @RequestHeader String session_id,
+                                             @RequestHeader String message, @RequestHeader String subject,
+                                             @RequestHeader String destination, @RequestBody FileMetadata fileMetadata)//, @RequestParam("file") MultipartFile file
+    {
+        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling handling PurchaseOrder mailto request.");
+        return APIController.emailBusinessObject(_id, session_id, message, subject, destination, fileMetadata, PurchaseOrder.class);
+    }
+
     @PostMapping("/approval_request")//, consumes = "text/plain"//value =//, produces = "application/pdf"
     public ResponseEntity<String> requestPurchaseOrderApproval(@RequestHeader String purchaseorder_id, @RequestHeader String session_id,
                                                      @RequestHeader String message, @RequestHeader String subject,

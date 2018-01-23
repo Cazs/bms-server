@@ -71,6 +71,15 @@ public class JobController
         return APIController.patchBusinessObject(job, "jobs", "jobs_timestamp");
     }
 
+    @PostMapping(value = "/jobs/mailto")//, consumes = "text/plain"//value =//, produces = "application/pdf"
+    public ResponseEntity<String> emailJob(@RequestHeader String _id, @RequestHeader String session_id,
+                                             @RequestHeader String message, @RequestHeader String subject,
+                                             @RequestHeader String destination, @RequestBody FileMetadata fileMetadata)//, @RequestParam("file") MultipartFile file
+    {
+        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling handling mailto request.");
+        return APIController.emailBusinessObject(_id, session_id, message, subject, destination, fileMetadata, Job.class);
+    }
+
     @PostMapping(value = "/jobs/approval_request")//, consumes = "text/plain"//value =//, produces = "application/pdf"
     public ResponseEntity<String> requestJobApproval(@RequestHeader String job_id, @RequestHeader String session_id,
                                                        @RequestHeader String message, @RequestHeader String subject,

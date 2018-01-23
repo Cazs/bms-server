@@ -353,4 +353,56 @@ public class RemoteComms
         System.out.println(response.getData());
         return response;
     }
+
+    /**
+     *
+     * @param subject email subject
+     * @param message email message
+     * @param recipient_addresses recipient email addresses
+     * @param fileMetadata email attachment files
+     * @return Mailjet email send response object
+     * @throws MailjetSocketTimeoutException
+     * @throws MailjetException
+     */
+    public static MailjetResponse emailWithAttachment(String subject, String message, String[] recipient_addresses, FileMetadata[] fileMetadata) throws MailjetSocketTimeoutException, MailjetException
+    {
+        MailjetClient client;
+        MailjetRequest request;
+        MailjetResponse response;
+
+        //setup recipients
+        JSONArray recipients_json = new JSONArray();
+        for(String recipient:recipient_addresses)
+        {
+            recipients_json.put(new JSONObject()
+                    .put("Email", recipient));
+                    //.put("Name", recipient));//recipient.getFirstname()+" "+recipient.getLastname()
+        }
+
+        //setup files to be emailed
+        JSONArray files = new JSONArray();
+        for(FileMetadata file: fileMetadata)
+            files.put(new JSONObject()
+                    .put("ContentType", file.getContent_type())
+                    .put("Filename", file.getFilename())
+                    .put("Base64Content", file.getFile()));//"VGhpcyBpcyB5b3VyIGF0dGFjaGVkIGZpbGUhISEK"
+
+
+        client = new MailjetClient("f8d3d1d74c95250bb2119063b3697082", "8304b30da4245632c878bf48f1d65d92", new ClientOptions("v3.1"));
+        request = new MailjetRequest(Emailv31.resource)
+                .property(Emailv31.MESSAGES, new JSONArray()
+                        .put(new JSONObject()
+                                .put(Emailv31.Message.FROM, new JSONObject()
+                                        .put("Email", SYSTEM_EMAIL)
+                                        .put("Name", "BMS"))
+                                .put(Emailv31.Message.TO, recipients_json)
+                                .put(Emailv31.Message.SUBJECT, subject)
+                                //.put(Emailv31.Message.TEXTPART, "Dear passenger 1, welcome to Mailjet! May the delivery force be with you!")
+                                .put(Emailv31.Message.HTMLPART, message)
+                                .put(Emailv31.Message.ATTACHMENTS, files)));
+        response = client.post(request);
+        IO.log(RemoteComms.class.getName(), IO.TAG_INFO, String.valueOf(response.getStatus()));
+        IO.log(RemoteComms.class.getName(), IO.TAG_INFO, String.valueOf(response.getData()));
+        return response;
+    }
 }

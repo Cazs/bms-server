@@ -67,6 +67,15 @@ public class InvoiceController
         return APIController.patchBusinessObject(invoice, "invoices", "invoices_timestamp");
     }
 
+    @PostMapping(value = "/mailto")//, consumes = "text/plain"//value =//, produces = "application/pdf"
+    public ResponseEntity<String> emailInvoice(@RequestHeader String _id, @RequestHeader String session_id,
+                                                     @RequestHeader String message, @RequestHeader String subject,
+                                                     @RequestHeader String destination, @RequestBody FileMetadata fileMetadata)//, @RequestParam("file") MultipartFile file
+    {
+        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Invoice mailto request.");
+        return APIController.emailBusinessObject(_id, session_id, message, subject, destination, fileMetadata, Invoice.class);
+    }
+
     @PostMapping(value = "/approval_request")//, consumes = "text/plain"//value =//, produces = "application/pdf"
     public ResponseEntity<String> requestInvoiceApproval(@RequestHeader String invoice_id, @RequestHeader String session_id,
                                                      @RequestHeader String message, @RequestHeader String subject,

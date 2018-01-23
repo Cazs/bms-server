@@ -68,6 +68,44 @@ public class APIController
         return "Incorrect Employee credentials.";
     }
 
+    public static ResponseEntity<String> emailBusinessObject(String _id, String session_id, String message,
+                                                             String subject, String destination, FileMetadata fileMetadata, Class model)//, @RequestParam("file") MultipartFile file
+    {
+        if(fileMetadata==null)
+            return new ResponseEntity<>("Invalid attached FileMetadata object.", HttpStatus.CONFLICT);
+        if(session_id!=null)
+        {
+            Session user_session = SessionManager.getInstance().getUserSession(session_id);
+            if(user_session!=null)
+            {
+                if(_id!=null)
+                {
+                    if(fileMetadata.getFile()!=null)
+                    {
+                        try
+                        {
+                            //check if destination param contains multiple emails
+                            String[] email_addresses = destination.split(",");
+                            //Send email
+                            MailjetResponse response = RemoteComms.emailWithAttachment(subject, message, email_addresses, new FileMetadata[]{fileMetadata});
+                            if(response==null)
+                                return new ResponseEntity<>("Could not send email.", HttpStatus.CONFLICT);
+                            else return new ResponseEntity<>("eMail has been sent successfully.", HttpStatus.valueOf(response.getStatus()));
+                        } catch (MailjetSocketTimeoutException e)
+                        {
+                            IO.log(APIController.class.getName(), IO.TAG_ERROR, e.getMessage());
+                            return new ResponseEntity<>("Could not send eMail: "+e.getMessage(), HttpStatus.CONFLICT);
+                        } catch (MailjetException e)
+                        {
+                            IO.log(APIController.class.getName(), IO.TAG_ERROR, e.getMessage());
+                            return new ResponseEntity<>("Could not send eMail: "+e.getMessage(), HttpStatus.CONFLICT);
+                        }
+                    } else return new ResponseEntity<>("Invalid attached BusinessObject{"+model.getName()+"["+_id+"]} PDF", HttpStatus.CONFLICT);
+                } else return new ResponseEntity<>("Invalid _id param", HttpStatus.CONFLICT);
+            } else return new ResponseEntity<>("Invalid user session. Please log in.", HttpStatus.CONFLICT);
+        } else return new ResponseEntity<>("Invalid session_id header param", HttpStatus.CONFLICT);
+    }
+
     public static ResponseEntity<String> requestBusinessObjectApproval(String _id, String session_id, String message,
                                                                        String subject, FileMetadata fileMetadata, String endpoint, Class model)//, @RequestParam("file") MultipartFile file
     {

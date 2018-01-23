@@ -72,6 +72,15 @@ public class QuoteController
         return APIController.patchBusinessObject(quote, "quotes", "quotes_timestamp");
     }
 
+    @PostMapping(value = "/quotes/mailto")//, consumes = "text/plain"//value =//, produces = "application/pdf"
+    public ResponseEntity<String> emailQuote(@RequestHeader String _id, @RequestHeader String session_id,
+                                                        @RequestHeader String message, @RequestHeader String subject,
+                                                        @RequestHeader String destination, @RequestBody FileMetadata fileMetadata)//, @RequestParam("file") MultipartFile file
+    {
+        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Quote mailto request.");
+        return APIController.emailBusinessObject(_id, session_id, message, subject, destination, fileMetadata, Quote.class);
+    }
+
     @PostMapping(value = "/quotes/approval_request")//, consumes = "text/plain"//value =//, produces = "application/pdf"
     public ResponseEntity<String> requestQuoteApproval(@RequestHeader String quote_id, @RequestHeader String session_id,
                                                        @RequestHeader String message, @RequestHeader String subject,

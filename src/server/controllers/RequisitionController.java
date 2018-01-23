@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import server.auxilary.IO;
 import server.model.FileMetadata;
+import server.model.Invoice;
 import server.model.Requisition;
 import server.model.Requisition;
 import server.repositories.RequisitionRepository;
@@ -63,6 +64,15 @@ public class RequisitionController
     {
         IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Requisition update request.");
         return APIController.patchBusinessObject(requisition, "requisitions", "requisitions_timestamp");
+    }
+
+    @PostMapping(value = "/mailto")//, consumes = "text/plain"//value =//, produces = "application/pdf"
+    public ResponseEntity<String> emailRequisition(@RequestHeader String _id, @RequestHeader String session_id,
+                                               @RequestHeader String message, @RequestHeader String subject,
+                                               @RequestHeader String destination, @RequestBody FileMetadata fileMetadata)//, @RequestParam("file") MultipartFile file
+    {
+        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Requisition mailto request.");
+        return APIController.emailBusinessObject(_id, session_id, message, subject, destination, fileMetadata, Requisition.class);
     }
 
     @PostMapping(value = "/request_approval")//, consumes = "text/plain"//value =//, produces = "application/pdf"
