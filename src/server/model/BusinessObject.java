@@ -16,6 +16,7 @@ public abstract class BusinessObject implements Serializable
     private String _id;
     private long date_logged;
     private String creator;
+    private long object_number;
     private String other;
     private boolean marked;
     public static final int STATUS_PENDING =0;
@@ -57,6 +58,16 @@ public abstract class BusinessObject implements Serializable
     public void setCreator(String creator)
     {
         this.creator = creator;
+    }
+
+    public long getObject_number()
+    {
+        return object_number;
+    }
+
+    public void setObject_number(long object_number)
+    {
+        this.object_number = object_number;
     }
 
     public String getOther()

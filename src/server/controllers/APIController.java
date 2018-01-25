@@ -44,7 +44,6 @@ public class APIController
     {
         IO.log(getClass().getName(), IO.TAG_INFO, "handling auth request.");
         String session_id = null;
-        System.out.println(">>>>>>Validating Employee: " + usr+":"+pwd);
         List<Employee> employees =  IO.getInstance().mongoOperations().find(
                 new Query(Criteria.where("usr").is(usr).and("pwd").is(pwd)), Employee.class, "employees");
         if(employees!=null)
@@ -60,6 +59,7 @@ public class APIController
                 session.setDate(System.currentTimeMillis());
                 session.setTtl(RemoteComms.TTL);
                 SessionManager.getInstance().addSession(session);
+                IO.log(getClass().getName(), IO.TAG_INFO, "user ["+session.getUsr()+"] signed in.");
                 return session.toString();
             } else if(employees.size()!=1)
                 throw new EmployeeNotFoundException();
@@ -152,7 +152,7 @@ public class APIController
                             message += "<br/><h3 style=\"text-align:center;\">" +
                                     "Click <a href=\""
                                     +RemoteComms.host+endpoint+"/approve/"+_id+"/"+vericode.getCode()
-                                    +"\">here</a> to approve this "+model.getName()+".</h3>";
+                                    +"\">here</a> to approve this "+model.getSimpleName()+".</h3>";
                             //Send email with approval link
                             MailjetResponse response = RemoteComms.emailWithAttachment(subject, message,
                                                                     auth_employees_arr, new FileMetadata[]{fileMetadata});

@@ -5,10 +5,10 @@ package server.auxilary;
  */
 public enum AccessLevels
 {
-    NO_ACCESS(0),
-    NORMAL(1),
-    ADMIN(2),
-    SUPERUSER(3);
+    NO_ACCESS(0),//No rights
+    STANDARD(1),//Read/Write rights - limited
+    ADMIN(2),//Read/Write rights - slightly less limited
+    SUPERUSER(3);//Read/Write rights
 
     private int level;
 

@@ -57,7 +57,23 @@ public class IO<T extends BusinessObject>
         return str;
     }
 
-    public byte[] encrypt(String digest, String message) throws Exception
+    public static String getEncryptedHexString(String message) throws Exception
+    {
+        StringBuilder str = new StringBuilder();
+        for(byte b: hash(message))
+            str.append(Integer.toHexString(0xFF & b));
+        return str.toString();
+    }
+
+    public static byte[] hash(String plaintext) throws Exception
+    {
+        MessageDigest m = MessageDigest.getInstance("MD5");
+        m.reset();
+        m.update(plaintext.getBytes());
+        return m.digest();
+    }
+
+    public static byte[] encrypt(String digest, String message) throws Exception
     {
         final MessageDigest md = MessageDigest.getInstance("md5");
         final byte[] digestOfPassword = md.digest(digest.getBytes("utf-8"));
@@ -77,7 +93,7 @@ public class IO<T extends BusinessObject>
         return cipherText;
     }
 
-    public String decrypt(String digest, byte[] message) throws Exception
+    public static String decrypt(String digest, byte[] message) throws Exception
     {
         final MessageDigest md = MessageDigest.getInstance("md5");
         final byte[] digestOfPassword = md.digest(digest.getBytes("utf-8"));
@@ -128,6 +144,76 @@ public class IO<T extends BusinessObject>
             }
         }
         return i;
+    }
+
+    public static void writeAttributeToConfig(String key, String value) throws IOException
+    {
+        //TO_Consider: add meta data for [key,value] to meta records.
+        File f = new File("config.cfg");
+        StringBuilder result = new StringBuilder();
+        boolean rec_found=false;
+        if(f.exists())
+        {
+            String s = "";
+            BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(f)));
+            int line_read_count=0;
+            while ((s = in.readLine())!=null)
+            {
+                if(s.contains("="))
+                {
+                    String k = s.split("=")[0];
+                    String val = s.split("=")[1];
+                    //If the record exists, change it
+                    if(k.equals(key))
+                    {
+                        val = value;//Update record value
+                        rec_found=true;
+                    }
+                    result.append(k+"="+val+"\n");//Append existing record.
+                    line_read_count++;
+                } else IO.log(TAG, IO.TAG_ERROR, "Config file may be corrupted.");
+            }
+            if(!rec_found)//File exists but no key was found - write new line.
+                result.append(key+"="+value+"\n");
+            /*if(in!=null)
+                in.close();*/
+        } else result.append(key+"="+value+"\n");//File DNE - write new line.
+
+        IO.log(TAG, IO.TAG_INFO, "writing attribute to config: " + key + "=" + value);
+
+        /*if(!rec_found)//File exists but record doesn't exist - create new record
+            result.append(key+"="+value+"\n");*/
+
+        //Write to disk.
+        PrintWriter out = new PrintWriter(f);
+        out.print(result);
+        out.flush();
+        out.close();
+    }
+
+    public static String readAttributeFromConfig(String key) throws IOException
+    {
+        File f = new File("config.cfg");
+        if(f.exists())
+        {
+            String s = "";
+            BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(f)));
+            while ((s = in.readLine())!=null)
+            {
+                if(s.contains("="))
+                {
+                    String var = s.split("=")[0];
+                    String val = s.split("=")[1];
+                    if(var.equals(key))
+                    {
+                        /*if(in!=null)
+                            in.close();*/
+                        return val;
+                    }
+                }
+            }
+        }
+        return null;
     }
 
     public static String readStream(InputStream stream) throws IOException

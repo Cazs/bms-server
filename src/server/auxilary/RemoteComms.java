@@ -5,12 +5,6 @@
  */
 package server.auxilary;
 
-/*import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import fadulousbms.exceptions.LoginException;
-import fadulousbms.managers.SessionManager;
-import fadulousbms.model.BusinessObject;
-import fadulousbms.model.Error;*/
 import com.mailjet.client.ClientOptions;
 import com.mailjet.client.MailjetClient;
 import com.mailjet.client.MailjetRequest;
@@ -22,29 +16,19 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import server.controllers.CounterController;
 import server.exceptions.InvalidBusinessObjectException;
-import server.exceptions.InvalidJobException;
 import server.model.BusinessObject;
 import server.model.Counter;
 import server.model.Employee;
 import server.model.FileMetadata;
-import sun.net.www.http.HttpClient;
 
-import javax.swing.*;
 import java.io.*;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
-import java.rmi.Remote;
 import java.util.AbstractMap;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  *
@@ -59,21 +43,6 @@ public class RemoteComms
     public static String DB_NAME = "fadulousbms";
     public static int TTL = 60*60*2;//2 hours in sec
     public static String SYSTEM_EMAIL = "bms@omegafs.co.za";
-
-    public static void setHost(String h)
-    {
-        host = h;
-    }
-
-    public static boolean pingServer() throws IOException
-    {
-        URL urlConn = new URL(host);
-        HttpURLConnection httpConn =  (HttpURLConnection)urlConn.openConnection();
-
-        boolean response = (httpConn.getResponseCode() == HttpURLConnection.HTTP_OK);
-        httpConn.disconnect();
-        return response;
-    }
 
     public static String sendGetRequest(String url, ArrayList<AbstractMap.SimpleEntry<String,String>> headers) throws IOException
     {
@@ -290,7 +259,11 @@ public class RemoteComms
             {
                 IO.log(RemoteComms.class.getName(),IO.TAG_INFO, is_valid[1]);//print message from isValid() call
                 IO.log(RemoteComms.class.getName(),IO.TAG_INFO, "committing BusinessObject{"+businessObject.getClass().getName()+"}: "+businessObject.toString());
-                //commit BusinessObject data to DB server
+                //get collection count
+                long count = IO.getInstance().mongoOperations().count(null, collection);
+                //use collection count as object_number for new BusinessObject
+                businessObject.setObject_number(count);//set current collection count as object_number for new BusinessObject
+                //commit BusinessObject to DB server
                 if(collection!=null)
                     IO.getInstance().mongoOperations().save(businessObject, collection);
                 else return null;

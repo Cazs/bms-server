@@ -29,10 +29,6 @@ public class Employee extends BusinessObject
     private int access_level;
     private boolean active;
     public static final String TAG = "Employee";
-    public static int ACCESS_LEVEL_NONE = 0;
-    public static int ACCESS_LEVEL_NORMAL = 1;
-    public static int ACCESS_LEVEL_ADMIN = 2;
-    public static int ACCESS_LEVEL_SUPER = 3;
 
     public String getUsr()
     {
@@ -52,11 +48,11 @@ public class Employee extends BusinessObject
         this.pwd = pwd;
     }
 
-    public int getAccessLevel() {
+    public int getAccess_level() {
         return access_level;
     }
 
-    public void setAccessLevel(int access_level)
+    public void setAccess_level(int access_level)
     {
         this.access_level = access_level;
     }
@@ -131,6 +127,11 @@ public class Employee extends BusinessObject
         this.gender = gender;
     }
 
+    public String getName()
+    {
+        return getFirstname() + " " + getLastname();
+    }
+
     @Override
     public String[] isValid()
     {
@@ -150,10 +151,13 @@ public class Employee extends BusinessObject
             return new String[]{"false", "invalid email value."};
         if(getGender()==null)
             return new String[]{"false", "invalid gender value."};
-        if(getAccessLevel()<0)
+        //purposely left out creator
+        if(getAccess_level()<0)
             return new String[]{"false", "invalid access_level value."};
+        if(getDate_logged()<=0)
+            return new String[]{"false", "invalid date_logged value."};
 
-        return super.isValid();
+        return new String[]{"true", "valid "+getClass().getName()+" object."};
     }
 
     @Override
@@ -180,7 +184,7 @@ public class Employee extends BusinessObject
                     setEmail((String)val);
                     break;
                 case "access_level":
-                    setAccessLevel(Integer.parseInt((String)val));
+                    setAccess_level(Integer.parseInt((String)val));
                     break;
                 case "tel":
                     setTel((String)val);
