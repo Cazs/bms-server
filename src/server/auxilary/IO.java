@@ -24,7 +24,6 @@ import java.util.Arrays;
  */
 public class IO<T extends BusinessObject>
 {
-
     public static final String TAG_VERBOSE = "verbose";
     public static final String TAG_INFO = "info";
     public static final String TAG_WARN = "warning";

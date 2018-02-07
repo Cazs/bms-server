@@ -30,7 +30,7 @@ public abstract class Type extends BusinessObject
         return type_description;
     }
 
-    public void setType_description(String type_name)
+    public void setType_description(String type_description)
     {
         this.type_description = type_description;
     }
