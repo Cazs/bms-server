@@ -19,6 +19,7 @@ public class QuoteItem extends BusinessObject
     private String additional_costs;
     private String quote_id;
     private String resource_id;
+    private String category;
     public static final String TAG = "QuoteItem";
 
     public int getItem_number()
@@ -139,11 +140,20 @@ public class QuoteItem extends BusinessObject
         return total;
     }
 
+    public String getCategory()
+    {
+        return category;
+    }
+
+    public void setCategory(String category)
+    {
+        this.category = category;
+    }
+
     public double getTotal()
     {
         return getRate()*getQuantity();
     }
-
     @Override
     public String[] isValid()
     {
@@ -192,11 +202,14 @@ public class QuoteItem extends BusinessObject
                 case "markup":
                     setMarkup(Double.parseDouble((String) val));
                     break;
+                case "category":
+                    setCategory((String) val);
+                    break;
                 default:
                     IO.log(getClass().getName(), IO.TAG_ERROR, "Unknown "+getClass().getName()+" attribute '" + var + "'.");
                     break;
             }
-        }catch (NumberFormatException e)
+        } catch (NumberFormatException e)
         {
             IO.log(getClass().getName(), IO.TAG_ERROR, e.getMessage());
         }
@@ -207,8 +220,6 @@ public class QuoteItem extends BusinessObject
     {
         switch (var.toLowerCase())
         {
-            case "_id":
-                return get_id();
             case "quote_id":
                 return getQuote_id();
             case "resource_id":
@@ -217,10 +228,15 @@ public class QuoteItem extends BusinessObject
                 return getItem_number();
             case "additional_costs":
                 return getAdditional_costs();
+            case "quantity":
+                return getQuantity();
             case "unit_cost":
+            case "value":
                 return getUnitCost();
             case "markup":
                 return getMarkup();
+            case "category":
+                return getCategory();
         }
         return super.get(var);
     }
