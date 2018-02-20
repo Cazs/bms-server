@@ -1,11 +1,6 @@
 package server.model;
 
-import org.springframework.data.annotation.Id;
 import server.auxilary.IO;
-
-import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 
 /**
  * Created by ghost on 2017/01/03.

@@ -14,8 +14,6 @@ import com.mailjet.client.errors.MailjetSocketTimeoutException;
 import com.mailjet.client.resource.Emailv31;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 import server.controllers.CounterController;
 import server.exceptions.InvalidBusinessObjectException;
 import server.model.BusinessObject;

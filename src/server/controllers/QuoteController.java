@@ -1,8 +1,5 @@
 package server.controllers;
 
-import com.mailjet.client.MailjetResponse;
-import com.mailjet.client.errors.MailjetException;
-import com.mailjet.client.errors.MailjetSocketTimeoutException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -16,11 +13,7 @@ import org.springframework.hateoas.ResourceAssembler;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import server.auxilary.AccessLevels;
 import server.auxilary.IO;
-import server.auxilary.RemoteComms;
-import server.auxilary.Session;
-import server.managers.SessionManager;
 import server.model.*;
 import server.repositories.QuoteRepository;
 
