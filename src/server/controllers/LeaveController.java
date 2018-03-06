@@ -14,9 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import server.auxilary.IO;
-import server.model.BusinessObject;
-import server.model.Leave;
-import server.model.PurchaseOrder;
+import server.model.*;
 import server.repositories.LeaveRepository;
 
 import java.util.LinkedList;
@@ -40,7 +38,7 @@ public class LeaveController
     public ResponseEntity<Page<Leave>> getLeave(@PathVariable("id") String id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
     {
         IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Leave GET request id: "+ id);
-        List<Leave> contents = IO.getInstance().mongoOperations().find(new Query(Criteria.where("_id").is(id)), Leave.class, "leave_applications");
+        List<Leave> contents = IO.getInstance().mongoOperations().find(new Query(Criteria.where("_id").is(id)), Leave.class, "leave_records");
         return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
     }
 
@@ -48,7 +46,7 @@ public class LeaveController
     public ResponseEntity<Page<Leave>> getLeaveRecords(Pageable pageRequest, PersistentEntityResourceAssembler assembler)
     {
         IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Leave GET request {all}");
-        List<Leave> contents =  IO.getInstance().mongoOperations().findAll(Leave.class, "leave_applications");
+        List<Leave> contents =  IO.getInstance().mongoOperations().findAll(Leave.class, "leave_records");
         return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
     }
 
@@ -64,5 +62,30 @@ public class LeaveController
     {
         IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Leave record update request.");
         return APIController.patchBusinessObject(leave, "leave_records", "leave_records_timestamp");
+    }
+
+    @PostMapping(value = "/mailto")
+    public ResponseEntity<String> emailLeave(@RequestHeader String _id, @RequestHeader String session_id,
+                                             @RequestHeader String message, @RequestHeader String subject,
+                                             @RequestHeader String destination, @RequestBody FileMetadata fileMetadata)
+    {
+        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Leave mailto request.");
+        return APIController.emailBusinessObject(_id, session_id, message, subject, destination, fileMetadata, Leave.class);
+    }
+
+    @PostMapping(value = "/approval_request")
+    public ResponseEntity<String> requestLeaveApproval(@RequestHeader String leave_record_id, @RequestHeader String session_id,
+                                                       @RequestHeader String message, @RequestHeader String subject,
+                                                       @RequestBody FileMetadata fileMetadata)//, @RequestParam("file") MultipartFile file
+    {
+        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Leave approval request.");
+        return APIController.requestBusinessObjectApproval(leave_record_id, session_id, message, subject, fileMetadata, new Leave().apiEndpoint(), Leave.class);
+    }
+
+    @GetMapping("/approve/{leave_record_id}/{vericode}")
+    public ResponseEntity<String> approveLeave(@PathVariable("leave_record_id") String leave_record_id, @PathVariable("vericode") String vericode)
+    {
+        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Leave Record "+leave_record_id+" approval request by Vericode.");
+        return APIController.approveBusinessObjectByVericode(leave_record_id, vericode, "leave_records", "leave_records_timestamp", Leave.class);
     }
 }

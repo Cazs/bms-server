@@ -1,3 +1,25 @@
 Manifest-Version: 1.0
+Class-Path: jboss-logging-3.3.1.Final.jar classmate-1.3.4.jar spring-b
+ oot-starter-data-mongodb-1.5.7.RELEASE.jar jackson-databind-2.8.10.ja
+ r snakeyaml-1.17.jar spring-data-commons-1.13.7.RELEASE.jar mailjet-c
+ lient-4.1.1.jar spring-boot-starter-tomcat-1.5.7.RELEASE.jar spring-b
+ oot-starter-web-1.5.7.RELEASE.jar jackson-annotations-2.8.0.jar hiber
+ nate-validator-5.3.5.Final.jar spring-boot-starter-data-rest-1.5.7.RE
+ LEASE.jar logback-classic-1.1.11.jar spring-plugin-core-1.2.0.RELEASE
+ .jar spring-aop-4.3.11.RELEASE.jar json-20140107.jar spring-boot-star
+ ter-1.5.7.RELEASE.jar spring-boot-1.5.7.RELEASE.jar spring-web-4.3.11
+ .RELEASE.jar spring-data-rest-webmvc-2.6.7.RELEASE.jar spring-beans-4
+ .3.11.RELEASE.jar spring-hateoas-0.23.0.RELEASE.jar spring-webmvc-4.3
+ .11.RELEASE.jar mongodb-driver-core-3.4.3.jar logback-core-1.1.11.jar
+  log4j-over-slf4j-1.7.25.jar spring-core-4.3.11.RELEASE.jar validatio
+ n-api-1.1.0.Final.jar jcl-over-slf4j-1.7.25.jar http-client-java-0.89
+ .jar spring-data-mongodb-1.10.7.RELEASE.jar evo-inflector-1.2.2.jar s
+ pring-context-4.3.11.RELEASE.jar spring-tx-4.3.11.RELEASE.jar spring-
+ boot-autoconfigure-1.5.7.RELEASE.jar slf4j-api-1.7.25.jar spring-data
+ -rest-core-2.6.7.RELEASE.jar mongodb-driver-3.4.3.jar tomcat-embed-we
+ bsocket-8.5.20.jar tomcat-embed-core-8.5.20.jar spring-boot-starter-l
+ ogging-1.5.7.RELEASE.jar spring-expression-4.3.11.RELEASE.jar jul-to-
+ slf4j-1.7.25.jar bson-3.4.3.jar tomcat-embed-el-8.5.20.jar jackson-co
+ re-2.8.10.jar
 Main-Class: server.Server
 

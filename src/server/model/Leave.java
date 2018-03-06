@@ -97,8 +97,8 @@ public class Leave extends BusinessObject
             return new String[]{"false", "invalid start_date value."};
         if(getEnd_date()<=0)
             return new String[]{"false", "invalid end_date value."};
-        if(getReturn_date()<=0)
-            return new String[]{"false", "invalid return_date value."};
+        /*if(getReturn_date()<=0)
+            return new String[]{"false", "invalid return_date value."};*/
         /*if(getStatus()<0)
             return new String[]{"false", "invalid status value."};*/
 

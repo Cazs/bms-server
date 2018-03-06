@@ -5,12 +5,7 @@
  */
 package server.model;
 
-import org.springframework.data.annotation.Id;
 import server.auxilary.IO;
-
-import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 
 /**
  *
@@ -18,25 +13,27 @@ import java.net.URLEncoder;
  */
 public class Resource extends BusinessObject
 {
-    private String resource_name;
+    private String brand_name;//optional
     private String resource_description;
-    private String resource_serial;
+    private String resource_code;
     private String resource_type;
     private double resource_value;
     private long quantity;
     private long date_acquired;
-    private long date_exhausted;
+    private long date_exhausted;//optional
     private String unit;
+    private String supplier_id;//optional
+    private String part_number;//optional
     public static final String TAG = "Resource";
 
-    public String getResource_name()
+    public String getBrand_name()
     {
-        return resource_name;
+        return brand_name;
     }
 
-    public void setResource_name(String resource_name)
+    public void setBrand_name(String brand_name)
     {
-        this.resource_name = resource_name;
+        this.brand_name = brand_name;
     }
 
     public String getResource_description()
@@ -49,14 +46,14 @@ public class Resource extends BusinessObject
         this.resource_description = description;
     }
 
-    public String getResource_serial()
-    {
-        return resource_serial;
-    }
+    public String getResource_code()
+{
+    return resource_code;
+}
 
-    public void setResource_serial(String resource_serial)
+    public void setResource_code(String resource_code)
     {
-        this.resource_serial = resource_serial;
+        this.resource_code = resource_code;
     }
 
     public String getResource_type()
@@ -119,11 +116,29 @@ public class Resource extends BusinessObject
         this.date_exhausted = date_exhausted;
     }
 
+    public String getSupplier_id()
+    {
+        return supplier_id;
+    }
+
+    public void setSupplier_id(String supplier_id)
+    {
+        this.supplier_id = supplier_id;
+    }
+
+    public String getPart_number()
+    {
+        return part_number;
+    }
+
+    public void setPart_number(String part_number)
+    {
+        this.part_number = part_number;
+    }
+
     @Override
     public String[] isValid()
     {
-        if(getResource_name()==null)
-            return new String[]{"false", "invalid resource_name value."};
         if(getResource_description()==null)
             return new String[]{"false", "invalid resource_description value."};
         if(getResource_value()<=0)
@@ -134,11 +149,18 @@ public class Resource extends BusinessObject
             return new String[]{"false", "invalid quantity value."};
         if(getDate_acquired()<=0)
             return new String[]{"false", "invalid date_acquired value."};
-        if(getResource_serial()==null)
-            return new String[]{"false", "invalid resource_serial value."};
+        if(getDate_exhausted()<getDate_acquired() && getDate_exhausted()!=0)
+            return new String[]{"false", "invalid date_exhausted value. Cannot be before date_acquired"};
+        if(getResource_code()==null)
+            return new String[]{"false", "invalid resource_code value."};
         if(getResource_type()==null)
             return new String[]{"false", "invalid resource_type value."};
-
+        /**is optional field if(getBrand_name()==null)
+         return new String[]{"false", "invalid resource_name value."};**/
+        /**is optional field if(getSupplier_id()==null)
+         return new String[]{"false", "invalid supplier_id value."};**/
+        /**is optional field if(getPart_number()==null)
+         return new String[]{"false", "invalid part_number value."};**/
         return super.isValid();
     }
 
@@ -150,8 +172,8 @@ public class Resource extends BusinessObject
         {
             switch (var.toLowerCase())
             {
-                case "resource_name":
-                    resource_name = (String)val;
+                case "brand_name":
+                    brand_name = (String)val;
                     break;
                 case "resource_type":
                     resource_type = (String)val;
@@ -159,8 +181,8 @@ public class Resource extends BusinessObject
                 case "resource_description":
                     resource_description = (String)val;
                     break;
-                case "resource_serial":
-                    resource_serial = (String)val;
+                case "resource_code":
+                    resource_code = (String)val;
                     break;
                 case "resource_value":
                     resource_value = Double.parseDouble(String.valueOf(val));
@@ -177,13 +199,19 @@ public class Resource extends BusinessObject
                 case "unit":
                     unit = String.valueOf(val);
                     break;
+                case "supplier_id":
+                    supplier_id = (String)val;
+                    break;
+                case "part_number":
+                    part_number = (String)val;
+                    break;
                 default:
-                    IO.log(TAG, IO.TAG_ERROR,"Unknown "+TAG+" attribute '" + var + "'.");
+                    IO.log(TAG, IO.TAG_ERROR,"Unknown "+getClass().getName()+" attribute '" + var + "'.");
                     break;
             }
         } catch (NumberFormatException e)
         {
-            IO.log(TAG, IO.TAG_ERROR, e.getMessage());
+            IO.log(getClass().getName(), IO.TAG_ERROR, e.getMessage());
         }
     }
 
@@ -193,14 +221,14 @@ public class Resource extends BusinessObject
         switch (var.toLowerCase())
         {
             case "name":
-            case "resource_name":
-                return getResource_name();
+            case "brand_name":
+                return getBrand_name();
             case "resource_type":
                 return resource_type;
             case "resource_description":
                 return resource_description;
-            case "resource_serial":
-                return resource_serial;
+            case "resource_code":
+                return getResource_code();
             case "cost":
             case "value":
             case "resource_value":
@@ -213,14 +241,19 @@ public class Resource extends BusinessObject
                 return quantity;
             case "unit":
                 return unit;
+            case "supplier_id":
+                return getSupplier_id();
+            case "part_number":
+                return getPart_number();
         }
         return super.get(var);
     }
 
+
     @Override
     public String toString()
     {
-        return getResource_name();
+        return getResource_description();
     }
 
     @Override

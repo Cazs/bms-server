@@ -8,7 +8,7 @@ import server.model.Leave;
 
 import java.util.List;
 
-@RepositoryRestResource(collectionResourceRel = "leave_applications", path = "/leave_records")
+@RepositoryRestResource(collectionResourceRel = "leave_records", path = "/leave_records")
 public interface LeaveRepository extends MongoRepository<Leave, String>
 {
 	List<Leave> findBy_id(@Param("_id") String _id);
