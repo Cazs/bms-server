@@ -139,8 +139,8 @@ public class Resource extends BusinessObject
     @Override
     public String[] isValid()
     {
-        if(getResource_description()==null)
-            return new String[]{"false", "invalid resource_description value."};
+        if(getBrand_name()==null && getResource_description()==null)
+            return new String[]{"false", "invalid resource_name and/or resource_description value."};
         if(getResource_value()<=0)
             return new String[]{"false", "invalid resource_value value."};
         if(getUnit()==null)

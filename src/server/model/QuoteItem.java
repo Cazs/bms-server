@@ -165,7 +165,7 @@ public class QuoteItem extends BusinessObject
             return new String[]{"false", "invalid quote_id value."};
         if(getUnitCost()<0)
             return new String[]{"false", "invalid unit_cost value."};
-        if(getQuantity()<=0)
+        if(getQuantity()<0)
             return new String[]{"false", "invalid quantity value."};
         if(getMarkup()<0)
             return new String[]{"false", "invalid markup value."};
