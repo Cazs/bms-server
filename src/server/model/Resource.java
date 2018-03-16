@@ -141,13 +141,13 @@ public class Resource extends BusinessObject
     {
         if(getBrand_name()==null && getResource_description()==null)
             return new String[]{"false", "invalid resource_name and/or resource_description value."};
-        if(getResource_value()<=0)
+        if(getResource_value()<0)
             return new String[]{"false", "invalid resource_value value."};
         if(getUnit()==null)
             return new String[]{"false", "invalid unit value."};
-        if(getQuantity()<=0)
+        if(getQuantity()<0)
             return new String[]{"false", "invalid quantity value."};
-        if(getDate_acquired()<=0)
+        if(getDate_acquired()<0)
             return new String[]{"false", "invalid date_acquired value."};
         if(getDate_exhausted()<getDate_acquired() && getDate_exhausted()!=0)
             return new String[]{"false", "invalid date_exhausted value. Cannot be before date_acquired"};
