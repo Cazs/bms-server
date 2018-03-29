@@ -2,10 +2,12 @@ package server.model;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import server.auxilary.AccessLevel;
 import server.auxilary.IO;
 
 /**
- * Created by ghost on 2017/01/21.
+ * Created by ghost on 2018/01/13.
+ * @author ghost
  */
 public class Requisition extends BusinessObject
 {
@@ -15,9 +17,26 @@ public class Requisition extends BusinessObject
     private String type;
     private int status;
     public static final String TAG = "Requisition";
-    public static final int STATUS_PENDING =0;
-    public static final int STATUS_APPROVED =1;
-    public static final int STATUS_ARCHIVED =2;
+
+    public Requisition()
+    {}
+
+    public Requisition(String _id)
+    {
+        super(_id);
+    }
+
+    @Override
+    public AccessLevel getReadMinRequiredAccessLevel()
+    {
+        return AccessLevel.STANDARD;
+    }
+
+    @Override
+    public AccessLevel getWriteMinRequiredAccessLevel()
+    {
+        return AccessLevel.STANDARD;
+    }
 
     public StringProperty client_idProperty(){return new SimpleStringProperty(client_id);}
 
@@ -154,22 +173,7 @@ public class Requisition extends BusinessObject
     @Override
     public String toString()
     {
-        String json_obj = "{"+(get_id()!=null?"\"_id\":\""+get_id()+"\",":"")
-                +"\"responsible_person_id\":\""+ responsible_person_id +"\""
-                +",\"type\":\""+type+"\""
-                +",\"description\":\""+ description +"\"";
-        if(getClient_id()!=null)
-            json_obj+=",\"client_id\":\""+client_id+"\"";
-        if(status>0)
-            json_obj+=",\"status\":\""+status+"\"";
-        if(getCreator()!=null)
-            json_obj+=",\"creator\":\""+getCreator()+"\"";
-        if(getDate_logged()>0)
-            json_obj+=",\"date_logged\":\""+getDate_logged()+"\"";
-        json_obj+=",\"other\":\""+getOther()+"\"}";
-
-        IO.log(getClass().getName(),IO.TAG_INFO, json_obj);
-        return json_obj;
+        return super.toString() + " type [" + getType() + "] "  + getDescription() + " for client [" +getClient_id() + "]";
     }
 
     @Override

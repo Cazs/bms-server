@@ -5,16 +5,12 @@
  */
 package server.model;
 
-import org.springframework.data.annotation.Id;
+import server.auxilary.AccessLevel;
 import server.auxilary.IO;
 
-import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-
 /**
- *
- * @author ghost
+ * Created by ghost on 2017/12/22.
+ * @author th3gh0st
  */
 public class Client extends BusinessObject
 {
@@ -30,6 +26,26 @@ public class Client extends BusinessObject
     private long date_partnered;
     private String website;
     private boolean active;
+
+    public Client()
+    {}
+
+    public Client(String _id)
+    {
+        super(_id);
+    }
+
+    @Override
+    public AccessLevel getReadMinRequiredAccessLevel()
+    {
+        return AccessLevel.STANDARD;
+    }
+
+    @Override
+    public AccessLevel getWriteMinRequiredAccessLevel()
+    {
+        return AccessLevel.ADMIN;
+    }
 
     public String getClient_name()
     {
@@ -279,27 +295,7 @@ public class Client extends BusinessObject
     @Override
     public String toString()
     {
-        String json_obj = "{"+(get_id()!=null?"\"_id\":\""+get_id()+"\",":"")
-                +"\"client_name\":\""+getClient_name()+"\""
-                +",\"tel\":\""+getTel()+"\""
-                +",\"fax\":\""+getFax()+"\""
-                +",\"physical_address\":\""+getPhysical_address()+"\""
-                +",\"postal_address\":\""+getPostal_address()+"\""
-                +",\"contact_email\":\""+getContact_email()+"\""
-                +",\"website\":\""+getWebsite()+"\""
-                +",\"account_name\":\""+getAccount_name()+"\""
-                +",\"registration_number\":\""+getRegistration_number()+"\""
-                +",\"vat_number\":\""+getVat_number()+"\"";
-        if(getDate_partnered()>0)
-            json_obj+=",\"date_partnered\":\""+getDate_logged()+"\"";
-        if(getCreator()!=null)
-            json_obj+=",\"creator\":\""+getCreator()+"\"";
-        if(getDate_logged()>0)
-            json_obj+=",\"date_logged\":\""+getDate_logged()+"\"";
-        json_obj+=",\"other\":\""+getOther()+"\"}";
-
-        IO.log(getClass().getName(),IO.TAG_INFO, json_obj);
-        return json_obj;
+        return super.toString() + " = "  + getClient_name();
     }
 
     @Override

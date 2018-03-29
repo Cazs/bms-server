@@ -1,10 +1,11 @@
 package server.model;
 
-import org.springframework.data.annotation.Id;
+import server.auxilary.AccessLevel;
 import server.auxilary.IO;
 
 /**
- * Created by ghost on 2017/09/14.
+ * Created by ghost on 2017/12/23.
+ * @author ghost
  */
 public class Vericode extends BusinessObject
 {
@@ -15,6 +16,18 @@ public class Vericode extends BusinessObject
     {
         setCode_name(code_name);
         setCode(code);
+    }
+
+    @Override
+    public AccessLevel getReadMinRequiredAccessLevel()
+    {
+        return AccessLevel.STANDARD;
+    }
+
+    @Override
+    public AccessLevel getWriteMinRequiredAccessLevel()
+    {
+        return AccessLevel.STANDARD;
     }
 
     public String getCode_name()
@@ -87,8 +100,7 @@ public class Vericode extends BusinessObject
     @Override
     public String toString()
     {
-        return "{\"code_name\":\""+ code_name +"\", "+
-                "\"code\":\""+ code +"\"}";
+        return super.toString() + " codename "  + getCode_name() + " code " +getCode();
     }
 
     @Override

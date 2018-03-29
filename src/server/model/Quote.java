@@ -1,14 +1,11 @@
 package server.model;
 
-import org.springframework.data.annotation.Id;
+import server.auxilary.AccessLevel;
 import server.auxilary.IO;
 
-import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-
 /**
- * Created by ghost on 2017/01/21.
+ * Created by ghost on 2017/12/22.
+ * @author th3gh0st
  */
 public class Quote extends BusinessObject
 {
@@ -23,6 +20,26 @@ public class Quote extends BusinessObject
     private double revision;
     private int status;
     public static final String TAG = "Quote";
+
+    public Quote()
+    {}
+
+    public Quote(String _id)
+    {
+        super(_id);
+    }
+
+    @Override
+    public AccessLevel getReadMinRequiredAccessLevel()
+    {
+        return AccessLevel.STANDARD;
+    }
+
+    @Override
+    public AccessLevel getWriteMinRequiredAccessLevel()
+    {
+        return AccessLevel.ADMIN;
+    }
 
     public String getRequisition_id()
     {
@@ -226,7 +243,7 @@ public class Quote extends BusinessObject
     @Override
     public String toString()
     {
-        return get_id();
+        return super.toString() + " for client "  + getClient_id() + " at " + getSitename();
     }
 
     @Override

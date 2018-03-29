@@ -3,7 +3,8 @@ package server.model;
 import org.springframework.data.annotation.Id;
 
 /**
- * Created by ghost on 2017/09/14.
+ * Created by ghost on 2017/12/23.
+ * @author ghost
  */
 public class Counter
 {

@@ -2,29 +2,23 @@ package server.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.rest.webmvc.PersistentEntityResourceAssembler;
 import org.springframework.data.rest.webmvc.RepositoryRestController;
 import org.springframework.data.web.PagedResourcesAssembler;
-import org.springframework.hateoas.ResourceAssembler;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import server.auxilary.IO;
 import server.model.BusinessObject;
-import server.model.ResourceType;
 import server.model.Revenue;
 import server.repositories.RevenueRepository;
 
-import java.util.LinkedList;
-import java.util.List;
+/**
+ * Created by ghost on 2017/12/22.
+ * @author th3gh0st
+ */
 
 @RepositoryRestController
-@RequestMapping("/revenues")
-public class RevenueController
+public class RevenueController extends APIController
 {
     private PagedResourcesAssembler<Revenue> pagedAssembler;
     @Autowired
@@ -36,34 +30,33 @@ public class RevenueController
         this.pagedAssembler = pagedAssembler;
     }
 
-    @GetMapping(path="/{id}", produces = "application/hal+json")
-    public ResponseEntity<Page<Revenue>> getRevenue(@PathVariable("id") String id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    @GetMapping(path="/revenue/{id}", produces = "application/hal+json")
+    public ResponseEntity<Page<? extends BusinessObject>> getRevenue(@PathVariable("id") String id, @RequestHeader String session_id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
     {
-        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Revenue GET request id: "+ id);
-        List<Revenue> contents = IO.getInstance().mongoOperations().find(new Query(Criteria.where("_id").is(id)), Revenue.class, "revenues");
-        return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
+        return getBusinessObject(new Revenue(id), "_id", session_id, "revenues", pagedAssembler, assembler, pageRequest);
     }
 
-    @GetMapping
-    public ResponseEntity<Page<Revenue>> getRevenues(Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    @GetMapping("/revenues")
+    public ResponseEntity<Page<? extends BusinessObject>> getRevenues(@RequestHeader String session_id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
     {
-        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Revenue GET request {all}");
-        List<Revenue> contents =  IO.getInstance().mongoOperations().findAll(Revenue.class, "revenues");
-        return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
+        return getBusinessObjects(new Revenue(), session_id, "revenues", pagedAssembler, assembler, pageRequest);
     }
 
-    @PutMapping
-    public ResponseEntity<String> addRevenue(@RequestBody Revenue revenue)
+    @PutMapping("/revenue")
+    public ResponseEntity<String> addRevenue(@RequestBody Revenue revenue, @RequestHeader String session_id)
     {
-        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Revenue creation request.");
-        //HttpHeaders headers = new HttpHeaders();
-        return APIController.putBusinessObject(revenue, "revenues", "revenues_timestamp");
+        return putBusinessObject(revenue, session_id, "revenues", "revenues_timestamp");
     }
 
-    @PostMapping
-    public ResponseEntity<String> patchRevenue(@RequestBody Revenue revenue)
+    @PostMapping("/revenue")
+    public ResponseEntity<String> patchRevenue(@RequestBody Revenue revenue, @RequestHeader String session_id)
     {
-        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Revenue update request.");
-        return APIController.patchBusinessObject(revenue, "revenues", "revenues_timestamp");
+        return patchBusinessObject(revenue, session_id, "revenues", "revenues_timestamp");
+    }
+
+    @DeleteMapping(path="/revenue/{revenue_id}")
+    public ResponseEntity<String> delete(@PathVariable String revenue_id, @RequestHeader String session_id)
+    {
+        return deleteBusinessObject(new Revenue(revenue_id), session_id, "revenues", "revenues_timestamp");
     }
 }

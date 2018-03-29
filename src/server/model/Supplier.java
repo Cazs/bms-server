@@ -1,9 +1,11 @@
 package server.model;
 
+import server.auxilary.AccessLevel;
 import server.auxilary.IO;
 
 /**
- * Created by ghost on 2017/01/03.
+ * Created by ghost on 2017/12/22.
+ * @author ghost
  */
 public class Supplier extends BusinessObject
 {
@@ -20,6 +22,26 @@ public class Supplier extends BusinessObject
     private String registration_number;
     private String vat_number;
     private String account_name;
+
+    public Supplier()
+    {}
+
+    public Supplier(String _id)
+    {
+        super(_id);
+    }
+
+    @Override
+    public AccessLevel getReadMinRequiredAccessLevel()
+    {
+        return AccessLevel.STANDARD;
+    }
+
+    @Override
+    public AccessLevel getWriteMinRequiredAccessLevel()
+    {
+        return AccessLevel.ADMIN;
+    }
 
     public String getSupplier_name()
     {
@@ -275,7 +297,7 @@ public class Supplier extends BusinessObject
     @Override
     public String toString()
     {
-        return supplier_name;
+        return super.toString() + getSupplier_name();
     }
 
     @Override

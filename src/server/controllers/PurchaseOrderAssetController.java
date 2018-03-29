@@ -2,29 +2,23 @@ package server.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.rest.webmvc.PersistentEntityResourceAssembler;
 import org.springframework.data.rest.webmvc.RepositoryRestController;
 import org.springframework.data.web.PagedResourcesAssembler;
-import org.springframework.hateoas.ResourceAssembler;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import server.auxilary.IO;
 import server.model.BusinessObject;
-import server.model.Overtime;
 import server.model.PurchaseOrderAsset;
 import server.repositories.PurchaseOrderAssetRepository;
 
-import java.util.LinkedList;
-import java.util.List;
+/**
+ * Created by ghost on 2017/12/22.
+ * @author th3gh0st
+ */
 
 @RepositoryRestController
-@RequestMapping("/purchaseorders/assets")
-public class PurchaseOrderAssetController
+public class PurchaseOrderAssetController extends APIController
 {
     private PagedResourcesAssembler<PurchaseOrderAsset> pagedAssembler;
     @Autowired
@@ -36,33 +30,33 @@ public class PurchaseOrderAssetController
         this.pagedAssembler = pagedAssembler;
     }
 
-    @GetMapping(path="/{id}", produces = "application/hal+json")
-    public ResponseEntity<Page<PurchaseOrderAsset>> getPurchaseOrderAsset(@PathVariable("id") String id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    @GetMapping(path="/purchaseorder/assets/{id}", produces = "application/hal+json")
+    public ResponseEntity<Page<? extends BusinessObject>> getPurchaseOrderAsset(@PathVariable("id") String id, @RequestHeader String session_id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
     {
-        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling PurchaseOrderAsset GET request id: "+ id);
-        List<PurchaseOrderAsset> contents = IO.getInstance().mongoOperations().find(new Query(Criteria.where("purchase_order_id").is(id)), PurchaseOrderAsset.class, "purchase_order_assets");
-        return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
+        return getBusinessObject(new PurchaseOrderAsset(id), "_id", session_id, "purchase_order_assets", pagedAssembler, assembler, pageRequest);
     }
 
-    @GetMapping
-    public ResponseEntity<Page<PurchaseOrderAsset>> getPurchaseOrderAssets(Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    @GetMapping("/purchaseorders/assets")
+    public ResponseEntity<Page<? extends BusinessObject>> getPurchaseOrderAssets(@RequestHeader String session_id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
     {
-        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling PurchaseOrderAsset GET request {all}");
-        List<PurchaseOrderAsset> contents =  IO.getInstance().mongoOperations().findAll(PurchaseOrderAsset.class, "purchase_order_assets");
-        return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
+        return getBusinessObjects(new PurchaseOrderAsset(), session_id, "purchase_order_assets", pagedAssembler, assembler, pageRequest);
     }
 
-    @PutMapping
-    public ResponseEntity<String> addPurchaseOrderAsset(@RequestBody PurchaseOrderAsset purchase_order_asset)
+    @PutMapping("/purchaseorder/asset")
+    public ResponseEntity<String> addPurchaseOrderAsset(@RequestBody PurchaseOrderAsset purchase_order_asset, @RequestHeader String session_id)
     {
-        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling PurchaseOrderAsset creation request");
-        return APIController.putBusinessObject(purchase_order_asset, "purchase_order_assets", "purchase_orders_timestamp");
+        return putBusinessObject(purchase_order_asset, session_id, "purchase_order_assets", "purchase_orders_timestamp");
     }
 
-    @PostMapping
-    public ResponseEntity<String> patchPurchaseOrderAsset(@RequestBody PurchaseOrderAsset purchase_order_asset)
+    @PostMapping("/purchaseorder/asset")
+    public ResponseEntity<String> patchPurchaseOrderAsset(@RequestBody PurchaseOrderAsset purchase_order_asset, @RequestHeader String session_id)
     {
-        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling PurchaseOrderAsset update request.");
-        return APIController.patchBusinessObject(purchase_order_asset, "purchase_order_assets", "purchase_orders_timestamp");
+        return patchBusinessObject(purchase_order_asset, session_id, "purchase_order_assets", "purchase_orders_timestamp");
+    }
+
+    @DeleteMapping(path="/purchaseorder/asset/{purchaseorder_id}")
+    public ResponseEntity<String> delete(@PathVariable String purchaseorder_id, @RequestHeader String session_id)
+    {
+        return deleteBusinessObject(new PurchaseOrderAsset(purchaseorder_id), session_id, "purchase_order_assets", "purchase_orders_timestamp");
     }
 }

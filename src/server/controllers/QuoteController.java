@@ -2,26 +2,22 @@ package server.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.rest.webmvc.PersistentEntityResourceAssembler;
 import org.springframework.data.rest.webmvc.RepositoryRestController;
 import org.springframework.data.web.PagedResourcesAssembler;
-import org.springframework.hateoas.ResourceAssembler;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import server.auxilary.IO;
 import server.model.*;
 import server.repositories.QuoteRepository;
 
-import java.util.List;
-
+/**
+ * Created by ghost on 2017/12/22.
+ * @author th3gh0st
+ */
 @RepositoryRestController
-//@RequestMapping("/quotes")
-public class QuoteController
+public class QuoteController extends APIController
 {
     private PagedResourcesAssembler<Quote> pagedAssembler;
     @Autowired
@@ -33,60 +29,58 @@ public class QuoteController
         this.pagedAssembler = pagedAssembler;
     }
 
-    @GetMapping(path="/quotes/{id}", produces = "application/hal+json")
-    public ResponseEntity<Page<Quote>> getQuote(@PathVariable("id") String id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    @GetMapping(path="/quote/{id}", produces = "application/hal+json")
+    public ResponseEntity<Page<? extends BusinessObject>> getQuote(@PathVariable("id") String id, @RequestHeader String session_id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
     {
-        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Quote GET request id: "+ id);
-        List<Quote> contents = IO.getInstance().mongoOperations().find(new Query(Criteria.where("_id").is(id)), Quote.class, "quotes");
-        return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
+        return getBusinessObject(new Quote(id), "_id", session_id, "quotes", pagedAssembler, assembler, pageRequest);
     }
 
     @GetMapping("/quotes")
-    public ResponseEntity<Page<Quote>> getQuotes(Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    public ResponseEntity<Page<? extends  BusinessObject>> getQuotes(Pageable pageRequest, @RequestHeader String session_id, PersistentEntityResourceAssembler assembler)
     {
-        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Quote GET request {all}");
-        List<Quote> contents =  IO.getInstance().mongoOperations().findAll(Quote.class, "quotes");
-        return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
+        return getBusinessObjects(new Quote(), session_id, "quotes", pagedAssembler, assembler, pageRequest);
     }
 
-    ////public ResponseEntity<Page<Quote>> addQuote(@RequestBody Quote quote, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
-    @PutMapping("/quotes")
-    public ResponseEntity<String> addQuote(@RequestBody Quote quote)
+    @PutMapping("/quote")
+    public ResponseEntity<String> addQuote(@RequestBody Quote quote, @RequestHeader String session_id)
     {
-        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Quote creation request.");
-        //HttpHeaders headers = new HttpHeaders();
-        return APIController.putBusinessObject(quote, "quotes", "quotes_timestamp");
+        return putBusinessObject(quote, session_id, "quotes", "quotes_timestamp");
     }
 
-    @PostMapping("/quotes")
-    public ResponseEntity<String> patchQuote(@RequestBody Quote quote)
+    @PostMapping("/quote")
+    public ResponseEntity<String> patchQuote(@RequestBody Quote quote, @RequestHeader String session_id)
     {
-        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Quote update request.");
-        return APIController.patchBusinessObject(quote, "quotes", "quotes_timestamp");
+        return patchBusinessObject(quote, session_id, "quotes", "quotes_timestamp");
     }
 
-    @PostMapping(value = "/quotes/mailto")//, consumes = "text/plain"//value =//, produces = "application/pdf"
+    @PostMapping(value = "/quote/mailto")//, consumes = "text/plain"//value =//, produces = "application/pdf"
     public ResponseEntity<String> emailQuote(@RequestHeader String _id, @RequestHeader String session_id,
                                                         @RequestHeader String message, @RequestHeader String subject,
-                                                        @RequestHeader String destination, @RequestBody FileMetadata fileMetadata)//, @RequestParam("file") MultipartFile file
+                                                        @RequestHeader String destination, @RequestBody Metafile metafile)//, @RequestParam("file") MultipartFile file
     {
         IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Quote mailto request.");
-        return APIController.emailBusinessObject(_id, session_id, message, subject, destination, fileMetadata, Quote.class);
+        return emailBusinessObject(_id, session_id, message, subject, destination, metafile, Quote.class);
     }
 
-    @PostMapping(value = "/quotes/approval_request")//, consumes = "text/plain"//value =//, produces = "application/pdf"
+    @PostMapping(value = "/quote/approval_request")//, consumes = "text/plain"//value =//, produces = "application/pdf"
     public ResponseEntity<String> requestQuoteApproval(@RequestHeader String quote_id, @RequestHeader String session_id,
                                                        @RequestHeader String message, @RequestHeader String subject,
-                                                       @RequestBody FileMetadata fileMetadata)//, @RequestParam("file") MultipartFile file
+                                                       @RequestBody Metafile metafile)//, @RequestParam("file") MultipartFile file
     {
         IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Quote approval request.");
-        return APIController.requestBusinessObjectApproval(quote_id, session_id, message, subject, fileMetadata, new Quote().apiEndpoint(), Quote.class);
+        return requestBusinessObjectApproval(quote_id, session_id, message, subject, metafile, new Quote().apiEndpoint(), Quote.class);
     }
 
-    @GetMapping("/quotes/approve/{quote_id}/{vericode}")
+    @GetMapping("/quote/approve/{quote_id}/{vericode}")
     public ResponseEntity<String> approveQuote(@PathVariable("quote_id") String quote_id, @PathVariable("vericode") String vericode)
     {
         IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Quote "+quote_id+" approval request by Vericode.");
-        return APIController.approveBusinessObjectByVericode(quote_id, vericode, "quotes", "quotes_timestamp", Quote.class);
+        return approveBusinessObjectByVericode(quote_id, vericode, "quotes", "quotes_timestamp", Quote.class);
+    }
+
+    @DeleteMapping(path="/quote/{quote_id}")
+    public ResponseEntity<String> delete(@PathVariable String quote_id, @RequestHeader String session_id)
+    {
+        return deleteBusinessObject(new Quote(quote_id), session_id, "quotes", "quotes_timestamp");
     }
 }

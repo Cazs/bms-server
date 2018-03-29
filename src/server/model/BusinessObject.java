@@ -2,12 +2,14 @@ package server.model;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.rest.core.annotation.RestResource;
+import server.auxilary.AccessLevel;
 import server.auxilary.IO;
 
 import java.io.Serializable;
 
 /**
- * Created by ghost on 2017/01/04.
+ * Created by ghost on 2017/12/23
+ * @author ghost
  */
 public abstract class BusinessObject implements Serializable
 {
@@ -22,6 +24,18 @@ public abstract class BusinessObject implements Serializable
     public static final int STATUS_PENDING =0;
     public static final int STATUS_APPROVED =1;
     public static final int STATUS_ARCHIVED =2;
+
+    public abstract AccessLevel getReadMinRequiredAccessLevel();
+
+    public abstract AccessLevel getWriteMinRequiredAccessLevel();
+
+    public BusinessObject()
+    {}
+
+    public BusinessObject(String _id)
+    {
+        set_id(_id);
+    }
 
     public String get_id()
     {
@@ -104,6 +118,7 @@ public abstract class BusinessObject implements Serializable
         switch (var.toLowerCase())
         {
             case "_id":
+            case "id":
                 return get_id();
             case "date_logged":
                 return getDate_logged();
@@ -123,6 +138,7 @@ public abstract class BusinessObject implements Serializable
      * Method to check if respective BusinessObject's attributes are valid or not.
      * @return String Array of size 2, first element is a true/false value and second is a message
      */
+    //TODO: throw InvalidBusinessObjectException
     public String[] isValid()
     {
         if(getDate_logged()<=0)
@@ -135,6 +151,12 @@ public abstract class BusinessObject implements Serializable
         return new String[]{"true", "valid "+getClass().getName()+" object."};
     }
     //TODO: public abstract String asURLEncodedString();//TODO: check if models comply
+
+    @Override
+    public String toString()
+    {
+        return get_id() + "#" + getObject_number() + " created by " +getCreator()+" ";
+    }
 
     public abstract String apiEndpoint();
 }

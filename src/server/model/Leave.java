@@ -1,17 +1,13 @@
 package server.model;
 
-import org.springframework.data.annotation.Id;
+import server.auxilary.AccessLevel;
 import server.auxilary.IO;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
-
-import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 
 /**
- * Created by ghost on 2017/01/21.
+ * Created by ghost on 2017/12/22.
+ * @author th3gh0st
  */
+
 public class Leave extends BusinessObject
 {
     private String usr;
@@ -22,9 +18,26 @@ public class Leave extends BusinessObject
     private String type;
     public static final String TAG = "Leave";
     public static String[] TYPES = {"ANNUAL", "SICK", "UNPAID", "FAMILY RESPONSIBILITY - See BCEA for definition"};
-    public static final int STATUS_PENDING =0;
-    public static final int STATUS_APPROVED =1;
-    public static final int STATUS_ARCHIVED =2;
+
+    public Leave()
+    {}
+
+    public Leave(String _id)
+    {
+        super(_id);
+    }
+
+    @Override
+    public AccessLevel getReadMinRequiredAccessLevel()
+    {
+        return AccessLevel.STANDARD;
+    }
+
+    @Override
+    public AccessLevel getWriteMinRequiredAccessLevel()
+    {
+        return AccessLevel.STANDARD;
+    }
 
     public String getUsr()
     {
@@ -161,6 +174,12 @@ public class Leave extends BusinessObject
                 return getType();
         }
         return super.get(var);
+    }
+
+    @Override
+    public String toString()
+    {
+        return super.toString() + " = "  + getUsr();
     }
 
     @Override

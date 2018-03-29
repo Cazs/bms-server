@@ -5,11 +5,12 @@
  */
 package server.model;
 
+import server.auxilary.AccessLevel;
 import server.auxilary.IO;
 
 /**
- *
- * @author ghost
+ * Created by ghost on 2017/12/22.
+ * @author th3gh0st
  */
 public class Resource extends BusinessObject
 {
@@ -25,6 +26,26 @@ public class Resource extends BusinessObject
     private String supplier_id;//optional
     private String part_number;//optional
     public static final String TAG = "Resource";
+
+    public Resource()
+    {}
+
+    public Resource(String _id)
+    {
+        super(_id);
+    }
+
+    @Override
+    public AccessLevel getReadMinRequiredAccessLevel()
+    {
+        return AccessLevel.STANDARD;
+    }
+
+    @Override
+    public AccessLevel getWriteMinRequiredAccessLevel()
+    {
+        return AccessLevel.STANDARD;
+    }
 
     public String getBrand_name()
     {

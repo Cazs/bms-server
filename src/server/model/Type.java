@@ -1,19 +1,36 @@
 package server.model;
 
-import org.springframework.data.annotation.Id;
+import server.auxilary.AccessLevel;
 import server.auxilary.IO;
 
-import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-
 /**
- * Created by ghost on 2017/01/13.
+ * Created by ghost on 2017/12/23.
+ * @author ghost
  */
 public abstract class Type extends BusinessObject
 {
     private String type_name;
     private String type_description;
+
+    public Type()
+    {}
+
+    public Type(String _id)
+    {
+        super(_id);
+    }
+
+    @Override
+    public AccessLevel getReadMinRequiredAccessLevel()
+    {
+        return AccessLevel.STANDARD;
+    }
+
+    @Override
+    public AccessLevel getWriteMinRequiredAccessLevel()
+    {
+        return AccessLevel.STANDARD;
+    }
 
     public String getType_name()
     {
@@ -86,6 +103,6 @@ public abstract class Type extends BusinessObject
     @Override
     public String toString()
     {
-        return this.type_name;
+        return super.toString() + " = "  + getType_name();
     }
 }

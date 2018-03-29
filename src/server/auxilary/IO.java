@@ -21,6 +21,7 @@ import java.util.Arrays;
 
 /**
  * Created by ghost on 2017/01/28.
+ * @author ghost
  */
 public class IO<T extends BusinessObject>
 {
@@ -64,6 +65,7 @@ public class IO<T extends BusinessObject>
         return str.toString();
     }
 
+    //TODO: use blowfish/bcrypt
     public static byte[] hash(String plaintext) throws Exception
     {
         MessageDigest m = MessageDigest.getInstance("MD5");
@@ -72,6 +74,7 @@ public class IO<T extends BusinessObject>
         return m.digest();
     }
 
+    //TODO: use blowfish/bcrypt
     public static byte[] encrypt(String digest, String message) throws Exception
     {
         final MessageDigest md = MessageDigest.getInstance("md5");
@@ -92,6 +95,7 @@ public class IO<T extends BusinessObject>
         return cipherText;
     }
 
+    //TODO: use blowfish/bcrypt
     public static String decrypt(String digest, byte[] message) throws Exception
     {
         final MessageDigest md = MessageDigest.getInstance("md5");

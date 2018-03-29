@@ -1,17 +1,13 @@
 package server.model;
 
-import org.springframework.data.annotation.Id;
+import server.auxilary.AccessLevel;
 import server.auxilary.IO;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
-
-import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 
 /**
- * Created by ghost on 2017/01/21.
+ * Created by ghost on 2017/12/22.
+ * @author th3gh0st
  */
+
 public class Overtime extends BusinessObject
 {
     private String usr;
@@ -21,11 +17,26 @@ public class Overtime extends BusinessObject
     private long time_out;
     private int status;
     public static final String TAG = "Overtime";
-    public static final int STATUS_PENDING =0;
-    public static final int STATUS_APPROVED =1;
-    public static final int STATUS_ARCHIVED =2;
 
-    public StringProperty usrProperty(){return new SimpleStringProperty(getUsr());}
+    public Overtime()
+    {}
+
+    public Overtime(String _id)
+    {
+        super(_id);
+    }
+
+    @Override
+    public AccessLevel getReadMinRequiredAccessLevel()
+    {
+        return AccessLevel.STANDARD;
+    }
+
+    @Override
+    public AccessLevel getWriteMinRequiredAccessLevel()
+    {
+        return AccessLevel.STANDARD;
+    }
 
     public String getUsr()
     {
@@ -139,7 +150,7 @@ public class Overtime extends BusinessObject
                     IO.log(getClass().getName(), IO.TAG_ERROR, "Unknown "+getClass().getName()+" attribute '" + var + "'.");
                     break;
             }
-        }catch (NumberFormatException e)
+        } catch (NumberFormatException e)
         {
             IO.log(getClass().getName(), IO.TAG_ERROR, e.getMessage());
         }
@@ -166,6 +177,12 @@ public class Overtime extends BusinessObject
                 return getStatus();
         }
         return super.get(var);
+    }
+
+    @Override
+    public String toString()
+    {
+        return super.toString() + " = "  + getUsr();
     }
 
     @Override

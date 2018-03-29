@@ -2,29 +2,24 @@ package server.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.rest.webmvc.PersistentEntityResourceAssembler;
 import org.springframework.data.rest.webmvc.RepositoryRestController;
 import org.springframework.data.web.PagedResourcesAssembler;
-import org.springframework.hateoas.ResourceAssembler;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import server.auxilary.IO;
 import server.model.BusinessObject;
-import server.model.Resource;
 import server.model.ResourceType;
+import server.model.Revenue;
 import server.repositories.ResourceTypeRepository;
 
-import java.util.LinkedList;
-import java.util.List;
+/**
+ * Created by ghost on 2017/12/22.
+ * @author th3gh0st
+ */
 
 @RepositoryRestController
-@RequestMapping("/resources/types")
-public class ResourceTypeController
+public class ResourceTypeController extends APIController
 {
     private PagedResourcesAssembler<ResourceType> pagedAssembler;
     @Autowired
@@ -36,34 +31,33 @@ public class ResourceTypeController
         this.pagedAssembler = pagedAssembler;
     }
 
-    @GetMapping(path="/{id}", produces = "application/hal+json")
-    public ResponseEntity<Page<ResourceType>> getResourceType(@PathVariable("id") String id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    @GetMapping(path="/resource/types/{id}", produces = "application/hal+json")
+    public ResponseEntity<Page<? extends BusinessObject>> get(@PathVariable("id") String id, @RequestHeader String session_id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
     {
-        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling ResourceType GET request id: "+ id);
-        List<ResourceType> contents = IO.getInstance().mongoOperations().find(new Query(Criteria.where("_id").is(id)), ResourceType.class, "resource_types");
-        return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
+        return getBusinessObject(new ResourceType(id), "_id", session_id, "resource_types", pagedAssembler, assembler, pageRequest);
     }
 
-    @GetMapping
-    public ResponseEntity<Page<ResourceType>> getResourceTypes(Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    @GetMapping("/resources/types")
+    public ResponseEntity<Page<? extends BusinessObject>> getAll(@RequestHeader String session_id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
     {
-        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling ResourceType GET request {all}");
-        List<ResourceType> contents =  IO.getInstance().mongoOperations().findAll(ResourceType.class, "resource_types");
-        return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
+        return getBusinessObjects(new ResourceType(), session_id, "resource_types", pagedAssembler, assembler, pageRequest);
     }
 
-    @PutMapping
-    public ResponseEntity<String> addResourceType(@RequestBody ResourceType resource_type)
+    @PutMapping("/resource/type")
+    public ResponseEntity<String> put(@RequestBody ResourceType resource_type, @RequestHeader String session_id)
     {
-        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling ResourceType creation request.");
-        //HttpHeaders headers = new HttpHeaders();
-        return APIController.putBusinessObject(resource_type, "resource_types", "resources_timestamp");
+        return putBusinessObject(resource_type, session_id, "resource_types", "resources_timestamp");
     }
 
-    @PostMapping
-    public ResponseEntity<String> patchResource(@RequestBody ResourceType resource_type)
+    @PostMapping("/resource/type")
+    public ResponseEntity<String> patch(@RequestBody ResourceType resource_type, @RequestHeader String session_id)
     {
-        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling ResourceType update request.");
-        return APIController.patchBusinessObject(resource_type, "resource_types", "resources_timestamp");
+        return patchBusinessObject(resource_type, session_id, "resource_types", "resources_timestamp");
+    }
+
+    @DeleteMapping(path="/resource/type/{resource_type_id}")
+    public ResponseEntity<String> delete(@PathVariable String resource_type_id, @RequestHeader String session_id)
+    {
+        return deleteBusinessObject(new ResourceType(resource_type_id), session_id, "resource_types", "resources_timestamp");
     }
 }

@@ -5,13 +5,13 @@
  */
 package server.model;
 
+import server.auxilary.AccessLevel;
 import server.auxilary.IO;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 
 import java.io.Serializable;
+
 /**
- *
+ * Created by ghost on 2018/02/23.
  * @author ghost
  */
 public class ServiceItem extends BusinessObject implements Serializable
@@ -23,6 +23,18 @@ public class ServiceItem extends BusinessObject implements Serializable
     private long quantity;
     private String unit;
     public static final String TAG = "ServiceItem";
+
+    @Override
+    public AccessLevel getReadMinRequiredAccessLevel()
+    {
+        return AccessLevel.STANDARD;
+    }
+
+    @Override
+    public AccessLevel getWriteMinRequiredAccessLevel()
+    {
+        return AccessLevel.ADMIN;
+    }
 
     public String getService_id()
     {

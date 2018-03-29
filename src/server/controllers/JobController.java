@@ -2,33 +2,25 @@ package server.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.rest.webmvc.PersistentEntityResourceAssembler;
 import org.springframework.data.rest.webmvc.RepositoryRestController;
 import org.springframework.data.web.PagedResourcesAssembler;
-import org.springframework.hateoas.ResourceAssembler;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import server.auxilary.IO;
-import server.auxilary.RemoteComms;
-import server.exceptions.InvalidBusinessObjectException;
-import server.exceptions.InvalidJobException;
-import server.model.Counter;
-import server.model.FileMetadata;
+import server.model.BusinessObject;
+import server.model.Metafile;
 import server.model.Job;
-import server.model.Quote;
 import server.repositories.JobRepository;
 
-import java.rmi.Remote;
-import java.util.List;
+/**
+ * Created by ghost on 2017/12/22.
+ * @author th3gh0st
+ */
 
 @RepositoryRestController
-//@RequestMapping("/jobs")
-public class JobController
+public class JobController extends APIController
 {
     private PagedResourcesAssembler<Job> pagedAssembler;
     @Autowired
@@ -40,59 +32,58 @@ public class JobController
         this.pagedAssembler = pagedAssembler;
     }
 
-    @GetMapping(path="/jobs/{id}", produces = "application/hal+json")
-    public ResponseEntity<Page<Job>> getJob(@PathVariable("id") String id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    @GetMapping(path="/job/{id}", produces = "application/hal+json")
+    public ResponseEntity<Page<? extends BusinessObject>> getJob(@PathVariable("id") String id, @RequestHeader String session_id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
     {
-        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Job GET request id: "+ id);
-        List<Job> contents = IO.getInstance().mongoOperations().find(new Query(Criteria.where("_id").is(id)), Job.class, "jobs");
-        return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
+        return getBusinessObject(new Job(id), "_id", session_id, "jobs", pagedAssembler, assembler, pageRequest);
     }
 
     @GetMapping("/jobs")
-    public ResponseEntity<Page<Job>> getJobs(Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    public ResponseEntity<Page<? extends BusinessObject>> getJobs(Pageable pageRequest, @RequestHeader String session_id, PersistentEntityResourceAssembler assembler)
     {
-        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Job GET request {all}");
-        List<Job> contents =  IO.getInstance().mongoOperations().findAll(Job.class, "jobs");
-        return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
+        return getBusinessObjects(new Job(), session_id, "jobs", pagedAssembler, assembler, pageRequest);
     }
 
-    @PutMapping("/jobs")
-    public ResponseEntity<String> addJob(@RequestBody Job job)
+    @PutMapping("/job")
+    public ResponseEntity<String> addJob(@RequestBody Job job, @RequestHeader String session_id)
     {
-        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Job creation request.");
-        //HttpHeaders headers = new HttpHeaders();
-        return APIController.putBusinessObject(job, "jobs", "jobs_timestamp");
+        return putBusinessObject(job, session_id, "jobs", "jobs_timestamp");
     }
 
-    @PostMapping("/jobs")
-    public ResponseEntity<String> patchJob(@RequestBody Job job)
+    @PostMapping("/job")
+    public ResponseEntity<String> patchJob(@RequestBody Job job, @RequestHeader String session_id)
     {
-        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Job update request.");
-        return APIController.patchBusinessObject(job, "jobs", "jobs_timestamp");
+        return patchBusinessObject(job, session_id, "jobs", "jobs_timestamp");
     }
 
-    @PostMapping(value = "/jobs/mailto")//, consumes = "text/plain"//value =//, produces = "application/pdf"
+    @PostMapping(value = "/job/mailto")//, consumes = "text/plain"//value =//, produces = "application/pdf"
     public ResponseEntity<String> emailJob(@RequestHeader String _id, @RequestHeader String session_id,
                                              @RequestHeader String message, @RequestHeader String subject,
-                                             @RequestHeader String destination, @RequestBody FileMetadata fileMetadata)//, @RequestParam("file") MultipartFile file
+                                             @RequestHeader String destination, @RequestBody Metafile metafile)//, @RequestParam("file") MultipartFile file
     {
         IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling handling mailto request.");
-        return APIController.emailBusinessObject(_id, session_id, message, subject, destination, fileMetadata, Job.class);
+        return emailBusinessObject(_id, session_id, message, subject, destination, metafile, Job.class);
     }
 
-    @PostMapping(value = "/jobs/approval_request")//, consumes = "text/plain"//value =//, produces = "application/pdf"
+    @PostMapping(value = "/job/approval_request")//, consumes = "text/plain"//value =//, produces = "application/pdf"
     public ResponseEntity<String> requestJobApproval(@RequestHeader String job_id, @RequestHeader String session_id,
                                                        @RequestHeader String message, @RequestHeader String subject,
-                                                       @RequestBody FileMetadata fileMetadata)//, @RequestParam("file") MultipartFile file
+                                                       @RequestBody Metafile metafile)//, @RequestParam("file") MultipartFile file
     {
         IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Job approval request.");
-        return APIController.requestBusinessObjectApproval(job_id, session_id, message, subject, fileMetadata, new Job().apiEndpoint(), Job.class);
+        return requestBusinessObjectApproval(job_id, session_id, message, subject, metafile, new Job().apiEndpoint(), Job.class);
     }
 
-    @GetMapping("/jobs/approve/{job_id}/{vericode}")
-    public ResponseEntity<String> approveJob(@PathVariable("job_id") String job_id, @PathVariable("vericode") String vericode)
+    @GetMapping("/job/approve/{job_id}/{vericode}")
+    public ResponseEntity<String> approve(@PathVariable("job_id") String job_id, @PathVariable("vericode") String vericode)
     {
         IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Job "+job_id+" approval request by Vericode.");
-        return APIController.approveBusinessObjectByVericode(job_id, vericode, "jobs", "jobs_timestamp", Job.class);
+        return approveBusinessObjectByVericode(job_id, vericode, "jobs", "jobs_timestamp", Job.class);
+    }
+
+    @DeleteMapping(path="/job/{job_id}")
+    public ResponseEntity<String> delete(@PathVariable String job_id, @RequestHeader String session_id)
+    {
+        return deleteBusinessObject(new Job(job_id), session_id, "jobs", "jobs_timestamp");
     }
 }

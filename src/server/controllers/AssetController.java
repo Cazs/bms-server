@@ -2,29 +2,23 @@ package server.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.rest.webmvc.PersistentEntityResourceAssembler;
 import org.springframework.data.rest.webmvc.RepositoryRestController;
 import org.springframework.data.web.PagedResourcesAssembler;
-import org.springframework.hateoas.ResourceAssembler;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import server.auxilary.IO;
 import server.model.Asset;
 import server.model.BusinessObject;
-import server.model.Resource;
 import server.repositories.AssetRepository;
 
-import java.util.LinkedList;
-import java.util.List;
+/**
+ * Created by ghost on 2017/12/22.
+ * @author th3gh0st
+ */
 
 @RepositoryRestController
-@RequestMapping("/assets")
-public class AssetController
+public class AssetController extends APIController
 {
     private PagedResourcesAssembler<Asset> pagedAssembler;
     @Autowired
@@ -36,34 +30,33 @@ public class AssetController
         this.pagedAssembler = pagedAssembler;
     }
 
-    @GetMapping(path="/{id}", produces = "application/hal+json")
-    public ResponseEntity<Page<Asset>> getAsset(@PathVariable("id") String id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    @GetMapping(path="/asset/{id}", produces = "application/hal+json")
+    public ResponseEntity<Page<? extends BusinessObject>> getAsset(@PathVariable("id") String id, @RequestHeader String session_id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
     {
-        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Asset GET request id: "+ id);
-        List<Asset> contents = IO.getInstance().mongoOperations().find(new Query(Criteria.where("_id").is(id)), Asset.class, "assets");
-        return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
+        return getBusinessObject(new Asset(id), "_id", session_id, "assets", pagedAssembler, assembler, pageRequest);
     }
 
-    @GetMapping
-    public ResponseEntity<Page<Asset>> getAssets(Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    @GetMapping("/assets")
+    public ResponseEntity<Page<? extends BusinessObject>> getAssets(@RequestHeader String session_id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
     {
-        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Asset GET request {all}");
-        List<Asset> contents =  IO.getInstance().mongoOperations().findAll(Asset.class, "assets");
-        return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
+        return getBusinessObjects(new Asset(), session_id, "assets", pagedAssembler, assembler, pageRequest);
     }
 
-    @PutMapping
-    public ResponseEntity<String> addAsset(@RequestBody Asset asset)
+    @PutMapping("/asset")
+    public ResponseEntity<String> addAsset(@RequestBody Asset asset, @RequestHeader String session_id)
     {
-        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Asset creation request.");
-        //HttpHeaders headers = new HttpHeaders();
-        return APIController.putBusinessObject(asset, "assets", "assets_timestamp");
+        return putBusinessObject(asset, session_id, "assets", "assets_timestamp");
     }
 
-    @PostMapping
-    public ResponseEntity<String> patchAsset(@RequestBody Asset asset)
+    @PostMapping("/asset")
+    public ResponseEntity<String> patchAsset(@RequestBody Asset asset, @RequestHeader String session_id)
     {
-        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Asset update request.");
-        return APIController.patchBusinessObject(asset, "assets", "assets_timestamp");
+        return patchBusinessObject(asset, session_id, "assets", "assets_timestamp");
+    }
+
+    @DeleteMapping(path = "/asset/{asset_id}")
+    public ResponseEntity<String> delete(@PathVariable String asset_id, @RequestHeader String session_id)
+    {
+        return deleteBusinessObject(new Asset(asset_id), session_id, "assets", "assets_timestamp");
     }
 }

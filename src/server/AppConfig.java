@@ -9,7 +9,6 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.SimpleMongoDbFactory;
 import org.springframework.data.rest.core.config.RepositoryRestConfiguration;
 import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurerAdapter;
-import org.springframework.data.rest.webmvc.config.RepositoryRestMvcConfiguration;
 import server.auxilary.RemoteComms;
 import server.model.*;
 
@@ -55,6 +54,8 @@ public class AppConfig  extends RepositoryRestConfigurerAdapter
         config.exposeIdsFor(Overtime.class);
         config.exposeIdsFor(Service.class);
         config.exposeIdsFor(ServiceItem.class);
+        config.exposeIdsFor(Task.class);
+        config.exposeIdsFor(TaskItem.class);
     }
 
     /*@Bean

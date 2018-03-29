@@ -6,10 +6,11 @@
 package server.model;
 
 import org.springframework.data.rest.core.annotation.RestResource;
+import server.auxilary.AccessLevel;
 import server.auxilary.IO;
 
 /**
- *
+ * Created by ghost on 2017/12/23.
  * @author ghost
  */
 public class Job extends BusinessObject
@@ -22,8 +23,26 @@ public class Job extends BusinessObject
     private String invoice_id;
     private String quote_id;
     private int status;
-    private Employee[] assigned_employees;
-    private FileMetadata[] safety_catalogue;
+
+    public Job()
+    {}
+
+    public Job(String _id)
+    {
+        super(_id);
+    }
+
+    @Override
+    public AccessLevel getReadMinRequiredAccessLevel()
+    {
+        return AccessLevel.STANDARD;
+    }
+
+    @Override
+    public AccessLevel getWriteMinRequiredAccessLevel()
+    {
+        return AccessLevel.ADMIN;
+    }
 
     public long getPlanned_start_date() {return planned_start_date;}
 
@@ -173,18 +192,8 @@ public class Job extends BusinessObject
                 case "invoice_id":
                     invoice_id = (String)val;
                     break;
-                case "assigned_employees":
-                    if(val!=null)
-                        assigned_employees = (Employee[]) val;
-                    else IO.log(getClass().getName(), IO.TAG_WARN, "value to be casted to Employee[] is null.");
-                    break;
-                case "safety_catalogue":
-                    if(val!=null)
-                        safety_catalogue = (FileMetadata[]) val;
-                    else IO.log(getClass().getName(), IO.TAG_WARN, "value to be casted to FileMetadata[] is null.");
-                    break;
                 default:
-                    IO.log(getClass().getName(), IO.TAG_ERROR, "unknown Job attribute '" + var + "'.");
+                    IO.log(getClass().getName(), IO.TAG_ERROR, "unknown " +getClass().getName()+ " attribute '" + var + "'.");
                     break;
             }
         }catch (NumberFormatException e)

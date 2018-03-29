@@ -1,17 +1,11 @@
 package server.model;
 
-import org.springframework.data.annotation.Id;
-import server.auxilary.Globals;
+import server.auxilary.AccessLevel;
 import server.auxilary.IO;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
-
-import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 
 /**
- * Created by ghost on 2017/02/01.
+ * Created by ghost on 2017/12/22.
+ * @author th3gh0st
  */
 public class Asset extends BusinessObject
 {
@@ -24,6 +18,26 @@ public class Asset extends BusinessObject
     private long date_exhausted;
     private long quantity;
     private String unit;
+
+    public Asset()
+    {}
+
+    public Asset(String _id)
+    {
+        super(_id);
+    }
+
+    @Override
+    public AccessLevel getReadMinRequiredAccessLevel()
+    {
+        return AccessLevel.STANDARD;
+    }
+
+    @Override
+    public AccessLevel getWriteMinRequiredAccessLevel()
+    {
+        return AccessLevel.ADMIN;
+    }
 
     public String getAsset_name()
     {
@@ -215,7 +229,7 @@ public class Asset extends BusinessObject
     @Override
     public String toString()
     {
-        return getAsset_name();
+        return super.toString() + " = " + getAsset_name();
     }
 
     @Override

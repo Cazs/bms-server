@@ -1,18 +1,13 @@
 package server.model;
 
-import org.springframework.data.annotation.Id;
+import server.auxilary.AccessLevel;
 import server.auxilary.IO;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
-
-import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.ArrayList;
 
 /**
- * Created by ghost on 2017/01/21.
+ * Created by ghost on 2017/12/22.
+ * @author th3gh0st
  */
+
 public class Expense extends BusinessObject
 {
     private String expense_title;
@@ -21,6 +16,26 @@ public class Expense extends BusinessObject
     private String supplier;
     private String account;
     public static final String TAG = "Expense";
+
+    public Expense()
+    {}
+
+    public Expense(String _id)
+    {
+        super(_id);
+    }
+
+    @Override
+    public AccessLevel getReadMinRequiredAccessLevel()
+    {
+        return AccessLevel.STANDARD;
+    }
+
+    @Override
+    public AccessLevel getWriteMinRequiredAccessLevel()
+    {
+        return AccessLevel.STANDARD;
+    }
 
     public String getSupplier()
     {
@@ -150,7 +165,7 @@ public class Expense extends BusinessObject
     @Override
     public String toString()
     {
-        return this.expense_title;
+        return super.toString() + " = "  + getExpense_title();
     }
 
     @Override

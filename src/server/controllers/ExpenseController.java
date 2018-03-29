@@ -2,68 +2,62 @@ package server.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.rest.webmvc.PersistentEntityResourceAssembler;
 import org.springframework.data.rest.webmvc.RepositoryRestController;
 import org.springframework.data.web.PagedResourcesAssembler;
-import org.springframework.hateoas.ResourceAssembler;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import server.auxilary.IO;
-import server.model.Employee;
 import server.model.Expense;
 import server.model.BusinessObject;
 import server.repositories.ExpenseRepository;
 
-import java.util.LinkedList;
-import java.util.List;
+/**
+ * Created by ghost on 2017/12/22.
+ * @author th3gh0st
+ */
 
 @RepositoryRestController
-@RequestMapping("/expenses")
-public class ExpenseController
+public class ExpenseController extends APIController
 {
-        private PagedResourcesAssembler<Expense> pagedAssembler;
-        @Autowired
-        private ExpenseRepository expenseRepository;
+    private PagedResourcesAssembler<Expense> pagedAssembler;
 
-        @Autowired
-        public ExpenseController(PagedResourcesAssembler<Expense> pagedAssembler)
-        {
-            this.pagedAssembler = pagedAssembler;
-        }
+    @Autowired
+    private ExpenseRepository expenseRepository;
 
-        @GetMapping(path="/{id}", produces = "application/hal+json")
-        public ResponseEntity<Page<Expense>> getExpense(@PathVariable("id") String id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
-        {
-            IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Expense GET request id: "+ id);
-            List<Expense> contents = IO.getInstance().mongoOperations().find(new Query(Criteria.where("_id").is(id)), Expense.class, "expenses");
-            return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
-        }
+    @Autowired
+    public ExpenseController(PagedResourcesAssembler<Expense> pagedAssembler)
+    {
+        this.pagedAssembler = pagedAssembler;
+    }
 
-        @GetMapping
-        public ResponseEntity<Page<Expense>> getExpenses(Pageable pageRequest, PersistentEntityResourceAssembler assembler)
-        {
-            IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Expense GET request {all}");
-            List<Expense> contents =  IO.getInstance().mongoOperations().findAll(Expense.class, "expenses");
-            return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
-        }
+    @GetMapping(path = "/expense/{id}", produces = "application/hal+json")
+    public ResponseEntity<Page<? extends BusinessObject>> getExpense(@PathVariable("id") String id, @RequestHeader String session_id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    {
+        return getBusinessObject(new Expense(id), "_id", session_id, "expenses", pagedAssembler, assembler, pageRequest);
+    }
 
-        @PutMapping
-        public ResponseEntity<String> addExpense(@RequestBody Expense expense)
-        {
-            IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Expense creation request.");
-            //HttpHeaders headers = new HttpHeaders();
-            return APIController.putBusinessObject(expense, "expenses", "expenses_timestamp");
-        }
+    @GetMapping("/expenses")
+    public ResponseEntity<Page<? extends BusinessObject>> getExpenses(@RequestHeader String session_id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    {
+        return getBusinessObjects(new Expense(), session_id, "expenses", pagedAssembler, assembler, pageRequest);
+    }
 
-        @PostMapping
-        public ResponseEntity<String> patchExpense(@RequestBody Expense expense)
-        {
-            IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Expense update request.");
-            return APIController.patchBusinessObject(expense, "expenses", "expenses_timestamp");
-        }
+    @PutMapping("/expense")
+    public ResponseEntity<String> addExpense(@RequestBody Expense expense, @RequestHeader String session_id)
+    {
+        return putBusinessObject(expense, session_id, "expenses", "expenses_timestamp");
+    }
+
+    @PostMapping("/expense")
+    public ResponseEntity<String> patchExpense(@RequestBody Expense expense, @RequestHeader String session_id)
+    {
+        return patchBusinessObject(expense, session_id, "expenses", "expenses_timestamp");
+    }
+
+    @DeleteMapping(path = "/expense/{expense_id}")
+    public ResponseEntity<String> delete(@PathVariable String expense_id, @RequestHeader String session_id)
+    {
+        return deleteBusinessObject(new Expense(expense_id), session_id, "expenses", "expenses_timestamp");
+    }
 }

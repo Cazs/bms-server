@@ -2,30 +2,23 @@ package server.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.rest.webmvc.PersistentEntityResourceAssembler;
 import org.springframework.data.rest.webmvc.RepositoryRestController;
 import org.springframework.data.web.PagedResourcesAssembler;
-import org.springframework.hateoas.ResourceAssembler;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import server.auxilary.IO;
-import server.auxilary.RemoteComms;
-import server.exceptions.InvalidBusinessObjectException;
 import server.model.BusinessObject;
-import server.model.Job;
 import server.model.JobEmployee;
 import server.repositories.JobEmployeeRepository;
 
-import java.rmi.Remote;
-import java.util.List;
+/**
+ * Created by ghost on 2017/12/22.
+ * @author th3gh0st
+ */
 
 @RepositoryRestController
-public class JobEmployeeController
+public class JobEmployeeController extends APIController
 {
     private PagedResourcesAssembler<JobEmployee> pagedAssembler;
 
@@ -39,27 +32,33 @@ public class JobEmployeeController
     }
 
     //Job Employee Route Handlers
-    @GetMapping(path="/jobs/employees/{id}", produces = "application/hal+json")
-    public ResponseEntity<Page<JobEmployee>> getJobEmployee(@PathVariable("id") String id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    @GetMapping(path="/job/employees/{id}", produces = "application/hal+json")
+    public ResponseEntity<Page<? extends BusinessObject>> get(@PathVariable("id") String id, @RequestHeader String session_id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
     {
-        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling JobEmployees GET request job_id: ["+ id+"]");
-        List<JobEmployee> contents = IO.getInstance().mongoOperations().find(new Query(Criteria.where("job_id").is(id)), JobEmployee.class, "job_employees");
-        return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
+        return getBusinessObject(new JobEmployee(id), "_id", session_id, "job_employees", pagedAssembler, assembler, pageRequest);
     }
 
     @GetMapping("/jobs/employees")
-    public ResponseEntity<Page<JobEmployee>> getJobEmployees(Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    public ResponseEntity<Page<? extends BusinessObject>> getAll(Pageable pageRequest, @RequestHeader String session_id, PersistentEntityResourceAssembler assembler)
     {
-        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling JobEmployee GET request {all}");
-        List<JobEmployee> contents =  IO.getInstance().mongoOperations().findAll(JobEmployee.class, "job_employees");
-        return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
+        return getBusinessObjects(new JobEmployee(), session_id, "job_employees", pagedAssembler, assembler, pageRequest);
     }
 
-    @PutMapping("/jobs/employees")
-    public ResponseEntity<String> addJobEmployee(@RequestBody JobEmployee job_employee)
+    @PutMapping("/job/employee")
+    public ResponseEntity<String> put(@RequestBody JobEmployee job_employee, @RequestHeader String session_id)
     {
-        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling JobEmployee creation request.");
-        //HttpHeaders headers = new HttpHeaders();
-        return APIController.putBusinessObject(job_employee, "job_employees", "jobs_timestamp");
+        return putBusinessObject(job_employee, session_id, "job_employees", "jobs_timestamp");
+    }
+
+    @PostMapping("/job/employee")
+    public ResponseEntity<String> patch(@RequestBody JobEmployee jobEmployee, @RequestHeader String session_id)
+    {
+        return patchBusinessObject(jobEmployee, session_id, "job_employees", "jobs_timestamp");
+    }
+
+    @DeleteMapping(path="/job/employee/{job_employee_id}")
+    public ResponseEntity<String> delete(@PathVariable String job_employee_id, @RequestHeader String session_id)
+    {
+        return deleteBusinessObject(new JobEmployee(job_employee_id), session_id, "job_employees", "jobs_timestamp");
     }
 }

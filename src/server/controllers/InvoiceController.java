@@ -2,30 +2,23 @@ package server.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.rest.webmvc.PersistentEntityResourceAssembler;
 import org.springframework.data.rest.webmvc.RepositoryRestController;
 import org.springframework.data.web.PagedResourcesAssembler;
-import org.springframework.hateoas.ResourceAssembler;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import server.auxilary.IO;
-import server.auxilary.RemoteComms;
-import server.exceptions.InvalidBusinessObjectException;
 import server.model.*;
 import server.repositories.InvoiceRepository;
 
-import java.rmi.Remote;
-import java.util.LinkedList;
-import java.util.List;
+/**
+ * Created by ghost on 2017/12/22.
+ * @author th3gh0st
+ */
 
 @RepositoryRestController
-@RequestMapping("/invoices")
-public class InvoiceController
+public class InvoiceController extends APIController
 {
     private PagedResourcesAssembler<Invoice> pagedAssembler;
     @Autowired
@@ -37,58 +30,58 @@ public class InvoiceController
         this.pagedAssembler = pagedAssembler;
     }
 
-    @GetMapping(path="/{id}", produces = "application/hal+json")
-    public ResponseEntity<Page<Invoice>> getInvoice(@PathVariable("id") String id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    @GetMapping(path="/invoice/{id}", produces = "application/hal+json")
+    public ResponseEntity<Page<? extends BusinessObject>> getInvoice(@PathVariable("id") String id, @RequestHeader String session_id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
     {
-        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Invoice GET request id: "+ id);
-        List<Invoice> contents = IO.getInstance().mongoOperations().find(new Query(Criteria.where("_id").is(id)), Invoice.class, "invoices");
-        return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
+        return getBusinessObject(new Invoice(id), "_id", session_id, "invoices", pagedAssembler, assembler, pageRequest);
     }
 
-    @GetMapping
-    public ResponseEntity<Page<Invoice>> getInvoices(Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    @GetMapping("/invoices")
+    public ResponseEntity<Page<? extends BusinessObject>> getInvoices(Pageable pageRequest, @RequestHeader String session_id, PersistentEntityResourceAssembler assembler)
     {
-        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Invoice GET request {all}");
-        List<Invoice> contents =  IO.getInstance().mongoOperations().findAll(Invoice.class, "invoices");
-        return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
+        return getBusinessObjects(new Invoice(), session_id, "invoices", pagedAssembler, assembler, pageRequest);
     }
 
-    @PutMapping
-    public ResponseEntity<String> addInvoice(@RequestBody Invoice invoice)
+    @PutMapping("/invoice")
+    public ResponseEntity<String> addInvoice(@RequestBody Invoice invoice, @RequestHeader String session_id)
     {
-        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Invoice creation request");
-        return APIController.putBusinessObject(invoice, "invoices", "invoices_timestamp");
+        return putBusinessObject(invoice, session_id, "invoices", "invoices_timestamp");
     }
 
-    @PostMapping
-    public ResponseEntity<String> patchInvoice(@RequestBody Invoice invoice)
+    @PostMapping("/invoice")
+    public ResponseEntity<String> patchInvoice(@RequestBody Invoice invoice, @RequestHeader String session_id)
     {
-        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Invoice update request.");
-        return APIController.patchBusinessObject(invoice, "invoices", "invoices_timestamp");
+        return patchBusinessObject(invoice, session_id, "invoices", "invoices_timestamp");
     }
 
-    @PostMapping(value = "/mailto")//, consumes = "text/plain"//value =//, produces = "application/pdf"
+    @PostMapping(value = "/invoice/mailto")//, consumes = "text/plain"//value =//, produces = "application/pdf"
     public ResponseEntity<String> emailInvoice(@RequestHeader String _id, @RequestHeader String session_id,
                                                      @RequestHeader String message, @RequestHeader String subject,
-                                                     @RequestHeader String destination, @RequestBody FileMetadata fileMetadata)//, @RequestParam("file") MultipartFile file
+                                                     @RequestHeader String destination, @RequestBody Metafile metafile)//, @RequestParam("file") MultipartFile file
     {
         IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Invoice mailto request.");
-        return APIController.emailBusinessObject(_id, session_id, message, subject, destination, fileMetadata, Invoice.class);
+        return emailBusinessObject(_id, session_id, message, subject, destination, metafile, Invoice.class);
     }
 
-    @PostMapping(value = "/approval_request")//, consumes = "text/plain"//value =//, produces = "application/pdf"
+    @PostMapping(value = "/invoice/approval_request")//, consumes = "text/plain"//value =//, produces = "application/pdf"
     public ResponseEntity<String> requestInvoiceApproval(@RequestHeader String invoice_id, @RequestHeader String session_id,
                                                      @RequestHeader String message, @RequestHeader String subject,
-                                                     @RequestBody FileMetadata fileMetadata)//, @RequestParam("file") MultipartFile file
+                                                     @RequestBody Metafile metafile)//, @RequestParam("file") MultipartFile file
     {
         IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Invoice approval request.");
-        return APIController.requestBusinessObjectApproval(invoice_id, session_id, message, subject, fileMetadata, new Invoice().apiEndpoint(), Invoice.class);
+        return requestBusinessObjectApproval(invoice_id, session_id, message, subject, metafile, new Invoice().apiEndpoint(), Invoice.class);
     }
 
-    @GetMapping("/approve/{invoice_id}/{vericode}")
+    @GetMapping("/invoice/approve/{invoice_id}/{vericode}")
     public ResponseEntity<String> approveInvoice(@PathVariable("invoice_id") String invoice_id, @PathVariable("vericode") String vericode)
     {
         IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Invoice "+invoice_id+" approval request by Vericode.");
-        return APIController.approveBusinessObjectByVericode(invoice_id, vericode, "invoices", "invoices_timestamp", Invoice.class);
+        return approveBusinessObjectByVericode(invoice_id, vericode, "invoices", "invoices_timestamp", Invoice.class);
+    }
+
+    @DeleteMapping(path="/invoice/{invoice_id}")
+    public ResponseEntity<String> delete(@PathVariable String invoice_id, @RequestHeader String session_id)
+    {
+        return deleteBusinessObject(new Invoice(invoice_id), session_id, "invoices", "invoices_timestamp");
     }
 }

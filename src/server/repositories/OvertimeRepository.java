@@ -8,7 +8,12 @@ import server.model.Overtime;
 
 import java.util.List;
 
-@RepositoryRestResource(collectionResourceRel = "overtime_records", path = "/overtime_records")
+/**
+ * Created by ghost on 2017/12/22.
+ * @author th3gh0st
+ */
+
+@RepositoryRestResource(collectionResourceRel = "overtime_applications", path = "/overtime_applications")
 public interface OvertimeRepository extends MongoRepository<Overtime, String>
 {
 	List<Overtime> findBy_id(@Param("_id") String _id);

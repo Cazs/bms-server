@@ -2,27 +2,22 @@ package server.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.rest.webmvc.PersistentEntityResourceAssembler;
 import org.springframework.data.rest.webmvc.RepositoryRestController;
 import org.springframework.data.web.PagedResourcesAssembler;
-import org.springframework.hateoas.ResourceAssembler;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import server.auxilary.IO;
 import server.model.*;
 import server.repositories.LeaveRepository;
 
-import java.util.LinkedList;
-import java.util.List;
+/**
+ * Created by ghost on 2017/12/22.
+ * @author th3gh0st
+ */
 
 @RepositoryRestController
-@RequestMapping("/leave_records")
-public class LeaveController
+public class LeaveController extends APIController
 {
     private PagedResourcesAssembler<Leave> pagedAssembler;
     @Autowired
@@ -34,58 +29,55 @@ public class LeaveController
         this.pagedAssembler = pagedAssembler;
     }
 
-    @GetMapping(path="/{id}", produces = "application/hal+json")
-    public ResponseEntity<Page<Leave>> getLeave(@PathVariable("id") String id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    @GetMapping(path="/leave_application/{id}", produces = "application/hal+json")
+    public ResponseEntity<Page<? extends BusinessObject>> getLeave(@PathVariable("id") String id, @RequestHeader String session_id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
     {
-        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Leave GET request id: "+ id);
-        List<Leave> contents = IO.getInstance().mongoOperations().find(new Query(Criteria.where("_id").is(id)), Leave.class, "leave_records");
-        return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
+        return getBusinessObject(new Leave(id), "_id", session_id, "leave_applications", pagedAssembler, assembler, pageRequest);
     }
 
-    @GetMapping
-    public ResponseEntity<Page<Leave>> getLeaveRecords(Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    @GetMapping("/leave_applications")
+    public ResponseEntity<Page<? extends BusinessObject>> getLeaveRecords(@RequestHeader String session_id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
     {
-        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Leave GET request {all}");
-        List<Leave> contents =  IO.getInstance().mongoOperations().findAll(Leave.class, "leave_records");
-        return new ResponseEntity(pagedAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) assembler), HttpStatus.OK);
+        return getBusinessObjects(new Leave(), session_id, "leave_applications", pagedAssembler, assembler, pageRequest);
     }
 
-    @PutMapping
-    public ResponseEntity<String> addLeaveRecord(@RequestBody Leave leave)
+    @PutMapping("/leave_application")
+    public ResponseEntity<String> addLeaveRecord(@RequestBody Leave leave, @RequestHeader String session_id)
     {
-        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Leave record creation request");
-        return APIController.putBusinessObject(leave, "leave_records", "leave_records_timestamp");
+        return putBusinessObject(leave, session_id, "leave_applications", "leave_applications_timestamp");
     }
 
-    @PostMapping
-    public ResponseEntity<String> patchLeaveRecord(@RequestBody Leave leave)
+    @PostMapping("/leave_application")
+    public ResponseEntity<String> patchLeaveRecord(@RequestBody Leave leave, @RequestHeader String session_id)
     {
-        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Leave record update request.");
-        return APIController.patchBusinessObject(leave, "leave_records", "leave_records_timestamp");
+        return patchBusinessObject(leave, session_id, "leave_applications", "leave_applications_timestamp");
     }
 
-    @PostMapping(value = "/mailto")
+    @PostMapping(value = "/leave_application/mailto")
     public ResponseEntity<String> emailLeave(@RequestHeader String _id, @RequestHeader String session_id,
                                              @RequestHeader String message, @RequestHeader String subject,
-                                             @RequestHeader String destination, @RequestBody FileMetadata fileMetadata)
+                                             @RequestHeader String destination, @RequestBody Metafile metafile)
     {
-        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Leave mailto request.");
-        return APIController.emailBusinessObject(_id, session_id, message, subject, destination, fileMetadata, Leave.class);
+        return emailBusinessObject(_id, session_id, message, subject, destination, metafile, Leave.class);
     }
 
-    @PostMapping(value = "/approval_request")
+    @PostMapping(value = "/leave_application/approval_request")
     public ResponseEntity<String> requestLeaveApproval(@RequestHeader String leave_record_id, @RequestHeader String session_id,
                                                        @RequestHeader String message, @RequestHeader String subject,
-                                                       @RequestBody FileMetadata fileMetadata)//, @RequestParam("file") MultipartFile file
+                                                       @RequestBody Metafile metafile)//, @RequestParam("file") MultipartFile file
     {
-        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Leave approval request.");
-        return APIController.requestBusinessObjectApproval(leave_record_id, session_id, message, subject, fileMetadata, new Leave().apiEndpoint(), Leave.class);
+        return requestBusinessObjectApproval(leave_record_id, session_id, message, subject, metafile, new Leave().apiEndpoint(), Leave.class);
     }
 
-    @GetMapping("/approve/{leave_record_id}/{vericode}")
+    @GetMapping("/leave_application/approve/{leave_record_id}/{vericode}")
     public ResponseEntity<String> approveLeave(@PathVariable("leave_record_id") String leave_record_id, @PathVariable("vericode") String vericode)
     {
-        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Leave Record "+leave_record_id+" approval request by Vericode.");
-        return APIController.approveBusinessObjectByVericode(leave_record_id, vericode, "leave_records", "leave_records_timestamp", Leave.class);
+        return approveBusinessObjectByVericode(leave_record_id, vericode, "leave_applications", "leave_applications_timestamp", Leave.class);
+    }
+
+    @DeleteMapping(path="/leave_application/{leave_application_id}")
+    public ResponseEntity<String> delete(@PathVariable String leave_application_id, @RequestHeader String session_id)
+    {
+        return deleteBusinessObject(new Leave(leave_application_id), session_id, "leave_applications", "leave_applications_timestamp");
     }
 }

@@ -5,10 +5,11 @@
  */
 package server.model;
 
+import server.auxilary.AccessLevel;
 import server.auxilary.IO;
 
 /**
- *
+ * Created by ghost on 2017/12/23.
  * @author ghost
  */
 public class Invoice extends BusinessObject
@@ -17,6 +18,26 @@ public class Invoice extends BusinessObject
     private double receivable;
     private String quote_revision_numbers;
     private int status;
+
+    public Invoice()
+    {}
+
+    public Invoice(String _id)
+    {
+        super(_id);
+    }
+
+    @Override
+    public AccessLevel getReadMinRequiredAccessLevel()
+    {
+        return AccessLevel.STANDARD;
+    }
+
+    @Override
+    public AccessLevel getWriteMinRequiredAccessLevel()
+    {
+        return AccessLevel.ADMIN;
+    }
 
     public int getStatus()
     {
@@ -116,6 +137,12 @@ public class Invoice extends BusinessObject
                 return getReceivable();
         }
         return super.get(var);
+    }
+
+    @Override
+    public String toString()
+    {
+        return super.toString() + " = for job "  + getJob_id();
     }
 
     @Override

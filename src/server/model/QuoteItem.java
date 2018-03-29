@@ -1,14 +1,11 @@
 package server.model;
 
-import org.springframework.data.annotation.Id;
+import server.auxilary.AccessLevel;
 import server.auxilary.IO;
 
-import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-
 /**
- * Created by ghost on 2017/01/21.
+ * Created by ghost on 2017/12/22.
+ * @author ghost
  */
 public class QuoteItem extends BusinessObject
 {
@@ -21,6 +18,26 @@ public class QuoteItem extends BusinessObject
     private String resource_id;
     private String category;
     public static final String TAG = "QuoteItem";
+
+    public QuoteItem()
+    {}
+
+    public QuoteItem(String _id)
+    {
+        super(_id);
+    }
+
+    @Override
+    public AccessLevel getReadMinRequiredAccessLevel()
+    {
+        return AccessLevel.STANDARD;
+    }
+
+    @Override
+    public AccessLevel getWriteMinRequiredAccessLevel()
+    {
+        return AccessLevel.ADMIN;
+    }
 
     public int getItem_number()
     {
@@ -154,6 +171,7 @@ public class QuoteItem extends BusinessObject
     {
         return getRate()*getQuantity();
     }
+
     @Override
     public String[] isValid()
     {
@@ -239,6 +257,12 @@ public class QuoteItem extends BusinessObject
                 return getCategory();
         }
         return super.get(var);
+    }
+
+    @Override
+    public String toString()
+    {
+        return super.toString() + " for Quote ["  + getQuote_id() + "] material ID [" +getResource_id() + "] [qty: "+getQuantity()+"]";
     }
 
     @Override

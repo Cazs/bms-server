@@ -1,14 +1,11 @@
 package server.model;
 
-import org.springframework.data.annotation.Id;
+import server.auxilary.AccessLevel;
 import server.auxilary.IO;
 
-import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-
 /**
- * Created by ghost on 2017/01/21.
+ * Created by ghost on 2017/12/22.
+ * @author ghost
  */
 public class Revenue extends BusinessObject
 {
@@ -17,6 +14,26 @@ public class Revenue extends BusinessObject
     private double revenue_value;
     private String account_name;
     public static final String TAG = "Revenue";
+
+    public Revenue()
+    {}
+
+    public Revenue(String _id)
+    {
+        super(_id);
+    }
+
+    @Override
+    public AccessLevel getReadMinRequiredAccessLevel()
+    {
+        return AccessLevel.STANDARD;
+    }
+
+    @Override
+    public AccessLevel getWriteMinRequiredAccessLevel()
+    {
+        return AccessLevel.ADMIN;
+    }
 
     public String getRevenue_title()
     {
@@ -123,7 +140,7 @@ public class Revenue extends BusinessObject
     @Override
     public String toString()
     {
-        return this.revenue_title;
+        return super.toString() + "["  + getRevenue_title() + "] description [" +getRevenue_description() + "]";
     }
 
     @Override

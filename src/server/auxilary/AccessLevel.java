@@ -3,7 +3,7 @@ package server.auxilary;
 /**
  * Created by ghost on 2017/04/06.
  */
-public enum AccessLevels
+public enum AccessLevel
 {
     NO_ACCESS(0),//No rights
     STANDARD(1),//Read/Write rights - limited
@@ -12,7 +12,7 @@ public enum AccessLevels
 
     private int level;
 
-    private AccessLevels(int level)
+    private AccessLevel(int level)
     {
         this.level=level;
     }

@@ -1,10 +1,11 @@
 package server.model;
 
+import server.auxilary.AccessLevel;
 import server.auxilary.IO;
 
-
 /**
- * Created by ghost on 2017/01/21.
+ * Created by ghost on 2017/12/23.
+ * @author ghost
  */
 public class PurchaseOrder extends BusinessObject
 {
@@ -15,6 +16,26 @@ public class PurchaseOrder extends BusinessObject
     private String account_name;
     private int status;
     public static final String TAG = "PurchaseOrder";
+
+    public PurchaseOrder()
+    {}
+
+    public PurchaseOrder(String _id)
+    {
+        super(_id);
+    }
+
+    @Override
+    public AccessLevel getReadMinRequiredAccessLevel()
+    {
+        return AccessLevel.STANDARD;
+    }
+
+    @Override
+    public AccessLevel getWriteMinRequiredAccessLevel()
+    {
+        return AccessLevel.ADMIN;
+    }
 
     public int getPo_number()
     {
@@ -160,6 +181,12 @@ public class PurchaseOrder extends BusinessObject
                 return getStatus();
         }
         return super.get(var);
+    }
+
+    @Override
+    public String toString()
+    {
+        return super.toString() + " to supplier "  + getSupplier_id();
     }
 
     @Override

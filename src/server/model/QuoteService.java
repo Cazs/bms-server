@@ -1,11 +1,11 @@
 package server.model;
 
+import server.auxilary.AccessLevel;
 import server.auxilary.IO;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 
 /**
- * Created by ghost on 2017/02/03.
+ * Created by ghost on 2018/02/23.
+ * @author ghost
  */
 public class QuoteService extends BusinessObject
 {
@@ -13,7 +13,25 @@ public class QuoteService extends BusinessObject
     private String service_id;
     public static final String TAG = "QuoteService";
 
-    private StringProperty quote_idProperty(){return new SimpleStringProperty(quote_id);}
+    public QuoteService()
+    {}
+
+    public QuoteService(String _id)
+    {
+        super(_id);
+    }
+
+    @Override
+    public AccessLevel getReadMinRequiredAccessLevel()
+    {
+        return AccessLevel.STANDARD;
+    }
+
+    @Override
+    public AccessLevel getWriteMinRequiredAccessLevel()
+    {
+        return AccessLevel.ADMIN;
+    }
 
     public String getQuote_id()
     {
@@ -25,16 +43,9 @@ public class QuoteService extends BusinessObject
         this.quote_id = quote_id;
     }
 
-    private StringProperty service_idProperty(){return new SimpleStringProperty(service_id);}
-
     public String getService_id()
     {
         return service_id;
-    }
-
-    public void setService_id(String service_id)
-    {
-        this.service_id = service_id;
     }
 
     @Override

@@ -5,10 +5,15 @@
  */
 package server.auxilary;
 
-import org.springframework.boot.json.GsonJsonParser;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import server.controllers.APIController;
+import server.model.Employee;
+
+import java.util.List;
 
 /**
- *
+ * Created by ghost on 2017/12/23
  * @author ghost
  */
 public class Session 
@@ -71,6 +76,24 @@ public class Session
     public boolean isExpired()
     {
         return (System.currentTimeMillis()/1000) >= getDate()+getTtl();
+    }
+
+    public Employee getEmployee()
+    {
+        //get User from this Session object
+        List<Employee> employees = IO.getInstance().mongoOperations().find(new Query(Criteria.where("usr").is(getUsr())), Employee.class, "employees");
+        if(employees==null)
+        {
+            IO.log(getClass().getName(), IO.TAG_ERROR, "getEmployee()> could not find a user associated with the username ["+getUsr()+"]");
+            return null;
+        }
+        if(employees.size()!=1)//should never happen
+        {
+            IO.log(getClass().getName(), IO.TAG_ERROR, "getEmployee()> could not find a valid user associated with username ["+getUsr()+"]");
+            return null;
+        }
+
+        return employees.get(0);
     }
 
     @Override

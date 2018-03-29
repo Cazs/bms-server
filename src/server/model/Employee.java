@@ -5,16 +5,12 @@
  */
 package server.model;
 
-import org.springframework.data.annotation.Id;
+import server.auxilary.AccessLevel;
 import server.auxilary.IO;
 
-import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-
 /**
- *
- * @author ghost
+ * Created by ghost on 2017/12/22.
+ * @author th3gh0st
  */
 public class Employee extends BusinessObject
 {
@@ -30,13 +26,37 @@ public class Employee extends BusinessObject
     private boolean active;
     public static final String TAG = "Employee";
 
+    public Employee()
+    {}
+
+    public Employee(String _id)
+    {
+        super(_id);
+    }
+
+    @Override
+    public AccessLevel getReadMinRequiredAccessLevel()
+    {
+        return AccessLevel.STANDARD;
+    }
+
+    @Override
+    public AccessLevel getWriteMinRequiredAccessLevel()
+    {
+        //if Employee to be created has access rights > standard then creator must have superuser access rights
+        if(getAccess_level()>AccessLevel.STANDARD.getLevel())
+            return AccessLevel.SUPERUSER;
+        else return AccessLevel.STANDARD;
+    }
+
     public String getUsr()
     {
         return usr;
     }
 
-    public void setUsr(String usr) {
+    public Employee setUsr(String usr) {
         this.usr = usr;
+        return this;
     }
 
     public String getPwd()
@@ -241,19 +261,7 @@ public class Employee extends BusinessObject
     @Override
     public String toString()
     {
-        //return String.format("[id = %s, firstname = %s, lastname = %s]", get_id(), getFirstname(), getLastname());
-        return "{\"_id\":\""+get_id()+"\", "+
-                "\"lastname\":\""+lastname+"\","+
-                "\"usr\":\""+usr+"\","+
-                "\"pwd\":\""+pwd+"\","+
-                "\"access_level\":\""+access_level+"\","+
-                "\"gender\":\""+gender+"\","+
-                "\"email\":\""+email+"\","+
-                "\"tel\":\""+tel+"\","+
-                "\"cell\":\""+cell+"\","+
-                "\"date_logged\":\""+getDate_logged()+"\","+
-                "\"active\":\""+active+"\","+
-                "\"other\":\""+getOther()+"\"}";
+        return super.toString() + " = "  + getName();
     }
 
     public String getInitials(){return new String(firstname.substring(0,1) + lastname.substring(0,1));}

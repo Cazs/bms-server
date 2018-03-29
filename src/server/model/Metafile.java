@@ -1,18 +1,14 @@
 package server.model;
 
-import org.springframework.data.annotation.Id;
+import server.auxilary.AccessLevel;
 import server.auxilary.IO;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
-
-import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 
 /**
- * Created by ghost on 2017/02/24.
+ * Created by ghost on 2017/12/22.
+ * @author th3gh0st
  */
-public class FileMetadata extends BusinessObject
+
+public class Metafile extends BusinessObject
 {
     private String filename;
     private String label;
@@ -20,7 +16,27 @@ public class FileMetadata extends BusinessObject
     private String content_type;
     private String file;//Base64 String representation of file
     //TODO: private String extra;//{"logo_options":{}, "required":false}
-    public static final String TAG = "FileMetadata";
+    public static final String TAG = "Metafile";
+
+    public Metafile()
+    {}
+
+    public Metafile(String _id)
+    {
+        super(_id);
+    }
+
+    @Override
+    public AccessLevel getReadMinRequiredAccessLevel()
+    {
+        return AccessLevel.STANDARD;
+    }
+
+    @Override
+    public AccessLevel getWriteMinRequiredAccessLevel()
+    {
+        return AccessLevel.STANDARD;
+    }
 
     public String getFilename()
     {
@@ -139,8 +155,14 @@ public class FileMetadata extends BusinessObject
     }
 
     @Override
+    public String toString()
+    {
+        return super.toString() + " = "  + getFilename();
+    }
+
+    @Override
     public String apiEndpoint()
     {
-        return "/files";
+        return "/file";
     }
 }

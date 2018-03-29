@@ -1,14 +1,11 @@
 package server.model;
 
-import org.springframework.data.annotation.Id;
+import server.auxilary.AccessLevel;
 import server.auxilary.IO;
 
-import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-
 /**
- * Created by ghost on 2017/01/21.
+ * Created by ghost on 2017/12/23.
+ * @author ghost
  */
 public abstract class PurchaseOrderItem extends BusinessObject
 {
@@ -19,6 +16,26 @@ public abstract class PurchaseOrderItem extends BusinessObject
     private double discount;
     private double cost;
     private String type;
+
+    public PurchaseOrderItem()
+    {}
+
+    public PurchaseOrderItem(String _id)
+    {
+        super(_id);
+    }
+
+    @Override
+    public AccessLevel getReadMinRequiredAccessLevel()
+    {
+        return AccessLevel.STANDARD;
+    }
+
+    @Override
+    public AccessLevel getWriteMinRequiredAccessLevel()
+    {
+        return AccessLevel.ADMIN;
+    }
 
     public int getItem_number()
     {
@@ -163,5 +180,11 @@ public abstract class PurchaseOrderItem extends BusinessObject
                 return getDiscount();
         }
         return super.get(var);
+    }
+
+    @Override
+    public String toString()
+    {
+        return super.toString() + " for PO ["  + getPurchase_order_id() + "] item [" +getItem_id() + "]";
     }
 }

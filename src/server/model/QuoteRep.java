@@ -1,22 +1,37 @@
 package server.model;
 
-import org.springframework.data.annotation.Id;
+import server.auxilary.AccessLevel;
 import server.auxilary.IO;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
-
-import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 
 /**
- * Created by ghost on 2017/01/29.
+ * Created by ghost on 2017/12/22.
+ * @author ghost
  */
 public class QuoteRep extends BusinessObject
 {
     private String quote_id;
     private String usr;
     public static final String TAG = "QuoteRepresentative";
+
+    public QuoteRep()
+    {}
+
+    public QuoteRep(String _id)
+    {
+        super(_id);
+    }
+
+    @Override
+    public AccessLevel getReadMinRequiredAccessLevel()
+    {
+        return AccessLevel.STANDARD;
+    }
+
+    @Override
+    public AccessLevel getWriteMinRequiredAccessLevel()
+    {
+        return AccessLevel.ADMIN;
+    }
 
     public String getQuote_id()
     {
@@ -85,6 +100,12 @@ public class QuoteRep extends BusinessObject
                 IO.log(getClass().getName(), IO.TAG_ERROR, "Unknown "+getClass().getName()+" attribute '" + var + "'.");
                 return null;
         }
+    }
+
+    @Override
+    public String toString()
+    {
+        return super.toString() + " for Quote ["  + getQuote_id() + "] username [" +getUsr() + "]";
     }
 
     @Override
