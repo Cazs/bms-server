@@ -8,12 +8,12 @@ import org.springframework.data.rest.webmvc.RepositoryRestController;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import server.model.BusinessObject;
+import server.model.ApplicationObject;
 import server.model.QuoteRep;
 import server.repositories.QuoteRepRepository;
 
 /**
- * Created by ghost on 2017/12/22.
+ * Created by th3gh0st on 2017/12/22.
  * @author th3gh0st
  */
 @RepositoryRestController
@@ -30,15 +30,20 @@ public class QuoteRepController extends APIController
     }
 
     @GetMapping(path="/quote/representatives/{id}", produces = "application/hal+json")
-    public ResponseEntity<Page<? extends BusinessObject>> getQuoteRep(@PathVariable("id") String id, @RequestHeader String session_id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    public ResponseEntity<Page<? extends ApplicationObject>> getQuoteRep(@PathVariable("id") String id,
+                                                                         @RequestHeader String session_id,
+                                                                         Pageable pageRequest,
+                                                                         PersistentEntityResourceAssembler assembler)
     {
         return getBusinessObject(new QuoteRep(id), "_id", session_id, "quote_representatives", pagedAssembler, assembler, pageRequest);
     }
 
     @GetMapping("/quotes/representatives")
-    public ResponseEntity<Page<? extends BusinessObject>> getQuoteReps(@RequestHeader String session_id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    public ResponseEntity<Page<? extends ApplicationObject>> getQuoteReps(@RequestHeader String session_id,
+                                                                          Pageable pageRequest,
+                                                                          PersistentEntityResourceAssembler assembler)
     {
-        return getBusinessObjects(new QuoteRep(), session_id, "quote_representatives", pagedAssembler, assembler, pageRequest);
+        return getBusinessObjects(new QuoteRep(), session_id, "quote_representatives", pagedAssembler,assembler, pageRequest);
     }
 
     @PutMapping("/quote/representative")

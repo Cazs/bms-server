@@ -8,12 +8,12 @@ import org.springframework.data.rest.webmvc.RepositoryRestController;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import server.model.BusinessObject;
+import server.model.ApplicationObject;
 import server.model.Revenue;
 import server.repositories.RevenueRepository;
 
 /**
- * Created by ghost on 2017/12/22.
+ * Created by th3gh0st on 2017/12/22.
  * @author th3gh0st
  */
 
@@ -31,13 +31,18 @@ public class RevenueController extends APIController
     }
 
     @GetMapping(path="/revenue/{id}", produces = "application/hal+json")
-    public ResponseEntity<Page<? extends BusinessObject>> getRevenue(@PathVariable("id") String id, @RequestHeader String session_id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    public ResponseEntity<Page<? extends ApplicationObject>> getRevenue(@PathVariable("id") String id,
+                                                                        @RequestHeader String session_id,
+                                                                        Pageable pageRequest,
+                                                                        PersistentEntityResourceAssembler assembler)
     {
         return getBusinessObject(new Revenue(id), "_id", session_id, "revenues", pagedAssembler, assembler, pageRequest);
     }
 
     @GetMapping("/revenues")
-    public ResponseEntity<Page<? extends BusinessObject>> getRevenues(@RequestHeader String session_id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    public ResponseEntity<Page<? extends ApplicationObject>> getRevenues(@RequestHeader String session_id,
+                                                                         Pageable pageRequest,
+                                                                         PersistentEntityResourceAssembler assembler)
     {
         return getBusinessObjects(new Revenue(), session_id, "revenues", pagedAssembler, assembler, pageRequest);
     }

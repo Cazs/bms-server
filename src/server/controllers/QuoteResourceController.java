@@ -8,13 +8,13 @@ import org.springframework.data.rest.webmvc.RepositoryRestController;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import server.model.BusinessObject;
+import server.model.ApplicationObject;
 import server.model.Quote;
 import server.model.QuoteItem;
 import server.repositories.QuoteItemRepository;
 
 /**
- * Created by ghost on 2017/12/22.
+ * Created by th3gh0st on 2017/12/22.
  * @author th3gh0st
  */
 
@@ -32,13 +32,18 @@ public class QuoteResourceController extends APIController
     }
 
     @GetMapping(path="/quote/resources/{id}", produces = "application/hal+json")
-    public ResponseEntity<Page<? extends BusinessObject>> getQuoteItem(@PathVariable("id") String id, @RequestHeader String session_id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    public ResponseEntity<Page<? extends ApplicationObject>> getQuoteItem(@PathVariable("id") String id,
+                                                                          @RequestHeader String session_id,
+                                                                          Pageable pageRequest,
+                                                                          PersistentEntityResourceAssembler assembler)
     {
         return getBusinessObject(new Quote(id), "_id", session_id, "quote_resources", pagedAssembler, assembler, pageRequest);
     }
 
     @GetMapping("/quotes/resources")
-    public ResponseEntity<Page<? extends BusinessObject>> getQuoteItems(@RequestHeader String session_id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    public ResponseEntity<Page<? extends ApplicationObject>> getQuoteItems(@RequestHeader String session_id,
+                                                                           Pageable pageRequest,
+                                                                           PersistentEntityResourceAssembler assembler)
     {
         return getBusinessObjects(new Quote(), session_id, "quote_resources", pagedAssembler, assembler, pageRequest);
     }

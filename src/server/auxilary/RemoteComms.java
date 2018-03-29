@@ -18,7 +18,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import server.controllers.CounterController;
 import server.exceptions.InvalidBusinessObjectException;
-import server.model.BusinessObject;
+import server.model.ApplicationObject;
 import server.model.Counter;
 import server.model.Employee;
 import server.model.Metafile;
@@ -38,44 +38,44 @@ public class RemoteComms
     public static int TTL = 60*60*2;//2 hours in sec
     public static String SYSTEM_EMAIL = "bms@omegafs.co.za";
 
-    public static String commitBusinessObjectToDatabase(BusinessObject businessObject, String collection, String timestamp_name)
+    public static String commitBusinessObjectToDatabase(ApplicationObject applicationObject, String collection, String timestamp_name)
     {
-        if(businessObject!=null)
+        if(applicationObject !=null)
         {
-            String[] is_valid = businessObject.isValid();
+            String[] is_valid = applicationObject.isValid();
             if(is_valid==null)
             {
-                IO.log(RemoteComms.class.getName(),IO.TAG_INFO, "invalid isValid() response from BusinessObject{"+businessObject.getClass().getName()+"}");
+                IO.log(RemoteComms.class.getName(),IO.TAG_INFO, "invalid isValid() response from ApplicationObject{"+ applicationObject.getClass().getName()+"}");
                 return null;
             }
             if(is_valid.length!=2)
             {
-                IO.log(RemoteComms.class.getName(),IO.TAG_INFO, "invalid isValid() response array length from BusinessObject{"+businessObject.getClass().getName()+"}");
+                IO.log(RemoteComms.class.getName(),IO.TAG_INFO, "invalid isValid() response array length from ApplicationObject{"+ applicationObject.getClass().getName()+"}");
                 return null;
             }
             if (is_valid[0].toLowerCase().equals("true"))
             {
                 IO.log(RemoteComms.class.getName(),IO.TAG_INFO, is_valid[1]);//print message from isValid() call
-                IO.log(RemoteComms.class.getName(),IO.TAG_INFO, "committing BusinessObject{"+businessObject.getClass().getName()+"}: "+businessObject.toString());
+                IO.log(RemoteComms.class.getName(),IO.TAG_INFO, "committing ApplicationObject{"+ applicationObject.getClass().getName()+"}: "+ applicationObject.toString());
 
-                //commit BusinessObject to DB server
+                //commit ApplicationObject to DB server
                 if(collection!=null)
                 {
-                    IO.getInstance().mongoOperations().save(businessObject, collection);
-                    IO.log(RemoteComms.class.getName(),IO.TAG_INFO, "committed BusinessObject:{"+businessObject.getClass().getName()+"} ["+businessObject.getObject_number()+"]");
+                    IO.getInstance().mongoOperations().save(applicationObject, collection);
+                    IO.log(RemoteComms.class.getName(),IO.TAG_INFO, "committed ApplicationObject:{"+ applicationObject.getClass().getName()+"} ["+ applicationObject.getObject_number()+"]");
 
                     //get new object's ID by using object number
-                    BusinessObject new_obj = IO.getInstance().mongoOperations().findOne(new Query(Criteria.where("object_number").is(businessObject.getObject_number())), businessObject.getClass(), collection);
+                    ApplicationObject new_obj = IO.getInstance().mongoOperations().findOne(new Query(Criteria.where("object_number").is(applicationObject.getObject_number())), applicationObject.getClass(), collection);
                     if(new_obj!=null)
-                        businessObject.set_id(new_obj.get_id());
+                        applicationObject.set_id(new_obj.get_id());
                     else
                     {
-                        IO.log(RemoteComms.class.getName(), IO.TAG_WARN, "could not find newly created object of type " + businessObject.getClass() + " in the database.");
+                        IO.log(RemoteComms.class.getName(), IO.TAG_WARN, "could not find newly created object of type " + applicationObject.getClass() + " in the database.");
                         return null;
                     }
                 } else
                 {
-                    IO.log(RemoteComms.class.getName(),IO.TAG_ERROR, "Could NOT commit BusinessObject:{"+businessObject.getClass().getName()+"} ["+businessObject.get_id()+"] due to an invalid collection name.");
+                    IO.log(RemoteComms.class.getName(),IO.TAG_ERROR, "Could NOT commit ApplicationObject:{"+ applicationObject.getClass().getName()+"} ["+ applicationObject.get_id()+"] due to an invalid collection name.");
                     return null;
                 }
 
@@ -89,9 +89,9 @@ public class RemoteComms
                     IO.log(RemoteComms.class.getName(),IO.TAG_WARN, "Did not find any timestamp to update for collection ["+collection+"]");
                     return null;
                 }
-                return businessObject.get_id();
+                return applicationObject.get_id();
             } else throw new InvalidBusinessObjectException(is_valid[1]);
-        } else throw new InvalidBusinessObjectException("invalid[null] BusinessObject.");
+        } else throw new InvalidBusinessObjectException("invalid[null] ApplicationObject.");
     }
 
     /**

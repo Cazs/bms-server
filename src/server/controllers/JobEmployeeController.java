@@ -8,12 +8,12 @@ import org.springframework.data.rest.webmvc.RepositoryRestController;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import server.model.BusinessObject;
+import server.model.ApplicationObject;
 import server.model.JobEmployee;
 import server.repositories.JobEmployeeRepository;
 
 /**
- * Created by ghost on 2017/12/22.
+ * Created by th3gh0st on 2017/12/22.
  * @author th3gh0st
  */
 
@@ -33,13 +33,13 @@ public class JobEmployeeController extends APIController
 
     //Job Employee Route Handlers
     @GetMapping(path="/job/employees/{id}", produces = "application/hal+json")
-    public ResponseEntity<Page<? extends BusinessObject>> get(@PathVariable("id") String id, @RequestHeader String session_id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    public ResponseEntity<Page<? extends ApplicationObject>> get(@PathVariable("id") String id, @RequestHeader String session_id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
     {
         return getBusinessObject(new JobEmployee(id), "_id", session_id, "job_employees", pagedAssembler, assembler, pageRequest);
     }
 
     @GetMapping("/jobs/employees")
-    public ResponseEntity<Page<? extends BusinessObject>> getAll(Pageable pageRequest, @RequestHeader String session_id, PersistentEntityResourceAssembler assembler)
+    public ResponseEntity<Page<? extends ApplicationObject>> getAll(Pageable pageRequest, @RequestHeader String session_id, PersistentEntityResourceAssembler assembler)
     {
         return getBusinessObjects(new JobEmployee(), session_id, "job_employees", pagedAssembler, assembler, pageRequest);
     }

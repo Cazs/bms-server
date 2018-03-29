@@ -4,10 +4,10 @@ import server.auxilary.AccessLevel;
 import server.auxilary.IO;
 
 /**
- * Created by ghost on 2017/12/23.
- * @author ghost
+ * Created by th3gh0st on 2017/12/23.
+ * @author th3gh0st
  */
-public class Vericode extends BusinessObject
+public class Vericode extends ApplicationObject
 {
     private String code_name;
     private String code;
@@ -103,9 +103,12 @@ public class Vericode extends BusinessObject
         return super.toString() + " codename "  + getCode_name() + " code " +getCode();
     }
 
+    /**
+     * @return this model's root endpoint URL.
+     */
     @Override
     public String apiEndpoint()
     {
-        return "/";
+        return "/vericode";
     }
 }

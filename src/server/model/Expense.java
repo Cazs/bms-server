@@ -4,11 +4,11 @@ import server.auxilary.AccessLevel;
 import server.auxilary.IO;
 
 /**
- * Created by ghost on 2017/12/22.
+ * Created by th3gh0st on 2017/12/22.
  * @author th3gh0st
  */
 
-public class Expense extends BusinessObject
+public class Expense extends ApplicationObject
 {
     private String expense_title;
     private String expense_description;
@@ -168,9 +168,12 @@ public class Expense extends BusinessObject
         return super.toString() + " = "  + getExpense_title();
     }
 
+    /**
+     * @return this model's root endpoint URL.
+     */
     @Override
     public String apiEndpoint()
     {
-        return "/expenses";
+        return "/expense";
     }
 }

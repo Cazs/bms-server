@@ -8,12 +8,12 @@ import org.springframework.data.rest.webmvc.RepositoryRestController;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import server.model.BusinessObject;
+import server.model.ApplicationObject;
 import server.model.Resource;
 import server.repositories.ResourceRepository;
 
 /**
- * Created by ghost on 2017/12/22.
+ * Created by th3gh0st on 2017/12/22.
  * @author th3gh0st
  */
 @RepositoryRestController
@@ -30,13 +30,18 @@ public class ResourceController extends APIController
     }
 
     @GetMapping(path="/resource/{id}", produces = "application/hal+json")
-    public ResponseEntity<Page<? extends BusinessObject>> getResource(@PathVariable("id") String id, @RequestHeader String session_id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    public ResponseEntity<Page<? extends ApplicationObject>> getResource(@PathVariable("id") String id,
+                                                                         @RequestHeader String session_id,
+                                                                         Pageable pageRequest,
+                                                                         PersistentEntityResourceAssembler assembler)
     {
         return getBusinessObject(new Resource(id), "_id", session_id, "resources", pagedAssembler, assembler, pageRequest);
     }
 
     @GetMapping("/resources")
-    public ResponseEntity<Page<? extends BusinessObject>> getResources(@RequestHeader String session_id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    public ResponseEntity<Page<? extends ApplicationObject>> getResources(@RequestHeader String session_id,
+                                                                          Pageable pageRequest,
+                                                                          PersistentEntityResourceAssembler assembler)
     {
         return getBusinessObjects(new Resource(), session_id, "resources", pagedAssembler, assembler, pageRequest);
     }

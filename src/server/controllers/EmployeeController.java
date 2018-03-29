@@ -13,13 +13,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import server.auxilary.AccessLevel;
 import server.auxilary.IO;
-import server.model.BusinessObject;
+import server.model.ApplicationObject;
 import server.model.Employee;
 
 import java.util.List;
 
 /**
- * Created by ghost on 2017/12/22.
+ * Created by th3gh0st on 2017/12/22.
  * @author th3gh0st
  */
 
@@ -35,19 +35,19 @@ public class EmployeeController extends APIController
     }
 
     @GetMapping(path="/employee/{id}", produces = "application/hal+json")
-    public ResponseEntity<Page<? extends BusinessObject>> getEmployeeById(@PathVariable("id") String id, @RequestHeader String session_id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    public ResponseEntity<Page<? extends ApplicationObject>> getEmployeeById(@PathVariable("id") String id, @RequestHeader String session_id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
     {
         return getBusinessObject(new Employee(id), "_id", session_id, "employees", pagedAssembler, assembler, pageRequest);
     }
 
-    @GetMapping(path="/user/{usr}", produces = "application/hal+json")
-    public ResponseEntity<Page<? extends BusinessObject>> getEmployeeByUsername(@PathVariable("usr") String usr, @RequestHeader String session_id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    @GetMapping(path="/usr/{usr}", produces = "application/hal+json")
+    public ResponseEntity<Page<? extends ApplicationObject>> getEmployeeByUsername(@PathVariable("usr") String usr, @RequestHeader String session_id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
     {
         return getBusinessObject(new Employee().setUsr(usr), "usr", session_id, "employees", pagedAssembler, assembler, pageRequest);
     }
 
     @GetMapping(path = "/employees")
-    public ResponseEntity<Page<? extends BusinessObject>> getAllEmployees(Pageable pageRequest, @RequestHeader String session_id, PersistentEntityResourceAssembler assembler)
+    public ResponseEntity<Page<? extends ApplicationObject>> getAllEmployees(Pageable pageRequest, @RequestHeader String session_id, PersistentEntityResourceAssembler assembler)
     {
         return getBusinessObjects(new Employee(), session_id, "employees", pagedAssembler, assembler, pageRequest);
     }

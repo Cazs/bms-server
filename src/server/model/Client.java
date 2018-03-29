@@ -9,10 +9,10 @@ import server.auxilary.AccessLevel;
 import server.auxilary.IO;
 
 /**
- * Created by ghost on 2017/12/22.
+ * Created by th3gh0st on 2017/12/22.
  * @author th3gh0st
  */
-public class Client extends BusinessObject
+public class Client extends ApplicationObject
 {
     private String client_name;
     private String physical_address;
@@ -298,9 +298,12 @@ public class Client extends BusinessObject
         return super.toString() + " = "  + getClient_name();
     }
 
+    /**
+     * @return this model's root endpoint URL.
+     */
     @Override
     public String apiEndpoint()
     {
-        return "/clients";
+        return "/client";
     }
 }

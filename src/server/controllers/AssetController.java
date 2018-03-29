@@ -9,11 +9,11 @@ import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import server.model.Asset;
-import server.model.BusinessObject;
+import server.model.ApplicationObject;
 import server.repositories.AssetRepository;
 
 /**
- * Created by ghost on 2017/12/22.
+ * Created by th3gh0st on 2017/12/22.
  * @author th3gh0st
  */
 
@@ -31,13 +31,13 @@ public class AssetController extends APIController
     }
 
     @GetMapping(path="/asset/{id}", produces = "application/hal+json")
-    public ResponseEntity<Page<? extends BusinessObject>> getAsset(@PathVariable("id") String id, @RequestHeader String session_id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    public ResponseEntity<Page<? extends ApplicationObject>> getAsset(@PathVariable("id") String id, @RequestHeader String session_id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
     {
         return getBusinessObject(new Asset(id), "_id", session_id, "assets", pagedAssembler, assembler, pageRequest);
     }
 
     @GetMapping("/assets")
-    public ResponseEntity<Page<? extends BusinessObject>> getAssets(@RequestHeader String session_id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    public ResponseEntity<Page<? extends ApplicationObject>> getAssets(@RequestHeader String session_id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
     {
         return getBusinessObjects(new Asset(), session_id, "assets", pagedAssembler, assembler, pageRequest);
     }

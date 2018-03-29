@@ -4,11 +4,11 @@ import server.auxilary.AccessLevel;
 import server.auxilary.IO;
 
 /**
- * Created by ghost on 2017/12/22.
+ * Created by th3gh0st on 2017/12/22.
  * @author th3gh0st
  */
 
-public class Overtime extends BusinessObject
+public class Overtime extends ApplicationObject
 {
     private String usr;
     private String job_id;
@@ -185,9 +185,12 @@ public class Overtime extends BusinessObject
         return super.toString() + " = "  + getUsr();
     }
 
+    /**
+     * @return this model's root endpoint URL.
+     */
     @Override
     public String apiEndpoint()
     {
-        return "/overtime_records";
+        return "/overtime_application";
     }
 }

@@ -9,14 +9,14 @@ import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import server.auxilary.IO;
-import server.model.BusinessObject;
+import server.model.ApplicationObject;
 import server.model.Metafile;
 import server.model.Task;
 import server.repositories.TaskRepository;
 
 /**
- * Created by ghost on 2018/03/16.
- * @author ghost
+ * Created by th3gh0st on 2018/03/16.
+ * @author th3gh0st
  */
 
 @RepositoryRestController
@@ -33,13 +33,17 @@ public class TaskController extends APIController
     }
 
     @GetMapping(path="/task/{id}", produces = "application/hal+json")
-    public ResponseEntity<Page<? extends BusinessObject>> getTask(@PathVariable("id") String id, @RequestHeader String session_id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    public ResponseEntity<Page<? extends ApplicationObject>> getTask(@PathVariable("id") String id,
+                                                                     @RequestHeader String session_id,
+                                                                     Pageable pageRequest,
+                                                                     PersistentEntityResourceAssembler assembler)
     {
         return getBusinessObject(new Task(id), "_id", session_id, "tasks", pagedAssembler, assembler, pageRequest);
     }
 
     @GetMapping("/tasks")
-    public ResponseEntity<Page<? extends BusinessObject>> getTasks(@RequestHeader String session_id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    public ResponseEntity<Page<? extends ApplicationObject>> getTasks(@RequestHeader String session_id, Pageable pageRequest,
+                                                                      PersistentEntityResourceAssembler assembler)
     {
         return getBusinessObjects(new Task(), session_id, "tasks", pagedAssembler, assembler, pageRequest);
     }
@@ -56,19 +60,19 @@ public class TaskController extends APIController
         return patchBusinessObject(task, session_id, "tasks", "tasks_timestamp");
     }
 
-    @PostMapping(value = "/task/mailto")//, consumes = "text/plain"//value =//, produces = "application/pdf"
+    @PostMapping(value = "/task/mailto")
     public ResponseEntity<String> emailTask(@RequestHeader String _id, @RequestHeader String session_id,
                                              @RequestHeader String message, @RequestHeader String subject,
-                                             @RequestHeader String destination, @RequestBody Metafile metafile)//, @RequestParam("file") MultipartFile file
+                                             @RequestHeader String destination, @RequestBody Metafile metafile)
     {
         IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling handling mailto request.");
         return emailBusinessObject(_id, session_id, message, subject, destination, metafile, Task.class);
     }
 
-    @PostMapping(value = "/task/approval_request")//, consumes = "text/plain"//value =//, produces = "application/pdf"
+    @PostMapping(value = "/task/approval_request")
     public ResponseEntity<String> requestTaskApproval(@RequestHeader String task_id, @RequestHeader String session_id,
                                                        @RequestHeader String message, @RequestHeader String subject,
-                                                       @RequestBody Metafile metafile)//, @RequestParam("file") MultipartFile file
+                                                       @RequestBody Metafile metafile)
     {
         IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Task approval request.");
         return requestBusinessObjectApproval(task_id, session_id, message, subject, metafile, new Task().apiEndpoint(), Task.class);

@@ -13,7 +13,7 @@ import server.model.*;
 import server.repositories.OvertimeRepository;
 
 /**
- * Created by ghost on 2017/12/22.
+ * Created by th3gh0st on 2017/12/22.
  * @author th3gh0st
  */
 
@@ -31,15 +31,22 @@ public class OvertimeController extends APIController
     }
 
     @GetMapping(path="/overtime_application/{id}", produces = "application/hal+json")
-    public ResponseEntity<Page<? extends BusinessObject>> getOvertime(@PathVariable("id") String id, @RequestHeader String session_id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    public ResponseEntity<Page<? extends ApplicationObject>> getOvertime(@PathVariable("id") String id,
+                                                                         @RequestHeader String session_id,
+                                                                         Pageable pageRequest,
+                                                                         PersistentEntityResourceAssembler assembler)
     {
-        return getBusinessObject(new Overtime(id), "_id", session_id, "overtime_applications", pagedAssembler, assembler, pageRequest);
+        return getBusinessObject(new Overtime(id), "_id",session_id, "overtime_applications",
+                                 pagedAssembler, assembler, pageRequest);
     }
 
     @GetMapping("/overtime_applications")
-    public ResponseEntity<Page<? extends BusinessObject>> getOvertimeApplications(Pageable pageRequest, @RequestHeader String session_id, PersistentEntityResourceAssembler assembler)
+    public ResponseEntity<Page<? extends ApplicationObject>> getOvertimeApplications(Pageable pageRequest,
+                                                                                     @RequestHeader String session_id,
+                                                                                     PersistentEntityResourceAssembler assembler)
     {
-        return getBusinessObjects(new Overtime(), session_id, "overtime_applications", pagedAssembler, assembler, pageRequest);
+        return getBusinessObjects(new Overtime(), session_id, "overtime_applications", pagedAssembler,
+                                  assembler, pageRequest);
     }
 
     @PutMapping("/overtime_application")
@@ -64,16 +71,17 @@ public class OvertimeController extends APIController
     }
 
     @PostMapping(value = "/overtime_application/approval_request")
-    public ResponseEntity<String> requestOvertimeApproval(@RequestHeader String overtime_record_id, @RequestHeader String session_id,
-                                                       @RequestHeader String message, @RequestHeader String subject,
-                                                       @RequestBody Metafile metafile)
+    public ResponseEntity<String> requestOvertimeApproval(@RequestHeader String overtime_record_id,
+                                                          @RequestHeader String session_id, @RequestHeader String message,
+                                                          @RequestHeader String subject, @RequestBody Metafile metafile)
     {
         IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Overtime Application approval request.");
         return requestBusinessObjectApproval(overtime_record_id, session_id, message, subject, metafile, new Overtime().apiEndpoint(), Overtime.class);
     }
 
     @GetMapping("/overtime_application/approve/{overtime_record_id}/{vericode}")
-    public ResponseEntity<String> approveOvertime(@PathVariable("overtime_record_id") String overtime_record_id, @PathVariable("vericode") String vericode)
+    public ResponseEntity<String> approveOvertime(@PathVariable("overtime_record_id") String overtime_record_id,
+                                                  @PathVariable("vericode") String vericode)
     {
         IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Overtime Application "+overtime_record_id+" approval request by Vericode.");
         return approveBusinessObjectByVericode(overtime_record_id, vericode, "overtime_applications", "overtime_applications_timestamp", Overtime.class);

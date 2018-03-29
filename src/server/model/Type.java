@@ -4,10 +4,10 @@ import server.auxilary.AccessLevel;
 import server.auxilary.IO;
 
 /**
- * Created by ghost on 2017/12/23.
- * @author ghost
+ * Created by th3gh0st on 2017/12/23.
+ * @author th3gh0st
  */
-public abstract class Type extends BusinessObject
+public abstract class Type extends ApplicationObject
 {
     private String type_name;
     private String type_description;

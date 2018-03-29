@@ -8,12 +8,12 @@ import org.springframework.data.rest.webmvc.RepositoryRestController;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import server.model.BusinessObject;
+import server.model.ApplicationObject;
 import server.model.PurchaseOrderResource;
 import server.repositories.PurchaseOrderResourceRepository;
 
 /**
- * Created by ghost on 2017/12/22.
+ * Created by th3gh0st on 2017/12/22.
  * @author th3gh0st
  */
 
@@ -31,25 +31,32 @@ public class PurchaseOrderResourceController extends APIController
     }
 
     @GetMapping(path="/purchaseorder/resources/{id}", produces = "application/hal+json")
-    public ResponseEntity<Page<? extends BusinessObject>> getPurchaseOrderResource(@PathVariable("id") String id, @RequestHeader String session_id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    public ResponseEntity<Page<? extends ApplicationObject>> getPurchaseOrderResource(@PathVariable("id") String id,
+                                                                                      @RequestHeader String session_id,
+                                                                                      Pageable pageRequest,
+                                                                                      PersistentEntityResourceAssembler assembler)
     {
         return getBusinessObject(new PurchaseOrderResource(id), "_id", session_id, "purchase_order_resources", pagedAssembler, assembler, pageRequest);
     }
 
     @GetMapping("/purchaseorders/resources")
-    public ResponseEntity<Page<? extends BusinessObject>> getPurchaseOrderResources(Pageable pageRequest, @RequestHeader String session_id, PersistentEntityResourceAssembler assembler)
+    public ResponseEntity<Page<? extends ApplicationObject>> getPurchaseOrderResources(Pageable pageRequest,
+                                                                                       @RequestHeader String session_id,
+                                                                                       PersistentEntityResourceAssembler assembler)
     {
         return getBusinessObjects(new PurchaseOrderResource(), session_id, "purchase_order_resources", pagedAssembler, assembler, pageRequest);
     }
 
     @PutMapping("/purchaseorder/resource")
-    public ResponseEntity<String> addPurchaseOrderResource(@RequestBody PurchaseOrderResource purchase_order_resource, @RequestHeader String session_id)
+    public ResponseEntity<String> addPurchaseOrderResource(@RequestBody PurchaseOrderResource purchase_order_resource,
+                                                           @RequestHeader String session_id)
     {
         return putBusinessObject(purchase_order_resource, session_id, "purchase_order_resources", "purchase_orders_timestamp");
     }
 
     @PostMapping("/purchaseorder/resource")
-    public ResponseEntity<String> patchPurchaseOrderResource(@RequestBody PurchaseOrderResource purchase_order_resource, @RequestHeader String session_id)
+    public ResponseEntity<String> patchPurchaseOrderResource(@RequestBody PurchaseOrderResource purchase_order_resource,
+                                                             @RequestHeader String session_id)
     {
         return patchBusinessObject(purchase_order_resource, session_id, "purchase_order_resources", "purchase_orders_timestamp");
     }

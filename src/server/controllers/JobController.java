@@ -9,13 +9,13 @@ import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import server.auxilary.IO;
-import server.model.BusinessObject;
+import server.model.ApplicationObject;
 import server.model.Metafile;
 import server.model.Job;
 import server.repositories.JobRepository;
 
 /**
- * Created by ghost on 2017/12/22.
+ * Created by th3gh0st on 2017/12/22.
  * @author th3gh0st
  */
 
@@ -33,13 +33,18 @@ public class JobController extends APIController
     }
 
     @GetMapping(path="/job/{id}", produces = "application/hal+json")
-    public ResponseEntity<Page<? extends BusinessObject>> getJob(@PathVariable("id") String id, @RequestHeader String session_id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    public ResponseEntity<Page<? extends ApplicationObject>> getJob(@PathVariable("id") String id,
+                                                                    @RequestHeader String session_id,
+                                                                    Pageable pageRequest,
+                                                                    PersistentEntityResourceAssembler assembler)
     {
         return getBusinessObject(new Job(id), "_id", session_id, "jobs", pagedAssembler, assembler, pageRequest);
     }
 
     @GetMapping("/jobs")
-    public ResponseEntity<Page<? extends BusinessObject>> getJobs(Pageable pageRequest, @RequestHeader String session_id, PersistentEntityResourceAssembler assembler)
+    public ResponseEntity<Page<? extends ApplicationObject>> getJobs(Pageable pageRequest,
+                                                                     @RequestHeader String session_id,
+                                                                     PersistentEntityResourceAssembler assembler)
     {
         return getBusinessObjects(new Job(), session_id, "jobs", pagedAssembler, assembler, pageRequest);
     }
@@ -56,19 +61,19 @@ public class JobController extends APIController
         return patchBusinessObject(job, session_id, "jobs", "jobs_timestamp");
     }
 
-    @PostMapping(value = "/job/mailto")//, consumes = "text/plain"//value =//, produces = "application/pdf"
+    @PostMapping(value = "/job/mailto")
     public ResponseEntity<String> emailJob(@RequestHeader String _id, @RequestHeader String session_id,
                                              @RequestHeader String message, @RequestHeader String subject,
-                                             @RequestHeader String destination, @RequestBody Metafile metafile)//, @RequestParam("file") MultipartFile file
+                                             @RequestHeader String destination, @RequestBody Metafile metafile)
     {
         IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling handling mailto request.");
         return emailBusinessObject(_id, session_id, message, subject, destination, metafile, Job.class);
     }
 
-    @PostMapping(value = "/job/approval_request")//, consumes = "text/plain"//value =//, produces = "application/pdf"
+    @PostMapping(value = "/job/approval_request")
     public ResponseEntity<String> requestJobApproval(@RequestHeader String job_id, @RequestHeader String session_id,
                                                        @RequestHeader String message, @RequestHeader String subject,
-                                                       @RequestBody Metafile metafile)//, @RequestParam("file") MultipartFile file
+                                                       @RequestBody Metafile metafile)
     {
         IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Job approval request.");
         return requestBusinessObjectApproval(job_id, session_id, message, subject, metafile, new Job().apiEndpoint(), Job.class);

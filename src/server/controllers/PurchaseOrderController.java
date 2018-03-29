@@ -13,7 +13,7 @@ import server.model.*;
 import server.repositories.PurchaseOrderRepository;
 
 /**
- * Created by ghost on 2017/12/22.
+ * Created by th3gh0st on 2017/12/22.
  * @author th3gh0st
  */
 
@@ -32,49 +32,57 @@ public class PurchaseOrderController extends APIController
     }
 
     @GetMapping(path="/purchaseorder/{id}", produces = "application/hal+json")
-    public ResponseEntity<Page<? extends BusinessObject>> getPurchaseOrder(@PathVariable("id") String id, @RequestHeader String session_id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    public ResponseEntity<Page<? extends ApplicationObject>> getPurchaseOrder(@PathVariable("id") String id,
+                                                                              @RequestHeader String session_id,
+                                                                              Pageable pageRequest,
+                                                                              PersistentEntityResourceAssembler assembler)
     {
         return getBusinessObject(new PurchaseOrder(id), "_id", session_id, "purchase_orders", pagedAssembler, assembler, pageRequest);
     }
 
     @GetMapping("/purchaseorders")
-    public ResponseEntity<Page<? extends BusinessObject>> getPurchaseOrders(Pageable pageRequest, @RequestHeader String session_id, PersistentEntityResourceAssembler assembler)
+    public ResponseEntity<Page<? extends ApplicationObject>> getPurchaseOrders(Pageable pageRequest,
+                                                                               @RequestHeader String session_id,
+                                                                               PersistentEntityResourceAssembler assembler)
     {
         return getBusinessObjects(new PurchaseOrder(), session_id, "purchase_orders", pagedAssembler, assembler, pageRequest);
     }
 
     @PutMapping("/purchaseorder")
-    public ResponseEntity<String> addPurchaseOrder(@RequestBody PurchaseOrder purchase_order, @RequestHeader String session_id)
+    public ResponseEntity<String> addPurchaseOrder(@RequestBody PurchaseOrder purchase_order,
+                                                   @RequestHeader String session_id)
     {
         return putBusinessObject(purchase_order, session_id, "purchase_orders", "purchase_orders_timestamp");
     }
 
     @PostMapping("/purchaseorder")
-    public ResponseEntity<String> patchPurchaseOrder(@RequestBody PurchaseOrder purchase_order, @RequestHeader String session_id)
+    public ResponseEntity<String> patchPurchaseOrder(@RequestBody PurchaseOrder purchase_order,
+                                                     @RequestHeader String session_id)
     {
         return patchBusinessObject(purchase_order, session_id, "purchase_orders", "purchase_orders_timestamp");
     }
 
-    @PostMapping(value = "/purchaseorder/mailto")//, consumes = "text/plain"//value =//, produces = "application/pdf"
+    @PostMapping(value = "/purchaseorder/mailto")
     public ResponseEntity<String> emailPurchaseOrder(@RequestHeader String _id, @RequestHeader String session_id,
-                                             @RequestHeader String message, @RequestHeader String subject,
-                                             @RequestHeader String destination, @RequestBody Metafile metafile)//, @RequestParam("file") MultipartFile file
+                                                     @RequestHeader String message, @RequestHeader String subject,
+                                                     @RequestHeader String destination, @RequestBody Metafile metafile)
     {
         IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling handling PurchaseOrder mailto request.");
         return emailBusinessObject(_id, session_id, message, subject, destination, metafile, PurchaseOrder.class);
     }
 
     @PostMapping("/purchaseorder/approval_request")//, consumes = "text/plain"//value =//, produces = "application/pdf"
-    public ResponseEntity<String> requestPurchaseOrderApproval(@RequestHeader String purchaseorder_id, @RequestHeader String session_id,
-                                                     @RequestHeader String message, @RequestHeader String subject,
-                                                     @RequestBody Metafile metafile)//, @RequestParam("file") MultipartFile file
+    public ResponseEntity<String> requestPurchaseOrderApproval(@RequestHeader String purchaseorder_id,
+                                                               @RequestHeader String session_id, @RequestHeader String message,
+                                                               @RequestHeader String subject, @RequestBody Metafile metafile)
     {
         IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling PurchaseOrder approval request.");
         return requestBusinessObjectApproval(purchaseorder_id, session_id, message, subject, metafile, new PurchaseOrder().apiEndpoint(), PurchaseOrder.class);
     }
 
     @GetMapping("/purchaseorder/approve/{purchaseorder_id}/{vericode}")
-    public ResponseEntity<String> approvePurchaseOrder(@PathVariable("purchaseorder_id") String purchaseorder_id, @PathVariable("vericode") String vericode)
+    public ResponseEntity<String> approvePurchaseOrder(@PathVariable("purchaseorder_id") String purchaseorder_id,
+                                                       @PathVariable("vericode") String vericode)
     {
         IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling PurchaseOrder "+purchaseorder_id+" approval request by Vericode.");
         return approveBusinessObjectByVericode(purchaseorder_id, vericode, "purchase_orders", "purchase_orders_timestamp", PurchaseOrder.class);

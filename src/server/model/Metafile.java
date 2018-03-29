@@ -4,11 +4,11 @@ import server.auxilary.AccessLevel;
 import server.auxilary.IO;
 
 /**
- * Created by ghost on 2017/12/22.
+ * Created by th3gh0st on 2017/12/22.
  * @author th3gh0st
  */
 
-public class Metafile extends BusinessObject
+public class Metafile extends ApplicationObject
 {
     private String filename;
     private String label;
@@ -160,9 +160,12 @@ public class Metafile extends BusinessObject
         return super.toString() + " = "  + getFilename();
     }
 
+    /**
+     * @return this model's root endpoint URL.
+     */
     @Override
     public String apiEndpoint()
     {
-        return "/file";
+        return "/metafile";
     }
 }

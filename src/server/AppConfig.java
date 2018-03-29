@@ -41,7 +41,6 @@ public class AppConfig  extends RepositoryRestConfigurerAdapter
         config.exposeIdsFor(Requisition.class);
         config.exposeIdsFor(Quote.class);
         config.exposeIdsFor(QuoteItem.class);
-        config.exposeIdsFor(QuoteService.class);
         config.exposeIdsFor(Job.class);
         config.exposeIdsFor(JobEmployee.class);
         config.exposeIdsFor(Invoice.class);
@@ -52,8 +51,6 @@ public class AppConfig  extends RepositoryRestConfigurerAdapter
         config.exposeIdsFor(PurchaseOrderAsset.class);
         config.exposeIdsFor(Leave.class);
         config.exposeIdsFor(Overtime.class);
-        config.exposeIdsFor(Service.class);
-        config.exposeIdsFor(ServiceItem.class);
         config.exposeIdsFor(Task.class);
         config.exposeIdsFor(TaskItem.class);
     }

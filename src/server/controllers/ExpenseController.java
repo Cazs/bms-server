@@ -8,12 +8,12 @@ import org.springframework.data.rest.webmvc.RepositoryRestController;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import server.model.ApplicationObject;
 import server.model.Expense;
-import server.model.BusinessObject;
 import server.repositories.ExpenseRepository;
 
 /**
- * Created by ghost on 2017/12/22.
+ * Created by th3gh0st on 2017/12/22.
  * @author th3gh0st
  */
 
@@ -32,13 +32,13 @@ public class ExpenseController extends APIController
     }
 
     @GetMapping(path = "/expense/{id}", produces = "application/hal+json")
-    public ResponseEntity<Page<? extends BusinessObject>> getExpense(@PathVariable("id") String id, @RequestHeader String session_id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    public ResponseEntity<Page<? extends ApplicationObject>> getExpense(@PathVariable("id") String id, @RequestHeader String session_id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
     {
         return getBusinessObject(new Expense(id), "_id", session_id, "expenses", pagedAssembler, assembler, pageRequest);
     }
 
     @GetMapping("/expenses")
-    public ResponseEntity<Page<? extends BusinessObject>> getExpenses(@RequestHeader String session_id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    public ResponseEntity<Page<? extends ApplicationObject>> getExpenses(@RequestHeader String session_id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
     {
         return getBusinessObjects(new Expense(), session_id, "expenses", pagedAssembler, assembler, pageRequest);
     }

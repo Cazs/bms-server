@@ -1,8 +1,8 @@
 package server.model;
 
 /**
- * Created by ghost on 2017/12/23.
- * @author ghost
+ * Created by th3gh0st on 2017/12/23.
+ * @author th3gh0st
  */
 public class PurchaseOrderAsset extends PurchaseOrderItem
 {
@@ -16,9 +16,12 @@ public class PurchaseOrderAsset extends PurchaseOrderItem
         super(_id);
     }
 
+    /**
+     * @return this model's root endpoint URL.
+     */
     @Override
     public String apiEndpoint()
     {
-        return "/purchaseorders/assets";
+        return "/purchaseorder/asset";
     }
 }

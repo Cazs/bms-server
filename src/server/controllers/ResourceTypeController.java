@@ -8,13 +8,12 @@ import org.springframework.data.rest.webmvc.RepositoryRestController;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import server.model.BusinessObject;
+import server.model.ApplicationObject;
 import server.model.ResourceType;
-import server.model.Revenue;
 import server.repositories.ResourceTypeRepository;
 
 /**
- * Created by ghost on 2017/12/22.
+ * Created by th3gh0st on 2017/12/22.
  * @author th3gh0st
  */
 
@@ -32,13 +31,18 @@ public class ResourceTypeController extends APIController
     }
 
     @GetMapping(path="/resource/types/{id}", produces = "application/hal+json")
-    public ResponseEntity<Page<? extends BusinessObject>> get(@PathVariable("id") String id, @RequestHeader String session_id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    public ResponseEntity<Page<? extends ApplicationObject>> get(@PathVariable("id") String id,
+                                                                 @RequestHeader String session_id,
+                                                                 Pageable pageRequest,
+                                                                 PersistentEntityResourceAssembler assembler)
     {
         return getBusinessObject(new ResourceType(id), "_id", session_id, "resource_types", pagedAssembler, assembler, pageRequest);
     }
 
     @GetMapping("/resources/types")
-    public ResponseEntity<Page<? extends BusinessObject>> getAll(@RequestHeader String session_id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    public ResponseEntity<Page<? extends ApplicationObject>> getAll(@RequestHeader String session_id,
+                                                                    Pageable pageRequest,
+                                                                    PersistentEntityResourceAssembler assembler)
     {
         return getBusinessObjects(new ResourceType(), session_id, "resource_types", pagedAssembler, assembler, pageRequest);
     }

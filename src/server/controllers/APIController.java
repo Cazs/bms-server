@@ -34,8 +34,13 @@ import java.util.List;
 @RequestMapping("/")
 public class APIController
 {
-    public ResponseEntity<String> emailBusinessObject(String _id, String session_id, String message,
-                                                             String subject, String destination, Metafile metafile, Class model)//, @RequestParam("file") MultipartFile file
+    public ResponseEntity<String> emailBusinessObject(String _id,
+                                                      String session_id,
+                                                      String message,
+                                                      String subject,
+                                                      String destination,
+                                                      Metafile metafile,
+                                                      Class model)//, @RequestParam("file") MultipartFile file
     {
         if(metafile ==null)
             return new ResponseEntity<>("Invalid attached Metafile object.", HttpStatus.CONFLICT);
@@ -66,14 +71,19 @@ public class APIController
                             IO.log(APIController.class.getName(), IO.TAG_ERROR, e.getMessage());
                             return new ResponseEntity<>("Could not send eMail: "+e.getMessage(), HttpStatus.CONFLICT);
                         }
-                    } else return new ResponseEntity<>("Invalid attached BusinessObject{"+model.getName()+"["+_id+"]} PDF", HttpStatus.CONFLICT);
+                    } else return new ResponseEntity<>("Invalid attached ApplicationObject{"+model.getName()+"["+_id+"]} PDF", HttpStatus.CONFLICT);
                 } else return new ResponseEntity<>("Invalid _id param", HttpStatus.CONFLICT);
             } else return new ResponseEntity<>("Invalid user session. Please log in.", HttpStatus.CONFLICT);
         } else return new ResponseEntity<>("Invalid session_id header param", HttpStatus.CONFLICT);
     }
 
-    public ResponseEntity<String> requestBusinessObjectApproval(String _id, String session_id, String message,
-                                                                       String subject, Metafile metafile, String endpoint, Class model)//, @RequestParam("file") MultipartFile file
+    public ResponseEntity<String> requestBusinessObjectApproval(String _id,
+                                                                String session_id,
+                                                                String message,
+                                                                String subject,
+                                                                Metafile metafile,
+                                                                String endpoint,
+                                                                Class model)//, @RequestParam("file") MultipartFile file
     {
         if(metafile ==null)
             return new ResponseEntity<>("Invalid attached Metafile object.", HttpStatus.CONFLICT);
@@ -86,7 +96,7 @@ public class APIController
                 {
                     if(metafile.getFile()!=null)
                     {
-                        IO.log(APIController.class.getClass().getName(), IO.TAG_INFO, "creating Vericode for BusinessObject{"+model.getName()+"["+_id+"]}");
+                        IO.log(APIController.class.getClass().getName(), IO.TAG_INFO, "creating Vericode for ApplicationObject{"+model.getName()+"["+_id+"]}");
                         //create Vericode object
                         String approval_code = IO.generateRandomString(16);
                         Vericode vericode = new Vericode(_id, approval_code);
@@ -110,7 +120,7 @@ public class APIController
                             if(auth_employees.isEmpty())
                                 return new ResponseEntity<>("Could not find any Employees with approval clearance.", HttpStatus.CONFLICT);
 
-                            IO.log(APIController.class.getName(), IO.TAG_INFO, "Found ["+auth_employees.size()+"] Employees with clearance. Sending[eMailing] BusinessObject{"+model.getName()+"["+_id+"]} for approval.");
+                            IO.log(APIController.class.getName(), IO.TAG_INFO, "Found ["+auth_employees.size()+"] Employees with clearance. Sending[eMailing] ApplicationObject{"+model.getName()+"["+_id+"]} for approval.");
                             Employee[] auth_employees_arr = new Employee[auth_employees.size()];
                             auth_employees.toArray(auth_employees_arr);
 
@@ -134,14 +144,18 @@ public class APIController
                             IO.log(APIController.class.getName(), IO.TAG_ERROR, e.getMessage());
                             return new ResponseEntity<>("Could not send eMail: "+e.getMessage(), HttpStatus.CONFLICT);
                         }
-                    } else return new ResponseEntity<>("Invalid attached BusinessObject{"+model.getName()+"["+_id+"]} PDF", HttpStatus.CONFLICT);
+                    } else return new ResponseEntity<>("Invalid attached ApplicationObject{"+model.getName()+"["+_id+"]} PDF", HttpStatus.CONFLICT);
                 } else return new ResponseEntity<>("Invalid _id param", HttpStatus.CONFLICT);
             } else return new ResponseEntity<>("Invalid user session. Please log in.", HttpStatus.CONFLICT);
         } else return new ResponseEntity<>("Invalid session_id header param", HttpStatus.CONFLICT);
     }
 
     //TODO: this won't always have a session_id, find a way around it
-    public ResponseEntity<String> approveBusinessObjectByVericode(String _id, String vericode, String collection, String collection_timestamp, Class model)
+    public ResponseEntity<String> approveBusinessObjectByVericode(String _id,
+                                                                  String vericode,
+                                                                  String collection,
+                                                                  String collection_timestamp,
+                                                                  Class model)
     {
         List<Vericode> contents = IO.getInstance().mongoOperations().find(new Query(Criteria.where("code_name").is(_id).and("code").is(vericode)), Vericode.class, "vericodes");
         String response_msg = "<!DOCTYPE html><html>";
@@ -151,21 +165,21 @@ public class APIController
         {
             if (!contents.isEmpty())
             {
-                //valid Vericode-BusinessObject combination - approve BusinessObject
-                List<BusinessObject> businessObjects = IO.getInstance().mongoOperations().find(new Query(Criteria.where("_id").is(_id)), model, collection);
-                if (businessObjects != null)
+                //valid Vericode-ApplicationObject combination - approve ApplicationObject
+                List<ApplicationObject> applicationObjects = IO.getInstance().mongoOperations().find(new Query(Criteria.where("_id").is(_id)), model, collection);
+                if (applicationObjects != null)
                 {
-                    if (!businessObjects.isEmpty())
+                    if (!applicationObjects.isEmpty())
                     {
-                        IO.log(APIController.class.getName(), IO.TAG_INFO, "valid BusinessObject{"+model+"["+_id+"]} approval credentials. Updating status.");
+                        IO.log(APIController.class.getName(), IO.TAG_INFO, "valid ApplicationObject{"+model+"["+_id+"]} approval credentials. Updating status.");
 
-                        BusinessObject businessObject = businessObjects.get(0);
-                        businessObject.parse("status", BusinessObject.STATUS_APPROVED);
-                        HttpStatus status = patchBusinessObject(businessObject, "", collection, collection_timestamp).getStatusCode();
+                        ApplicationObject applicationObject = applicationObjects.get(0);
+                        applicationObject.parse("status", ApplicationObject.STATUS_FINALISED);
+                        HttpStatus status = patchBusinessObject(applicationObject, "", collection, collection_timestamp).getStatusCode();
 
                         if(status==HttpStatus.OK)
                         {
-                            IO.log(APIController.class.getClass().getName(), IO.TAG_INFO, "Successfully approved BusinessObject{"+model+"["+_id+"]} using Vericode ["+vericode+"].");
+                            IO.log(APIController.class.getClass().getName(), IO.TAG_INFO, "Successfully approved ApplicationObject{"+model+"["+_id+"]} using Vericode ["+vericode+"].");
                             response_msg += "<h3>Successfully approved {"+model+"["+_id+"]} using verification code [" + vericode + "]</h3>"
                                     + "<script>alert('Successfully approved {"+model+"["+_id+"]} using verification code [" + vericode + "]');</script></html>";
                             return new ResponseEntity<>(response_msg, httpHeaders, HttpStatus.OK);
@@ -190,18 +204,18 @@ public class APIController
         //return response_msg;
     }
 
-    public ResponseEntity<Page<? extends BusinessObject>> getBusinessObject(BusinessObject object,
-                                                                                   String query_property,
-                                                                                   String session_id,
-                                                                                   String collection,
-                                                                                   PagedResourcesAssembler<? extends BusinessObject> pagedResourcesAssembler,
-                                                                                   PersistentEntityResourceAssembler persistentEntityResourceAssembler,
-                                                                                   Pageable pageRequest)
+    public ResponseEntity<Page<? extends ApplicationObject>> getBusinessObject(ApplicationObject object,
+                                                                               String query_property,
+                                                                               String session_id,
+                                                                               String collection,
+                                                                               PagedResourcesAssembler<? extends ApplicationObject> pagedResourcesAssembler,
+                                                                               PersistentEntityResourceAssembler persistentEntityResourceAssembler,
+                                                                               Pageable pageRequest)
     {
         if(object==null)
         {
-            IO.log(APIController.class.getName(), IO.TAG_ERROR, "Invalid object identifier. Should create an empty BusinessObject with at least the "+query_property+" attribute set.");
-            return new ResponseEntity("Invalid object identifier. Should create an empty BusinessObject with at least the "+query_property+" attribute set.", HttpStatus.CONFLICT);
+            IO.log(APIController.class.getName(), IO.TAG_ERROR, "Invalid object identifier. Should create an empty ApplicationObject with at least the "+query_property+" attribute set.");
+            return new ResponseEntity("Invalid object identifier. Should create an empty ApplicationObject with at least the "+query_property+" attribute set.", HttpStatus.CONFLICT);
         }
         if(object.get(query_property)!=null)
         {
@@ -234,24 +248,25 @@ public class APIController
             {
                 IO.log(APIController.class.getName(),IO.TAG_ERROR, "getBusinessObject()> employee ["+employee.getName()
                         +"]{current="+AccessLevel.values()[employee.getAccess_level()]+"} is not authorised to read " + object.getClass().getName() + "{required="+object.getReadMinRequiredAccessLevel()+"} objects.");
-                return new ResponseEntity("You are not authorised to READ " + object.getClass().getSimpleName() + " objects. Minimum read requirement is " + object.getReadMinRequiredAccessLevel(), HttpStatus.CONFLICT);
+                return new ResponseEntity("You are not authorised to READ " + object.getClass().getSimpleName() + " objects. Minimum read requirement is " + object.getReadMinRequiredAccessLevel(), HttpStatus.UNAUTHORIZED);
             }
 
             IO.log(APIController.class.getName(), IO.TAG_INFO, "querying object ["+ object.get(query_property) + "] of type [" + object.getClass().getName()+"] from collection ["+collection+"]");
 
-            List<? extends BusinessObject> contents = IO.getInstance().mongoOperations().find(new Query(Criteria.where(query_property).is(object.get(query_property))), object.getClass(), collection);
+            List<? extends ApplicationObject> contents = IO.getInstance().mongoOperations().find(new Query(Criteria.where(query_property).is(object.get(query_property))), object.getClass(), collection);
             if(contents!=null)
                 if(contents.size()>0)
                     return new ResponseEntity(pagedResourcesAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) persistentEntityResourceAssembler), HttpStatus.OK);
         }
-        return new ResponseEntity("Could not find BusinessObject with id ["+(object!=null?object.get_id():"null")+"] from collection ["+collection+"]", HttpStatus.CONFLICT);
+        return new ResponseEntity("Could not find ApplicationObject with id ["+(object!=null?object.get_id():"null")+"] from collection ["+collection+"]", HttpStatus.CONFLICT);
     }
 
-    public ResponseEntity<Page<? extends BusinessObject>> getBusinessObjects(BusinessObject object,
-                                                                                    String session_id, String collection,
-                                                                                    PagedResourcesAssembler<? extends BusinessObject> pagedResourcesAssembler,
-                                                                                    PersistentEntityResourceAssembler persistentEntityResourceAssembler,
-                                                                                    Pageable pageRequest)
+    public ResponseEntity<Page<? extends ApplicationObject>> getBusinessObjects(ApplicationObject object,
+                                                                                String session_id,
+                                                                                String collection,
+                                                                                PagedResourcesAssembler<? extends ApplicationObject> pagedResourcesAssembler,
+                                                                                PersistentEntityResourceAssembler persistentEntityResourceAssembler,
+                                                                                Pageable pageRequest)
     {
         if(object!=null)
         {
@@ -284,33 +299,36 @@ public class APIController
             {
                 IO.log(APIController.class.getName(),IO.TAG_ERROR, "getBusinessObject()> employee ["+employee.getName()
                         +"]{current="+AccessLevel.values()[employee.getAccess_level()]+"} is not authorised to read " + object.getClass().getName() + "{required="+object.getReadMinRequiredAccessLevel()+"} objects.");
-                return new ResponseEntity("You are not authorised to READ " + object.getClass().getSimpleName() + " objects. Minimum read requirement is " + object.getReadMinRequiredAccessLevel(), HttpStatus.CONFLICT);
+                return new ResponseEntity("You are not authorised to READ " + object.getClass().getSimpleName() + " objects. Minimum read requirement is " + object.getReadMinRequiredAccessLevel(), HttpStatus.UNAUTHORIZED);
             }
 
             IO.log(APIController.class.getName(), IO.TAG_INFO, "querying object ["+ object.get_id() + "] of type [" + object.getClass().getName()+"] from collection ["+collection+"]");
 
-            List<? extends BusinessObject> contents = IO.getInstance().mongoOperations().findAll(object.getClass(), collection);
+            List<? extends ApplicationObject> contents = IO.getInstance().mongoOperations().findAll(object.getClass(), collection);
             if(contents!=null)
                 if(contents.size()>0)
                     return new ResponseEntity(pagedResourcesAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) persistentEntityResourceAssembler), HttpStatus.OK);
         } else
         {
-            IO.log(APIController.class.getName(), IO.TAG_ERROR, "Invalid object. Should create an empty BusinessObject.");
-            return new ResponseEntity("Invalid object. Should create an empty BusinessObject.", HttpStatus.CONFLICT);
+            IO.log(APIController.class.getName(), IO.TAG_ERROR, "Invalid object. Should create an empty ApplicationObject.");
+            return new ResponseEntity("Invalid object. Should create an empty ApplicationObject.", HttpStatus.CONFLICT);
         }
         return new ResponseEntity("No BusinessObjects were found in the database.", HttpStatus.CONFLICT);
     }
 
-    public ResponseEntity<String> putBusinessObject(BusinessObject businessObject, String session_id, String collection, String collection_timestamp)
+    public ResponseEntity<String> putBusinessObject(ApplicationObject applicationObject,
+                                                    String session_id,
+                                                    String collection,
+                                                    String collection_timestamp)
     {
-        if(businessObject!=null)
+        if(applicationObject !=null)
         {
-            IO.log(businessObject.getClass().getName(), IO.TAG_INFO, "\nhandling "+businessObject.getClass().getSimpleName()+" PUT request.");
+            IO.log(applicationObject.getClass().getName(), IO.TAG_INFO, "\nhandling "+ applicationObject.getClass().getSimpleName()+" PUT request.");
 
-            if(businessObject.get_id()!=null)
+            if(applicationObject.get_id()!=null)
             {
-                IO.log(APIController.class.getName(),IO.TAG_ERROR, "BusinessObject "+businessObject.getClass().getName()+" already has an ObjectId, redirecting to PATCH method.");
-                return patchBusinessObject(businessObject, session_id, collection, collection_timestamp);
+                IO.log(APIController.class.getName(),IO.TAG_ERROR, "ApplicationObject "+ applicationObject.getClass().getName()+" already has an ObjectId, redirecting to PATCH method.");
+                return patchBusinessObject(applicationObject, session_id, collection, collection_timestamp);
             }
 
             //get session from session_id
@@ -330,19 +348,19 @@ public class APIController
             }
 
             //check if employee is authorised to create objects of this type
-            if(employee.getAccess_level() < businessObject.getWriteMinRequiredAccessLevel().getLevel())
+            if(employee.getAccess_level() < applicationObject.getWriteMinRequiredAccessLevel().getLevel())
             {
                 IO.log(APIController.class.getName(), IO.TAG_ERROR, "putBusinessObject()> employee ["+employee.getName()
-                        +"]{current="+AccessLevel.values()[employee.getAccess_level()]+"} is not authorised to create " + businessObject.getClass().getName() + "{required="+businessObject.getWriteMinRequiredAccessLevel()+"} objects.");
-                return new ResponseEntity<>("You are not authorised to CREATE " + businessObject.getClass().getSimpleName() + " objects. Minimum write requirement is " + businessObject.getWriteMinRequiredAccessLevel(), HttpStatus.CONFLICT);
+                        +"]{current="+AccessLevel.values()[employee.getAccess_level()]+"} is not authorised to create " + applicationObject.getClass().getName() + "{required="+ applicationObject.getWriteMinRequiredAccessLevel()+"} objects.");
+                return new ResponseEntity<>("You are not authorised to CREATE " + applicationObject.getClass().getSimpleName() + " objects. Minimum write requirement is " + applicationObject.getWriteMinRequiredAccessLevel(), HttpStatus.UNAUTHORIZED);
             }
 
-            IO.log(APIController.class.getName(), IO.TAG_INFO, "attempting to create new BusinessObject ["+businessObject.getClass().getName()+"]: "+businessObject.toString()+"");
+            IO.log(APIController.class.getName(), IO.TAG_INFO, "attempting to create new ApplicationObject ["+ applicationObject.getClass().getName()+"]: "+ applicationObject.toString()+"");
 
             try
             {
                 //set date object was logged
-                businessObject.setDate_logged(System.currentTimeMillis());
+                applicationObject.setDate_logged(System.currentTimeMillis());
 
                 //get collection count
                 long count = IO.getInstance().mongoOperations().count(null, collection);
@@ -351,33 +369,36 @@ public class APIController
                 while (IO.getInstance().mongoOperations().exists(new Query(Criteria.where("object_number").is(count)), collection))
                     count++;
 
-                //use collection count as object_number for new BusinessObject
-                businessObject.setObject_number(count);//set current collection count as object_number for new BusinessObject
+                //use collection count as object_number for new ApplicationObject
+                applicationObject.setObject_number(count);//set current collection count as object_number for new ApplicationObject
 
-                String new_obj_id = RemoteComms.commitBusinessObjectToDatabase(businessObject, collection, collection_timestamp);
+                String new_obj_id = RemoteComms.commitBusinessObjectToDatabase(applicationObject, collection, collection_timestamp);
 
                 return new ResponseEntity<>(new_obj_id, HttpStatus.OK);
             } catch (InvalidBusinessObjectException e)
             {
-                IO.log(RemoteComms.class.getName(),IO.TAG_ERROR, "invalid "+businessObject.getClass().getName()+" object: {"+e.getMessage()+"}");
+                IO.log(RemoteComms.class.getName(),IO.TAG_ERROR, "invalid "+ applicationObject.getClass().getName()+" object: {"+e.getMessage()+"}");
                 return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
             }
         }
-        return new ResponseEntity<>("Invalid BusinessObject", HttpStatus.CONFLICT);
+        return new ResponseEntity<>("Invalid ApplicationObject", HttpStatus.CONFLICT);
     }
 
-    public ResponseEntity<String> patchBusinessObject(BusinessObject businessObject, String session_id, String collection, String collection_timestamp)
+    public ResponseEntity<String> patchBusinessObject(ApplicationObject applicationObject,
+                                                      String session_id,
+                                                      String collection,
+                                                      String collection_timestamp)
     {
-        if(businessObject!=null)
+        if(applicationObject !=null)
         {
-            if(businessObject.get_id()==null)
+            if(applicationObject.get_id()==null)
             {
-                IO.log(APIController.class.getName(),IO.TAG_ERROR, "BusinessObject "+businessObject.getClass().getName()+" does NOT have an ObjectId, redirecting to PUT method.");
-                //return putBusinessObject(businessObject, session_id, collection, collection_timestamp);
-                return new ResponseEntity<>("invalid "+businessObject.getClass().getSimpleName()+" _id attribute.", HttpStatus.CONFLICT);
+                IO.log(APIController.class.getName(),IO.TAG_ERROR, "ApplicationObject "+ applicationObject.getClass().getName()+" does NOT have an ObjectId, redirecting to PUT method.");
+                //return putBusinessObject(applicationObject, session_id, collection, collection_timestamp);
+                return new ResponseEntity<>("invalid "+ applicationObject.getClass().getSimpleName()+" _id attribute.", HttpStatus.CONFLICT);
             }
 
-            IO.log(businessObject.getClass().getName(), IO.TAG_VERBOSE, "\nhandling "+businessObject.getClass().getSimpleName()+" PATCH ["+businessObject.get_id()+"] request.");
+            IO.log(applicationObject.getClass().getName(), IO.TAG_VERBOSE, "\nhandling "+ applicationObject.getClass().getSimpleName()+" PATCH ["+ applicationObject.get_id()+"] request.");
 
             //get session from session_id
             Session session = SessionManager.getInstance().getUserSession(session_id);
@@ -396,35 +417,38 @@ public class APIController
             }
 
             //check if employee is authorised to update objects of this type
-            if(employee.getAccess_level() < businessObject.getWriteMinRequiredAccessLevel().getLevel())
+            if(employee.getAccess_level() < applicationObject.getWriteMinRequiredAccessLevel().getLevel())
             {
                 IO.log(APIController.class.getName(),IO.TAG_ERROR, "patchBusinessObject()> employee ["+employee.getName()
-                        +"]{current="+AccessLevel.values()[employee.getAccess_level()]+"} is not authorised to update " + businessObject.getClass().getName() + "{required="+businessObject.getWriteMinRequiredAccessLevel()+"} objects.");
-                return new ResponseEntity<>("You are not authorised to EDIT " + businessObject.getClass().getSimpleName() + " objects. Minimum write requirement is " + businessObject.getWriteMinRequiredAccessLevel(), HttpStatus.CONFLICT);
+                        +"]{current="+AccessLevel.values()[employee.getAccess_level()]+"} is not authorised to update " + applicationObject.getClass().getName() + "{required="+ applicationObject.getWriteMinRequiredAccessLevel()+"} objects.");
+                return new ResponseEntity<>("You are not authorised to EDIT " + applicationObject.getClass().getSimpleName() + " objects. Minimum write requirement is " + applicationObject.getWriteMinRequiredAccessLevel(), HttpStatus.UNAUTHORIZED);
             }
 
-            IO.log(APIController.class.getName(), IO.TAG_INFO, "patching "+businessObject.getClass().getName()+" ["+businessObject.get_id()+"]");
+            IO.log(APIController.class.getName(), IO.TAG_INFO, "patching "+ applicationObject.getClass().getName()+" ["+ applicationObject.get_id()+"]");
 
             try
             {
-                RemoteComms.commitBusinessObjectToDatabase(businessObject, collection, collection_timestamp);
-                return new ResponseEntity<>(businessObject.get_id(), HttpStatus.OK);
+                RemoteComms.commitBusinessObjectToDatabase(applicationObject, collection, collection_timestamp);
+                return new ResponseEntity<>(applicationObject.get_id(), HttpStatus.OK);
             } catch (InvalidBusinessObjectException e)
             {
-                IO.log(RemoteComms.class.getName(),IO.TAG_ERROR, "invalid "+businessObject.getClass().getName()+" object: {"+e.getMessage()+"}");
+                IO.log(RemoteComms.class.getName(),IO.TAG_ERROR, "invalid "+ applicationObject.getClass().getName()+" object: {"+e.getMessage()+"}");
                 return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
             }
         }
-        return new ResponseEntity<>("Invalid BusinessObject", HttpStatus.CONFLICT);
+        return new ResponseEntity<>("Invalid ApplicationObject", HttpStatus.CONFLICT);
     }
 
-    public ResponseEntity<String> deleteBusinessObject(BusinessObject object, String session_id, String collection, String collection_timestamp)
+    public ResponseEntity<String> deleteBusinessObject(ApplicationObject object,
+                                                       String session_id,
+                                                       String collection,
+                                                       String collection_timestamp)
     {
         if(object!=null)
         {
             if(object.get_id()==null)
             {
-                IO.log(APIController.class.getName(),IO.TAG_ERROR, "BusinessObject "+object.getClass().getName()+" does NOT have a valid ObjectId.");
+                IO.log(APIController.class.getName(),IO.TAG_ERROR, "ApplicationObject "+object.getClass().getName()+" does NOT have a valid ObjectId.");
                 return new ResponseEntity<>("invalid "+object.getClass().getSimpleName()+" id. Please fix this before trying to delete this object", HttpStatus.CONFLICT);
             }
 
@@ -457,19 +481,19 @@ public class APIController
             {
                 IO.log(APIController.class.getName(),IO.TAG_ERROR, "deleteBusinessObject()> employee ["+employee.getName()
                         +"]{current="+AccessLevel.values()[employee.getAccess_level()]+"} is not authorised to delete " + object.getClass().getName() + "{required="+object.getWriteMinRequiredAccessLevel()+"} objects.");
-                return new ResponseEntity<>("You are not authorised to DELETE " + object.getClass().getSimpleName() + " objects. Minimum write requirement is " + object.getWriteMinRequiredAccessLevel(), HttpStatus.CONFLICT);
+                return new ResponseEntity<>("You are not authorised to DELETE " + object.getClass().getSimpleName() + " objects. Minimum write requirement is " + object.getWriteMinRequiredAccessLevel(), HttpStatus.UNAUTHORIZED);
             }
 
-            IO.log(APIController.class.getName(), IO.TAG_INFO, "deleteBusinessObject()> attempting to DELETE BusinessObject ["+object.get_id()+"] from collection ["+collection+"]");
+            IO.log(APIController.class.getName(), IO.TAG_INFO, "deleteBusinessObject()> attempting to DELETE ApplicationObject ["+object.get_id()+"] from collection ["+collection+"]");
 
-            //delete BusinessObject from DB server
+            //delete ApplicationObject from DB server
             if(collection!=null)
             {
                 IO.getInstance().mongoOperations().remove(new Query(Criteria.where("_id").is(object.get_id())), object.getClass(), collection);
-                IO.log(APIController.class.getName(),IO.TAG_INFO, "deleteBusinessObject()> DELETED BusinessObject: ["+object.get_id()+"]");
+                IO.log(APIController.class.getName(),IO.TAG_INFO, "deleteBusinessObject()> DELETED ApplicationObject: ["+object.get_id()+"]");
             } else
             {
-                IO.log(APIController.class.getName(),IO.TAG_ERROR, "deleteBusinessObject()> Could NOT DELETE BusinessObject: ["+object.get_id()+"] due to an invalid collection name.");
+                IO.log(APIController.class.getName(),IO.TAG_ERROR, "deleteBusinessObject()> Could NOT DELETE ApplicationObject: ["+object.get_id()+"] due to an invalid collection name.");
                 return null;
             }
 
@@ -485,6 +509,6 @@ public class APIController
             }
             return new ResponseEntity<>(object.get_id(), HttpStatus.OK);
         }
-        return new ResponseEntity<>("Invalid BusinessObject", HttpStatus.CONFLICT);
+        return new ResponseEntity<>("Invalid ApplicationObject", HttpStatus.CONFLICT);
     }
 }

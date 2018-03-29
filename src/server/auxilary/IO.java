@@ -2,7 +2,7 @@ package server.auxilary;
 
 import org.springframework.data.mongodb.core.MongoOperations;
 import server.AppConfig;
-import server.model.BusinessObject;
+import server.model.ApplicationObject;
 import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -23,7 +23,7 @@ import java.util.Arrays;
  * Created by ghost on 2017/01/28.
  * @author ghost
  */
-public class IO<T extends BusinessObject>
+public class IO<T extends ApplicationObject>
 {
     public static final String TAG_VERBOSE = "verbose";
     public static final String TAG_INFO = "info";

@@ -4,11 +4,11 @@ import server.auxilary.AccessLevel;
 import server.auxilary.IO;
 
 /**
- * Created by ghost on 2017/12/22.
+ * Created by th3gh0st on 2017/12/22.
  * @author th3gh0st
  */
 
-public class Leave extends BusinessObject
+public class Leave extends ApplicationObject
 {
     private String usr;
     private long start_date;
@@ -182,9 +182,12 @@ public class Leave extends BusinessObject
         return super.toString() + " = "  + getUsr();
     }
 
+    /**
+     * @return this model's root endpoint URL.
+     */
     @Override
     public String apiEndpoint()
     {
-        return "/leave_records";
+        return "/leave_application";
     }
 }

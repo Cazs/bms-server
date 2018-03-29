@@ -8,13 +8,13 @@ import org.springframework.data.rest.webmvc.RepositoryRestController;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import server.model.BusinessObject;
+import server.model.ApplicationObject;
 import server.model.Supplier;
 import server.repositories.SupplierRepository;
 
 /**
- * Created by ghost on 2017/12/22.
- * @author ghost
+ * Created by th3gh0st on 2017/12/22.
+ * @author th3gh0st
  */
 @RepositoryRestController
 @RequestMapping
@@ -31,13 +31,17 @@ public class SupplierController extends APIController
     }
 
     @GetMapping(path="/supplier/{id}", produces = "application/hal+json")
-    public ResponseEntity<Page<? extends BusinessObject>> getSupplier(@PathVariable("id") String id, @RequestHeader String session_id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    public ResponseEntity<Page<? extends ApplicationObject>> getSupplier(@PathVariable("id") String id,
+                                                                         @RequestHeader String session_id,
+                                                                         Pageable pageRequest,
+                                                                         PersistentEntityResourceAssembler assembler)
     {
         return getBusinessObject(new Supplier(id), "_id", session_id, "suppliers", pagedAssembler, assembler, pageRequest);
     }
 
     @GetMapping(path="/suppliers")
-    public ResponseEntity<Page<? extends BusinessObject>> getSuppliers(@RequestHeader String session_id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    public ResponseEntity<Page<? extends ApplicationObject>> getSuppliers(@RequestHeader String session_id,Pageable pageRequest,
+                                                                          PersistentEntityResourceAssembler assembler)
     {
         return getBusinessObjects(new Supplier(), session_id, "suppliers", pagedAssembler, assembler, pageRequest);
     }

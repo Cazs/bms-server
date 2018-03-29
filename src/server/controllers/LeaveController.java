@@ -12,7 +12,7 @@ import server.model.*;
 import server.repositories.LeaveRepository;
 
 /**
- * Created by ghost on 2017/12/22.
+ * Created by th3gh0st on 2017/12/22.
  * @author th3gh0st
  */
 
@@ -30,13 +30,13 @@ public class LeaveController extends APIController
     }
 
     @GetMapping(path="/leave_application/{id}", produces = "application/hal+json")
-    public ResponseEntity<Page<? extends BusinessObject>> getLeave(@PathVariable("id") String id, @RequestHeader String session_id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    public ResponseEntity<Page<? extends ApplicationObject>> getLeave(@PathVariable("id") String id, @RequestHeader String session_id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
     {
         return getBusinessObject(new Leave(id), "_id", session_id, "leave_applications", pagedAssembler, assembler, pageRequest);
     }
 
     @GetMapping("/leave_applications")
-    public ResponseEntity<Page<? extends BusinessObject>> getLeaveRecords(@RequestHeader String session_id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    public ResponseEntity<Page<? extends ApplicationObject>> getLeaveRecords(@RequestHeader String session_id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
     {
         return getBusinessObjects(new Leave(), session_id, "leave_applications", pagedAssembler, assembler, pageRequest);
     }

@@ -4,10 +4,10 @@ import server.auxilary.AccessLevel;
 import server.auxilary.IO;
 
 /**
- * Created by ghost on 2017/12/22.
- * @author ghost
+ * Created by th3gh0st on 2017/12/22.
+ * @author th3gh0st
  */
-public class Revenue extends BusinessObject
+public class Revenue extends ApplicationObject
 {
     private String revenue_title;
     private String revenue_description;
@@ -143,9 +143,12 @@ public class Revenue extends BusinessObject
         return super.toString() + "["  + getRevenue_title() + "] description [" +getRevenue_description() + "]";
     }
 
+    /**
+     * @return this model's root endpoint URL.
+     */
     @Override
     public String apiEndpoint()
     {
-        return "/revenues";
+        return "/revenue";
     }
 }

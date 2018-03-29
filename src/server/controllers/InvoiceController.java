@@ -13,7 +13,7 @@ import server.model.*;
 import server.repositories.InvoiceRepository;
 
 /**
- * Created by ghost on 2017/12/22.
+ * Created by th3gh0st on 2017/12/22.
  * @author th3gh0st
  */
 
@@ -31,13 +31,13 @@ public class InvoiceController extends APIController
     }
 
     @GetMapping(path="/invoice/{id}", produces = "application/hal+json")
-    public ResponseEntity<Page<? extends BusinessObject>> getInvoice(@PathVariable("id") String id, @RequestHeader String session_id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    public ResponseEntity<Page<? extends ApplicationObject>> getInvoice(@PathVariable("id") String id, @RequestHeader String session_id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
     {
         return getBusinessObject(new Invoice(id), "_id", session_id, "invoices", pagedAssembler, assembler, pageRequest);
     }
 
     @GetMapping("/invoices")
-    public ResponseEntity<Page<? extends BusinessObject>> getInvoices(Pageable pageRequest, @RequestHeader String session_id, PersistentEntityResourceAssembler assembler)
+    public ResponseEntity<Page<? extends ApplicationObject>> getInvoices(Pageable pageRequest, @RequestHeader String session_id, PersistentEntityResourceAssembler assembler)
     {
         return getBusinessObjects(new Invoice(), session_id, "invoices", pagedAssembler, assembler, pageRequest);
     }

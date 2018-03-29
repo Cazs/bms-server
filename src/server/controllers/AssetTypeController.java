@@ -8,12 +8,12 @@ import org.springframework.data.rest.webmvc.RepositoryRestController;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import server.model.ApplicationObject;
 import server.model.AssetType;
-import server.model.BusinessObject;
 import server.repositories.AssetTypeRepository;
 
 /**
- * Created by ghost on 2017/12/22.
+ * Created by th3gh0st on 2017/12/22.
  * @author th3gh0st
  */
 
@@ -31,13 +31,13 @@ public class AssetTypeController extends APIController
     }
 
     @GetMapping(path="/asset/types/{id}", produces = "application/hal+json")
-    public ResponseEntity<Page<? extends BusinessObject>> getAssetType(@PathVariable("id") String id, @RequestHeader String session_id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    public ResponseEntity<Page<? extends ApplicationObject>> getAssetType(@PathVariable("id") String id, @RequestHeader String session_id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
     {
         return getBusinessObject(new AssetType(id), "_id", session_id, "asset_types", pagedAssembler, assembler, pageRequest);
     }
 
     @GetMapping("/assets/types")
-    public ResponseEntity<Page<? extends BusinessObject>> getAssetTypes(Pageable pageRequest, @RequestHeader String session_id, PersistentEntityResourceAssembler assembler)
+    public ResponseEntity<Page<? extends ApplicationObject>> getAssetTypes(Pageable pageRequest, @RequestHeader String session_id, PersistentEntityResourceAssembler assembler)
     {
         return getBusinessObjects(new AssetType(), session_id, "asset_types", pagedAssembler, assembler, pageRequest);
     }

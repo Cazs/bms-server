@@ -1,7 +1,7 @@
 package server.model;
 
 /**
- * Created by ghost on 2017/12/22.
+ * Created by th3gh0st on 2017/12/22.
  * @author th3gh0st
  */
 public class ResourceType extends Type
@@ -14,9 +14,12 @@ public class ResourceType extends Type
         super(_id);
     }
 
+    /**
+     * @return this model's root endpoint URL.
+     */
     @Override
     public String apiEndpoint()
     {
-        return "/resources/types";
+        return "/resource/type";
     }
 }

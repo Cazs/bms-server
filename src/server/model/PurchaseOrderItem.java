@@ -4,10 +4,10 @@ import server.auxilary.AccessLevel;
 import server.auxilary.IO;
 
 /**
- * Created by ghost on 2017/12/23.
- * @author ghost
+ * Created by th3gh0st on 2017/12/23.
+ * @author th3gh0st
  */
-public abstract class PurchaseOrderItem extends BusinessObject
+public abstract class PurchaseOrderItem extends ApplicationObject
 {
     private int item_number;
     private String purchase_order_id;
@@ -182,6 +182,9 @@ public abstract class PurchaseOrderItem extends BusinessObject
         return super.get(var);
     }
 
+    /**
+     * @return this model's root endpoint URL.
+     */
     @Override
     public String toString()
     {

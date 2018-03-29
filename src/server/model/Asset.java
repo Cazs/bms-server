@@ -4,10 +4,10 @@ import server.auxilary.AccessLevel;
 import server.auxilary.IO;
 
 /**
- * Created by ghost on 2017/12/22.
+ * Created by th3gh0st on 2017/12/22.
  * @author th3gh0st
  */
-public class Asset extends BusinessObject
+public class Asset extends ApplicationObject
 {
     private String asset_name;
     private String asset_description;
@@ -232,9 +232,12 @@ public class Asset extends BusinessObject
         return super.toString() + " = " + getAsset_name();
     }
 
+    /**
+     * @return this model's root endpoint URL.
+     */
     @Override
     public String apiEndpoint()
     {
-        return "/assets";
+        return "/asset";
     }
 }

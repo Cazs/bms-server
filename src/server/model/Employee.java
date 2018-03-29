@@ -9,10 +9,10 @@ import server.auxilary.AccessLevel;
 import server.auxilary.IO;
 
 /**
- * Created by ghost on 2017/12/22.
+ * Created by th3gh0st on 2017/12/22.
  * @author th3gh0st
  */
-public class Employee extends BusinessObject
+public class Employee extends ApplicationObject
 {
     private String usr;
     private String pwd;//hashed
@@ -147,6 +147,8 @@ public class Employee extends BusinessObject
         this.gender = gender;
     }
 
+    public String getInitials(){return new String(firstname.substring(0,1) + lastname.substring(0,1));}
+
     public String getName()
     {
         return getFirstname() + " " + getLastname();
@@ -264,11 +266,12 @@ public class Employee extends BusinessObject
         return super.toString() + " = "  + getName();
     }
 
-    public String getInitials(){return new String(firstname.substring(0,1) + lastname.substring(0,1));}
-
+    /**
+     * @return this model's root endpoint URL.
+     */
     @Override
     public String apiEndpoint()
     {
-        return "/employees";
+        return "/usr";
     }
 }

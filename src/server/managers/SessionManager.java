@@ -11,8 +11,8 @@ import server.auxilary.Session;
 import java.util.HashMap;
 
 /**
- *
- * @author ghost
+ * Created by th3gh0st on 2017/12/22.
+ * @author th3gh0st
  */
 public class SessionManager 
 {

@@ -4,10 +4,10 @@ import server.auxilary.AccessLevel;
 import server.auxilary.IO;
 
 /**
- * Created by ghost on 2017/12/23.
- * @author ghost
+ * Created by th3gh0st on 2017/12/23.
+ * @author th3gh0st
  */
-public class JobEmployee extends BusinessObject
+public class JobEmployee extends ApplicationObject
 {
     private String job_id;
     private String task_id;
@@ -123,9 +123,12 @@ public class JobEmployee extends BusinessObject
         return super.toString() + " = "  + getUsr() + " -> " + getJob_id();
     }
 
+    /**
+     * @return this model's root endpoint URL.
+     */
     @Override
     public String apiEndpoint()
     {
-        return "/jobs/employees";
+        return "/job/employee";
     }
 }

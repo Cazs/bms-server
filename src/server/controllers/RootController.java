@@ -14,8 +14,8 @@ import java.util.List;
 
 /**
  * Contains behaviour for retrieving timestamps and user authentication etc..
- * Created by ghost on 2017/12/23.
- * @author ghost
+ * Created by th3gh0st on 2017/12/23.
+ * @author th3gh0st
  */
 
 @RestController

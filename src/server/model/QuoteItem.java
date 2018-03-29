@@ -4,10 +4,10 @@ import server.auxilary.AccessLevel;
 import server.auxilary.IO;
 
 /**
- * Created by ghost on 2017/12/22.
- * @author ghost
+ * Created by th3gh0st on 2017/12/22.
+ * @author th3gh0st
  */
-public class QuoteItem extends BusinessObject
+public class QuoteItem extends ApplicationObject
 {
     private int item_number;
     private int quantity;
@@ -265,9 +265,12 @@ public class QuoteItem extends BusinessObject
         return super.toString() + " for Quote ["  + getQuote_id() + "] material ID [" +getResource_id() + "] [qty: "+getQuantity()+"]";
     }
 
+    /**
+     * @return this model's root endpoint URL.
+     */
     @Override
     public String apiEndpoint()
     {
-        return "/quotes/resources";
+        return "/quote/resource";
     }
 }

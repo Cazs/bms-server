@@ -8,10 +8,10 @@ import server.auxilary.IO;
 import java.io.Serializable;
 
 /**
- * Created by ghost on 2017/12/23
- * @author ghost
+ * Created by th3gh0st on 2017/12/23
+ * @author th3gh0st
  */
-public abstract class BusinessObject implements Serializable
+public abstract class ApplicationObject implements Serializable
 {
     @Id
     @RestResource(exported = true)
@@ -22,17 +22,17 @@ public abstract class BusinessObject implements Serializable
     private String other;
     private boolean marked;
     public static final int STATUS_PENDING =0;
-    public static final int STATUS_APPROVED =1;
+    public static final int STATUS_FINALISED =1;
     public static final int STATUS_ARCHIVED =2;
 
     public abstract AccessLevel getReadMinRequiredAccessLevel();
 
     public abstract AccessLevel getWriteMinRequiredAccessLevel();
 
-    public BusinessObject()
+    public ApplicationObject()
     {}
 
-    public BusinessObject(String _id)
+    public ApplicationObject(String _id)
     {
         set_id(_id);
     }
@@ -135,7 +135,7 @@ public abstract class BusinessObject implements Serializable
     }
 
     /**
-     * Method to check if respective BusinessObject's attributes are valid or not.
+     * Method to check if respective ApplicationObject's attributes are valid or not.
      * @return String Array of size 2, first element is a true/false value and second is a message
      */
     //TODO: throw InvalidBusinessObjectException

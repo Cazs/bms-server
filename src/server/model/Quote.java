@@ -4,10 +4,10 @@ import server.auxilary.AccessLevel;
 import server.auxilary.IO;
 
 /**
- * Created by ghost on 2017/12/22.
+ * Created by th3gh0st on 2017/12/22.
  * @author th3gh0st
  */
-public class Quote extends BusinessObject
+public class Quote extends ApplicationObject
 {
     private String requisition_id;//optional
     private String client_id;
@@ -246,9 +246,12 @@ public class Quote extends BusinessObject
         return super.toString() + " for client "  + getClient_id() + " at " + getSitename();
     }
 
+    /**
+     * @return this model's root endpoint URL.
+     */
     @Override
     public String apiEndpoint()
     {
-        return "/quotes";
+        return "/quote";
     }
 }

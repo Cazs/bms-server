@@ -10,10 +10,10 @@ import server.auxilary.AccessLevel;
 import server.auxilary.IO;
 
 /**
- * Created by ghost on 2017/12/23.
- * @author ghost
+ * Created by th3gh0st on 2017/12/23.
+ * @author th3gh0st
  */
-public class Job extends BusinessObject
+public class Job extends ApplicationObject
 {
     private long planned_start_date;
     private long date_assigned;
@@ -251,9 +251,12 @@ public class Job extends BusinessObject
         return json_obj;
     }
 
+    /**
+     * @return this model's root endpoint URL.
+     */
     @Override
     public String apiEndpoint()
     {
-        return "/jobs";
+        return "/job";
     }
 }

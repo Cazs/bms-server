@@ -6,10 +6,10 @@ import server.auxilary.IO;
 import java.io.Serializable;
 
 /**
- * Created by ghost on 2018/03/17.
- * @author ghost
+ * Created by th3gh0st on 2018/03/17.
+ * @author th3gh0st
  */
-public class TaskItem extends BusinessObject implements Serializable
+public class TaskItem extends ApplicationObject implements Serializable
 {
     private long quantity;
     private double unit_cost;
@@ -212,9 +212,12 @@ public class TaskItem extends BusinessObject implements Serializable
         return super.toString() + " for task ["  + getTask_id() + "] material [" +getResource_id() + "]";
     }
 
+    /**
+     * @return this model's root endpoint URL.
+     */
     @Override
     public String apiEndpoint()
     {
-        return "/tasks/resources";
+        return "/task/resource";
     }
 }

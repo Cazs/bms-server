@@ -8,12 +8,12 @@ import org.springframework.data.rest.webmvc.RepositoryRestController;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import server.model.BusinessObject;
+import server.model.ApplicationObject;
 import server.model.Metafile;
 import server.repositories.MetafilesRepository;
 
 /**
- * Created by ghost on 2017/12/22.
+ * Created by th3gh0st on 2017/12/22.
  * @author th3gh0st
  */
 
@@ -31,13 +31,13 @@ public class MetafileController extends APIController
     }
 
     @GetMapping(path="/metafile/{id}", produces = "application/hal+json")
-    public ResponseEntity<Page<? extends BusinessObject>> getFileMetadata(@PathVariable("id") String id, @RequestHeader String session_id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    public ResponseEntity<Page<? extends ApplicationObject>> getFileMetadata(@PathVariable("id") String id, @RequestHeader String session_id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
     {
         return getBusinessObject(new Metafile(id), "_id", session_id, "metafiles", pagedAssembler, assembler, pageRequest);
     }
 
     @GetMapping("/metafiles")
-    public ResponseEntity<Page<? extends BusinessObject>> getFileMetadatas(Pageable pageRequest, @RequestHeader String session_id, PersistentEntityResourceAssembler assembler)
+    public ResponseEntity<Page<? extends ApplicationObject>> getFileMetadatas(Pageable pageRequest, @RequestHeader String session_id, PersistentEntityResourceAssembler assembler)
     {
         return getBusinessObjects(new Metafile(), session_id, "metafiles", pagedAssembler, assembler, pageRequest);
     }

@@ -4,10 +4,10 @@ import server.auxilary.AccessLevel;
 import server.auxilary.IO;
 
 /**
- * Created by ghost on 2017/12/22.
- * @author ghost
+ * Created by th3gh0st on 2017/12/22.
+ * @author th3gh0st
  */
-public class Supplier extends BusinessObject
+public class Supplier extends ApplicationObject
 {
     private String supplier_name;
     private String physical_address;
@@ -300,9 +300,12 @@ public class Supplier extends BusinessObject
         return super.toString() + getSupplier_name();
     }
 
+    /**
+     * @return this model's root endpoint URL.
+     */
     @Override
     public String apiEndpoint()
     {
-        return "/suppliers";
+        return "/supplier";
     }
 }

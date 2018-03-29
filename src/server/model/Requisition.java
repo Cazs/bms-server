@@ -6,10 +6,10 @@ import server.auxilary.AccessLevel;
 import server.auxilary.IO;
 
 /**
- * Created by ghost on 2018/01/13.
- * @author ghost
+ * Created by th3gh0st on 2018/01/13.
+ * @author th3gh0st
  */
-public class Requisition extends BusinessObject
+public class Requisition extends ApplicationObject
 {
     private String client_id;
     private String responsible_person_id;
@@ -176,9 +176,12 @@ public class Requisition extends BusinessObject
         return super.toString() + " type [" + getType() + "] "  + getDescription() + " for client [" +getClient_id() + "]";
     }
 
+    /**
+     * @return this model's root endpoint URL.
+     */
     @Override
     public String apiEndpoint()
     {
-        return "/requisitions";
+        return "/requisition";
     }
 }

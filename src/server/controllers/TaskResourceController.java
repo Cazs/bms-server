@@ -8,13 +8,13 @@ import org.springframework.data.rest.webmvc.RepositoryRestController;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import server.model.BusinessObject;
+import server.model.ApplicationObject;
 import server.model.TaskItem;
 import server.repositories.TaskItemRepository;
 
 /**
- * Created by ghost on 2018/03/22
- * @author ghost
+ * Created by th3gh0st on 2018/03/22
+ * @author th3gh0st
  */
 @RepositoryRestController
 public class TaskResourceController extends APIController
@@ -30,13 +30,18 @@ public class TaskResourceController extends APIController
     }
 
     @GetMapping(path="/task/resources/{id}", produces = "application/hal+json")
-    public ResponseEntity<Page<? extends BusinessObject>> getTaskItem(@PathVariable("id") String id, @RequestHeader String session_id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    public ResponseEntity<Page<? extends ApplicationObject>> getTaskItem(@PathVariable("id") String id,
+                                                                         @RequestHeader String session_id,
+                                                                         Pageable pageRequest,
+                                                                         PersistentEntityResourceAssembler assembler)
     {
         return getBusinessObject(new TaskItem(id), "_id", session_id, "task_resources", pagedAssembler, assembler, pageRequest);
     }
 
     @GetMapping("/tasks/resources")
-    public ResponseEntity<Page<? extends BusinessObject>> getTaskItems(@RequestHeader String session_id, Pageable pageRequest, PersistentEntityResourceAssembler assembler)
+    public ResponseEntity<Page<? extends ApplicationObject>> getTaskItems(@RequestHeader String session_id,
+                                                                          Pageable pageRequest,
+                                                                          PersistentEntityResourceAssembler assembler)
     {
         return getBusinessObjects(new TaskItem(), session_id, "task_resources", pagedAssembler, assembler, pageRequest);
     }

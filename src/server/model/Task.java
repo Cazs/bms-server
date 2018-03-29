@@ -10,10 +10,10 @@ import server.auxilary.AccessLevel;
 import server.auxilary.IO;
 
 /**
- * Created by ghost on 2018/03/15.
- * @author ghost
+ * Created by th3gh0st on 2018/03/15.
+ * @author th3gh0st
  */
-public class Task extends BusinessObject
+public class Task extends ApplicationObject
 {
     private long date_assigned;
     private long date_started;
@@ -83,7 +83,7 @@ public class Task extends BusinessObject
 
     public boolean isCompleted()
     {
-        return (date_completed>0 && status==STATUS_APPROVED);
+        return (date_completed>0 && status== STATUS_FINALISED);
     }
 
     public int getStatus()
@@ -254,11 +254,11 @@ public class Task extends BusinessObject
     }
 
     /**
-     * @return Task model's endpoint URL.
+     * @return this model's root endpoint URL.
      */
     @Override
     public String apiEndpoint()
     {
-        return "/tasks";
+        return "/task";
     }
 }
