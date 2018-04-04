@@ -53,6 +53,7 @@ public class AppConfig  extends RepositoryRestConfigurerAdapter
         config.exposeIdsFor(Overtime.class);
         config.exposeIdsFor(Task.class);
         config.exposeIdsFor(TaskItem.class);
+        config.exposeIdsFor(TimesheetActivity.class);
     }
 
     /*@Bean

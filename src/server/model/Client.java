@@ -21,7 +21,7 @@ public class Client extends ApplicationObject
     private String fax;
     private String contact_email;
     private String registration_number;
-    private String vat_number;
+    private String tax_number;
     private String account_name;
     private long date_partnered;
     private String website;
@@ -44,7 +44,7 @@ public class Client extends ApplicationObject
     @Override
     public AccessLevel getWriteMinRequiredAccessLevel()
     {
-        return AccessLevel.ADMIN;
+        return AccessLevel.STANDARD;
     }
 
     public String getClient_name()
@@ -147,14 +147,14 @@ public class Client extends ApplicationObject
         this.registration_number = registration_number;
     }
 
-    public String getVat_number()
+    public String getTax_number()
     {
-        return vat_number;
+        return tax_number;
     }
 
-    public void setVat_number(String vat_number)
+    public void setTax_number(String tax_number)
     {
-        this.vat_number = vat_number;
+        this.tax_number = tax_number;
     }
 
     public String getAccount_name()
@@ -186,10 +186,10 @@ public class Client extends ApplicationObject
             return new String[]{"false", "invalid physical_address value."};
         if(getPostal_address()==null)
             return new String[]{"false", "invalid postal_address value."};
-        if(getRegistration_number()==null)
+        /*if(getRegistration_number()==null)
             return new String[]{"false", "invalid registration_number value."};
-        if(getVat_number()==null)
-            return new String[]{"false", "invalid vat_number value."};
+        if(getTax_number()==null)
+            return new String[]{"false", "invalid tax_number value."};*/
 
         return super.isValid();
     }
@@ -223,8 +223,8 @@ public class Client extends ApplicationObject
                 case "registration_number":
                     setRegistration_number((String) val);
                     break;
-                case "vat_number":
-                    setVat_number((String) val);
+                case "tax_number":
+                    setTax_number((String) val);
                     break;
                 case "account_name":
                     setAccount_name((String)val);
@@ -273,8 +273,8 @@ public class Client extends ApplicationObject
                     return getContact_email();
                 case "registration_number":
                     return getRegistration_number();
-                case "vat_number":
-                    return getVat_number();
+                case "tax_number":
+                    return getTax_number();
                 case "account_name":
                     return getAccount_name();
                 case "date_partnered":
