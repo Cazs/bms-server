@@ -5,9 +5,15 @@
  */
 package server.model;
 
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.rest.core.annotation.RestResource;
 import server.auxilary.AccessLevel;
 import server.auxilary.IO;
+
+import java.time.LocalDateTime;
+import java.util.AbstractMap;
+import java.util.List;
 
 /**
  * Created by th3gh0st on 2017/12/23.
@@ -22,7 +28,6 @@ public class Job extends ApplicationObject
     private long job_number;
     private String invoice_id;
     private String quote_id;
-    private int status;
 
     public Job()
     {}
@@ -47,6 +52,15 @@ public class Job extends ApplicationObject
     public long getPlanned_start_date() {return planned_start_date;}
 
     public void setPlanned_start_date(long planned_start_date) {this.planned_start_date = planned_start_date;}
+
+    public String getScheduled_date()
+    {
+        // return date.format(DateTimeFormatter.BASIC_ISO_DATE);
+        AbstractMap.SimpleEntry<Integer, LocalDateTime> date_map = IO.isEpochSecondOrMilli(getPlanned_start_date());
+        LocalDateTime date = date_map.getValue();
+
+        return IO.getYyyyMMddFormmattedDate(date);
+    }
 
     public long getJob_number()
     {
@@ -73,6 +87,15 @@ public class Job extends ApplicationObject
         return date_started;
     }
 
+    public String getStart_date()
+    {
+        // return date.format(DateTimeFormatter.BASIC_ISO_DATE);
+        AbstractMap.SimpleEntry<Integer, LocalDateTime> date_map = IO.isEpochSecondOrMilli(getDate_started());
+        LocalDateTime date = date_map.getValue();
+
+        return IO.getYyyyMMddFormmattedDate(date);
+    }
+
     public void setDate_started(long date_started) 
     {
         this.date_started = date_started;
@@ -81,6 +104,15 @@ public class Job extends ApplicationObject
     public long getDate_completed() 
     {
         return date_completed;
+    }
+
+    public String getEnd_date()
+    {
+        // return date.format(DateTimeFormatter.BASIC_ISO_DATE);
+        AbstractMap.SimpleEntry<Integer, LocalDateTime> date_map = IO.isEpochSecondOrMilli(getDate_completed());
+        LocalDateTime date = date_map.getValue();
+
+        return IO.getYyyyMMddFormmattedDate(date);
     }
 
     public void setDate_completed(long date_completed) 
@@ -113,14 +145,81 @@ public class Job extends ApplicationObject
         this.invoice_id = invoice_id;
     }
 
-    public int getStatus()
+    public Quote getQuote()
     {
-        return status;
+        return IO.getInstance().mongoOperations().findOne(new Query(Criteria.where("_id").is(getQuote_id())), Quote.class, "quotes");
     }
 
-    public void setStatus(int status)
+    public String getClient_name()
     {
-        this.status = status;
+        Quote quote = getQuote();
+        if(quote!=null)
+        {
+            Client client = quote.getClient();
+            if(client!=null)
+                return client.getClient_name();
+        }
+        return "N/A";
+    }
+
+    public String getContact_person()
+    {
+        Quote quote = getQuote();
+        if(quote!=null)
+        {
+            Employee contact = quote.getContact();
+            if(contact!=null)
+                return contact.getName();
+            else return quote.getContact_person_id();
+        }
+        return "N/A";
+    }
+
+    public String getRequest()
+    {
+        Quote quote = getQuote();
+        if(quote!=null)
+            return quote.getRequest();
+        return "N/A";
+    }
+
+    public String getSitename()
+    {
+        Quote quote = getQuote();
+        if(quote!=null)
+            return quote.getSitename();
+        return "N/A";
+    }
+
+    public double getVat()
+    {
+        Quote quote = getQuote();
+        if(quote!=null)
+            return quote.getVat();
+        return Quote.VAT;
+    }
+
+    /**
+     * @return latest revision number for associated Quote object
+     */
+    public double getQuote_revisions()
+    {
+        Quote quote = getQuote();
+        if(quote!=null)
+            return quote.getRevision();
+        return 0;
+    }
+
+    public Task[] getTasks()
+    {
+        Task[] arr = new Task[0]; // for JS
+        List contents = IO.getInstance().mongoOperations().find(new Query(Criteria.where("job_id").is(get_id())), Task.class, "tasks");
+        if(contents!=null)
+        {
+            arr = new Task[contents.size()];
+            contents.toArray(arr);
+        }
+        return arr;
     }
 
     @Override
@@ -170,9 +269,6 @@ public class Job extends ApplicationObject
             {
                 case "quote_id":
                     quote_id = (String)val;
-                    break;
-                case "status":
-                    status = Integer.parseInt(String.valueOf(val));
                     break;
                 case "planned_start_date":
                     planned_start_date = Long.parseLong(String.valueOf(val));
@@ -232,7 +328,7 @@ public class Job extends ApplicationObject
     {
         String json_obj = "{\"_id\":\""+get_id()+"\"";
         json_obj+=",\"quote_id\":\""+quote_id+"\""
-                +",\"status\":\""+status+"\""
+                +",\"status\":\""+getStatus()+"\""
                 +",\"creator\":\""+getCreator()+"\""
                 +",\"date_logged\":\""+getDate_logged()+"\"";
         if(date_assigned>0)

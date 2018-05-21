@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.SimpleMongoDbFactory;
 import org.springframework.data.rest.core.config.RepositoryRestConfiguration;
 import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurerAdapter;
+import server.auxilary.IO;
 import server.auxilary.RemoteComms;
 import server.model.*;
 
@@ -20,12 +21,14 @@ public class AppConfig  extends RepositoryRestConfigurerAdapter
     @Bean
     public MongoDbFactory mongoDbFactory()
     {
+        IO.initEnv();
         return new SimpleMongoDbFactory(new MongoClient(RemoteComms.DB_IP, RemoteComms.DB_PORT), RemoteComms.DB_NAME);
     }
 
     @Bean
     public MongoOperations mongoOperations() throws UnknownHostException
     {
+        IO.initEnv();
         return new MongoTemplate(mongoDbFactory());
     }
 
@@ -54,6 +57,11 @@ public class AppConfig  extends RepositoryRestConfigurerAdapter
         config.exposeIdsFor(Task.class);
         config.exposeIdsFor(TaskItem.class);
         config.exposeIdsFor(TimesheetActivity.class);
+        config.exposeIdsFor(QuoteItemExtraCost.class);
+        config.exposeIdsFor(Metafile.class);
+        config.exposeIdsFor(SafetyDocument.class);
+        config.exposeIdsFor(QuickJob.class);
+        config.exposeIdsFor(QuickJobItem.class);
     }
 
     /*@Bean

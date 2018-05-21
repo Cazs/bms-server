@@ -30,13 +30,15 @@ import server.model.Metafile;
  */
 public class RemoteComms
 {
-    public static String host = "http://192.168.0.103:8080";//192.168.0.103//95.85.57.110
+    public static String host = null;
+    public static String DB_IP = null;
+    public static int DB_PORT = 0;
+    public static String DB_NAME = null;
+    public static int TTL = 60*60*2; // 2 hours in sec
+    public static String SYSTEM_EMAIL = null;
+    public static String MAILJET_API_KEY = null;
+    public static String MAILJET_API_KEY_SECRET = null;
     public static final String TAG = "RemoteComms";
-    public static String DB_IP = "localhost";
-    public static int DB_PORT = 27017;
-    public static String DB_NAME = "fadulousbms";
-    public static int TTL = 60*60*2;//2 hours in sec
-    public static String SYSTEM_EMAIL = "bms@omegafs.co.za";
 
     public static String commitBusinessObjectToDatabase(ApplicationObject applicationObject, String collection, String timestamp_name)
     {
@@ -122,11 +124,12 @@ public class RemoteComms
         for(Metafile file: fileMetadata)
             files.put(new JSONObject()
                     .put("ContentType", file.getContent_type())
-                    .put("Filename", file.getFilename())
-                    .put("Base64Content", file.getFile()));//"VGhpcyBpcyB5b3VyIGF0dGFjaGVkIGZpbGUhISEK"
+                    .put("Filename", file.getFilename().toLowerCase().replaceAll(" ", "-") + "."
+                            + (file.getContent_type().split("/").length > 0 ? file.getContent_type().split("/")[1] : file.getContent_type()))
+                    .put("Base64Content", file.getFile()));
 
 
-        client = new MailjetClient("f8d3d1d74c95250bb2119063b3697082", "8304b30da4245632c878bf48f1d65d92", new ClientOptions("v3.1"));
+        client = new MailjetClient(MAILJET_API_KEY, MAILJET_API_KEY_SECRET, new ClientOptions("v3.1"));
         request = new MailjetRequest(Emailv31.resource)
                 .property(Emailv31.MESSAGES, new JSONArray()
                         .put(new JSONObject()
@@ -160,6 +163,8 @@ public class RemoteComms
         MailjetRequest request;
         MailjetResponse response;
 
+        System.out.println("Sending mail to: " + recipient_addresses[0] + " of " + recipient_addresses.length);
+
         //setup recipients
         JSONArray recipients_json = new JSONArray();
         for(String recipient:recipient_addresses)
@@ -174,11 +179,12 @@ public class RemoteComms
         for(Metafile file: fileMetadata)
             files.put(new JSONObject()
                     .put("ContentType", file.getContent_type())
-                    .put("Filename", file.getFilename())
+                    .put("Filename", file.getFilename().toLowerCase().replaceAll(" ", "-") + "."
+                                        + (file.getContent_type().split("/").length > 0 ? file.getContent_type().split("/")[1] : file.getContent_type()))
                     .put("Base64Content", file.getFile()));//"VGhpcyBpcyB5b3VyIGF0dGFjaGVkIGZpbGUhISEK"
 
 
-        client = new MailjetClient("f8d3d1d74c95250bb2119063b3697082", "8304b30da4245632c878bf48f1d65d92", new ClientOptions("v3.1"));
+        client = new MailjetClient(MAILJET_API_KEY, MAILJET_API_KEY_SECRET, new ClientOptions("v3.1"));
         request = new MailjetRequest(Emailv31.resource)
                 .property(Emailv31.MESSAGES, new JSONArray()
                         .put(new JSONObject()
@@ -191,6 +197,7 @@ public class RemoteComms
                                 .put(Emailv31.Message.HTMLPART, message)
                                 .put(Emailv31.Message.ATTACHMENTS, files)));
         response = client.post(request);
+        System.out.println("Sent request, response: " + response);
         IO.log(RemoteComms.class.getName(), IO.TAG_INFO, String.valueOf(response.getStatus()));
         IO.log(RemoteComms.class.getName(), IO.TAG_INFO, String.valueOf(response.getData()));
         return response;

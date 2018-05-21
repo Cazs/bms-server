@@ -75,7 +75,7 @@ public class Session
 
     public boolean isExpired()
     {
-        return (System.currentTimeMillis()/1000) >= getDate()+getTtl();
+        return (System.currentTimeMillis()) >= getDate()+getTtl();
     }
 
     public Employee getEmployee()
@@ -96,12 +96,12 @@ public class Session
         return employees.get(0);
     }
 
-    @Override
-    public String toString()
-    {
-        return "{\"session_id\":\""+session_id+"\", "+
-                "\"usr\":\""+usr+"\","+
-                "\"date\":\""+date+"\","+
-                "\"ttl\":\""+ttl+"\"}";
-    }
+//    @Override
+//    public String toString()
+//    {
+//        return "{\"session_id\":\""+session_id+"\", "+
+//                "\"usr\":\""+usr+"\","+
+//                "\"date\":\""+date+"\","+
+//                "\"ttl\":\""+ttl+"\"}";
+//    }
 }

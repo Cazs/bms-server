@@ -15,13 +15,14 @@ public class Supplier extends ApplicationObject
     private String tel;
     private String fax;
     private String contact_email;
-    private String speciality;
-    private boolean active;
+    private String industry;
     private long date_partnered;
     private String website;
     private String registration_number;
     private String vat_number;
     private String account_name;
+    public static final int STATUS_INACTIVE = 0;
+    public static final int STATUS_ACTIVE = 1;
 
     public Supplier()
     {}
@@ -93,24 +94,38 @@ public class Supplier extends ApplicationObject
         this.fax = fax;
     }
 
-    public String getSpeciality()
+    public String getIndustry()
     {
-        return speciality;
+        return industry;
     }
 
-    public void setSpeciality(String speciality)
+    public void setIndustry(String industry)
     {
-        this.speciality = speciality;
+        this.industry = industry;
     }
 
     public boolean isActive()
     {
-        return active;
+        return getStatus()==STATUS_ACTIVE;
     }
 
     public void setActive(boolean active)
     {
-        this.active = active;
+        setStatus(active ? STATUS_ACTIVE : STATUS_INACTIVE);
+    }
+
+    @Override
+    public String getStatus_description()
+    {
+        switch (getStatus())
+        {
+            case STATUS_ACTIVE:
+                return "Active";
+            case STATUS_INACTIVE:
+                return "Inactive";
+            default:
+                return "Unknown";
+        }
     }
 
     public long getDate_partnered()
@@ -186,18 +201,18 @@ public class Supplier extends ApplicationObject
             return new String[]{"false", "invalid date_partnered value."};
         if(getAccount_name()==null)
             return new String[]{"false", "invalid account_name value."};
-        if(getWebsite()==null)
+        /*if(getWebsite()==null)
             return new String[]{"false", "invalid website value."};
         if(getPhysical_address()==null)
             return new String[]{"false", "invalid physical_address value."};
         if(getPostal_address()==null)
             return new String[]{"false", "invalid postal_address value."};
-        if(getSpeciality()==null)
-            return new String[]{"false", "invalid speciality value."};
+        if(getIndustry()==null)
+            return new String[]{"false", "invalid industry value."};
         if(getRegistration_number()==null)
             return new String[]{"false", "invalid registration_number value."};
         if(getVat_number()==null)
-            return new String[]{"false", "invalid vat_number value."};
+            return new String[]{"false", "invalid vat_number value."};*/
 
         return super.isValid();
     }
@@ -228,8 +243,8 @@ public class Supplier extends ApplicationObject
                 case "contact_email":
                     setContact_email((String)val);
                     break;
-                case "speciality":
-                    setSpeciality((String)val);
+                case "industry":
+                    setIndustry((String)val);
                     break;
                 case "registration_number":
                     setRegistration_number((String)val);
@@ -276,8 +291,8 @@ public class Supplier extends ApplicationObject
                 return getFax();
             case "contact_email":
                 return getContact_email();
-            case "speciality":
-                return getSpeciality();
+            case "industry":
+                return getIndustry();
             case "registration_number":
                 return getRegistration_number();
             case "vat_number":

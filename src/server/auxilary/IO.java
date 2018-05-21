@@ -1,15 +1,10 @@
 package server.auxilary;
 
+import org.springframework.boot.SpringApplication;
 import org.springframework.data.mongodb.core.MongoOperations;
 import server.AppConfig;
+import server.Server;
 import server.model.ApplicationObject;
-import javafx.application.Platform;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.layout.BorderPane;
-import javafx.stage.Stage;
-
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
@@ -17,6 +12,11 @@ import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
 import java.net.UnknownHostException;
 import java.security.MessageDigest;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.Month;
+import java.time.ZoneId;
+import java.util.AbstractMap;
 import java.util.Arrays;
 
 /**
@@ -55,6 +55,27 @@ public class IO<T extends ApplicationObject>
         for(int i=0;i<len;i++)
             str+=chars.charAt((int)(Math.floor(Math.random()*chars.length())));
         return str;
+    }
+
+    public static AbstractMap.SimpleEntry<Integer, LocalDateTime> isEpochSecondOrMilli(long epoch_date)
+    {
+        switch (String.valueOf(epoch_date).length())
+        {
+            case 10: // is using epoch seconds
+                return new AbstractMap.SimpleEntry<>(0, LocalDateTime.ofInstant(Instant.ofEpochSecond(epoch_date), ZoneId.systemDefault()));
+            case 13: // is using epoch millis
+                return new AbstractMap.SimpleEntry<>(1, LocalDateTime.ofInstant(Instant.ofEpochMilli(epoch_date), ZoneId.systemDefault()));
+            default:
+                IO.log(IO.class.getName(), IO.TAG_ERROR, "unknown date format ["+epoch_date+"] - should be epoch millis or epoch seconds.");
+                return new AbstractMap.SimpleEntry<>(3, LocalDateTime.of(1970, Month.JANUARY.getValue(), 1, 0, 0));
+        }
+    }
+
+    public static String getYyyyMMddFormmattedDate(LocalDateTime date)
+    {
+        return date.getYear() +
+                "-" + (date.getMonth().getValue() >= 10 ? date.getMonth().getValue() : "0" + String.valueOf((date.getMonth().getValue()))) +
+                "-" + (date.getDayOfMonth() >= 10 ? date.getDayOfMonth() : "0" + String.valueOf(date.getDayOfMonth()));
     }
 
     public static String getEncryptedHexString(String message) throws Exception
@@ -194,9 +215,141 @@ public class IO<T extends ApplicationObject>
         out.close();
     }
 
+    public static void initEnv()
+    {
+        try
+        {
+            if(RemoteComms.host == null)
+            {
+                String ip = IO.readAttributeFromConfig("SERVER_IP");
+                String port = IO.readAttributeFromConfig("SERVER_PORT");
+                if (ip != null && port != null)
+                {
+                    RemoteComms.host = "http://" + ip + ":" + port;
+                    IO.log(Server.class.getName(), IO.TAG_INFO, "setting host to: " + RemoteComms.host);
+                }
+                else
+                {
+                    IO.log(Server.class.getName(), IO.TAG_WARN, "attributes SERVER_IP and/or SERVER_PORT are not set in the config file.");
+                    return;
+                }
+            }
+
+            if(RemoteComms.DB_IP == null)
+            {
+                String db_ip = IO.readAttributeFromConfig("DB_IP");
+                if (db_ip != null)
+                {
+                    RemoteComms.DB_IP = db_ip;
+                    IO.log(Server.class.getName(), IO.TAG_INFO, "setting DB_IP to: " + db_ip);
+                }
+                else
+                {
+                    IO.log(Server.class.getName(), IO.TAG_WARN, "DB_IP attribute is not set in the config file.");
+                    return;
+                }
+            }
+
+            if(RemoteComms.DB_PORT == 0)
+            {
+                String db_port = IO.readAttributeFromConfig("DB_PORT");
+                if (db_port != null)
+                {
+                    RemoteComms.DB_PORT = Integer.parseInt(db_port);
+                    IO.log(Server.class.getName(), IO.TAG_INFO, "setting DB_PORT to: " + db_port);
+                }
+                else
+                {
+                    IO.log(Server.class.getName(), IO.TAG_WARN, "DB_PORT attribute is not set in the config file.");
+                    return;
+                }
+            }
+
+            if(RemoteComms.DB_NAME == null)
+            {
+                String db_name = IO.readAttributeFromConfig("DB_NAME");
+
+                if (db_name != null)
+                {
+                    RemoteComms.DB_NAME = db_name;
+                    IO.log(Server.class.getName(), IO.TAG_INFO, "setting DB_NAME to: " + db_name);
+                }
+                else
+                {
+                    IO.log(Server.class.getName(), IO.TAG_WARN, "DB_NAME attribute is not set in the config file.");
+                    return;
+                }
+            }
+
+            if(RemoteComms.TTL == 0)
+            {
+                String ttl = IO.readAttributeFromConfig("TTL");
+
+                if (ttl != null)
+                {
+                    RemoteComms.TTL = Integer.parseInt(ttl);
+                    IO.log(Server.class.getName(), IO.TAG_INFO, "setting TTL to: " + ttl);
+                }
+                else
+                {
+                    IO.log(Server.class.getName(), IO.TAG_WARN, "TTL attribute is not set in the config file.");
+                    return;
+                }
+            }
+
+            if(RemoteComms.SYSTEM_EMAIL == null)
+            {
+                String system_email = IO.readAttributeFromConfig("SYSTEM_EMAIL");
+                if (system_email != null)
+                {
+                    RemoteComms.SYSTEM_EMAIL = system_email;
+                    IO.log(Server.class.getName(), IO.TAG_INFO, "setting SYSTEM_EMAIL to: " + system_email);
+                }
+                else
+                {
+                    IO.log(Server.class.getName(), IO.TAG_WARN, "SYSTEM_EMAIL attribute is not set in the config file.");
+                    return;
+                }
+            }
+
+            if(RemoteComms.MAILJET_API_KEY == null)
+            {
+                String mailjet_api_key = IO.readAttributeFromConfig("MAILJET_API_KEY");
+                if (mailjet_api_key != null)
+                {
+                    RemoteComms.MAILJET_API_KEY = mailjet_api_key;
+                    IO.log(Server.class.getName(), IO.TAG_INFO, "setting MAILJET_API_KEY to: " + mailjet_api_key);
+                }
+                else
+                {
+                    IO.log(Server.class.getName(), IO.TAG_WARN, "MAILJET_API_KEY attribute is not set in the config file.");
+                    return;
+                }
+            }
+
+            if(RemoteComms.MAILJET_API_KEY_SECRET == null)
+            {
+                String mailjet_api_key_secret = IO.readAttributeFromConfig("MAILJET_API_KEY_SECRET");
+                if (mailjet_api_key_secret != null)
+                {
+                    RemoteComms.MAILJET_API_KEY_SECRET = mailjet_api_key_secret;
+                    IO.log(Server.class.getName(), IO.TAG_INFO, "setting MAILJET_API_KEY_SECRET to: " + mailjet_api_key_secret);
+                }
+                else
+                {
+                    IO.log(Server.class.getName(), IO.TAG_WARN, "MAILJET_API_KEY_SECRET attribute is not set in the config file.");
+                    return;
+                }
+            }
+        } catch (IOException e)
+        {
+            IO.log(Server.class.getName(), IO.TAG_ERROR, e.getMessage());
+        }
+    }
     public static String readAttributeFromConfig(String key) throws IOException
     {
         File f = new File("config.cfg");
+
         if(f.exists())
         {
             String s = "";
@@ -234,7 +387,7 @@ public class IO<T extends ApplicationObject>
             in.close();
 
             return msg.toString();
-        }else IO.logAndAlert(TAG, "could not read error stream from server response.", IO.TAG_ERROR);
+        }else IO.log(TAG, IO.TAG_ERROR, "could not read error stream from server response.");
         return null;
     }
 
@@ -262,53 +415,5 @@ public class IO<T extends ApplicationObject>
                 System.out.println(String.format("%s> %s: %s", src, tag, msg));
                 break;
         }
-    }
-
-    public static void showMessage(String title, String msg, String type)
-    {
-        Platform.runLater(() ->
-        {
-            Stage stage = new Stage();
-            stage.setTitle(title);
-            stage.setResizable(false);
-            stage.setAlwaysOnTop(true);
-            stage.centerOnScreen();
-
-            Label label = new Label(msg);
-            Button btn = new Button("Confirm");
-
-            BorderPane borderPane= new BorderPane();
-            borderPane.setTop(label);
-            borderPane.setCenter(btn);
-            //VBox vBox = new VBox(label, btn);
-            stage.setScene(new Scene(borderPane));
-
-            stage.show();
-
-            btn.setOnAction(event -> stage.close());
-
-            /*switch (type.toLowerCase())
-            {
-                case TAG_INFO:
-                    JOptionPane.showMessageDialog(null, msg, title, JOptionPane.INFORMATION_MESSAGE);
-                    break;
-                case TAG_WARN:
-                    JOptionPane.showMessageDialog(null, msg, title, JOptionPane.WARNING_MESSAGE);
-                    break;
-                case TAG_ERROR:
-                    JOptionPane.showMessageDialog(null, msg, title, JOptionPane.ERROR_MESSAGE);
-                    break;
-                default:
-                    System.err.println("IO> unknown message type '" + type + "'");
-                    JOptionPane.showMessageDialog(null, msg, title, JOptionPane.PLAIN_MESSAGE);
-                    break;
-            }*/
-        });
-    }
-
-    public static void logAndAlert(String title, String msg, String type)
-    {
-        log(title, type, msg);
-        showMessage(title, msg, type);
     }
 }

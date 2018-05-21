@@ -23,8 +23,9 @@ public class Employee extends ApplicationObject
     private String tel;
     private String cell;
     private int access_level;
-    private boolean active;
     public static final String TAG = "Employee";
+    public static final int STATUS_INACTIVE = 0;
+    public static final int STATUS_ACTIVE = 1;
 
     public Employee()
     {}
@@ -79,12 +80,12 @@ public class Employee extends ApplicationObject
 
     public boolean isActive()
     {
-        return active;
+        return getStatus()==STATUS_ACTIVE;
     }
 
     public void setActive(boolean active)
     {
-        this.active = active;
+        setStatus(active ? STATUS_ACTIVE : STATUS_INACTIVE);
     }
 
     public String getFirstname()
@@ -167,14 +168,13 @@ public class Employee extends ApplicationObject
             return new String[]{"false", "invalid lastname value."};
         if(getCell()==null)
             return new String[]{"false", "invalid cell value."};
-        if(getTel()==null)
-            return new String[]{"false", "invalid tel value."};
+        // if(getTel()==null)
+        //     return new String[]{"false", "invalid tel value."};
         if(getEmail()==null)
             return new String[]{"false", "invalid email value."};
-        if(getGender()==null)
-            return new String[]{"false", "invalid gender value."};
-        //purposely left out creator
-        if(getAccess_level()<0)
+        // if(getGender()==null)
+        //    return new String[]{"false", "invalid gender value."};
+        if(getAccess_level()<0) // access level verification is handled by the EmployeeController, TODO: move checks here
             return new String[]{"false", "invalid access_level value."};
         if(getDate_logged()<=0)
             return new String[]{"false", "invalid date_logged value."};
@@ -252,7 +252,7 @@ public class Employee extends ApplicationObject
                 case "cell":
                     return cell;
                 case "active":
-                    return active;
+                    return isActive();
                 default:
                     IO.log(TAG, IO.TAG_WARN, String.format("unknown "+getClass().getName()+" attribute '%s'", var));
                     return null;
@@ -272,6 +272,6 @@ public class Employee extends ApplicationObject
     @Override
     public String apiEndpoint()
     {
-        return "/usr";
+        return "/employee";
     }
 }

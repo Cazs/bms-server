@@ -61,14 +61,14 @@ public class JobController extends APIController
         return patchBusinessObject(job, session_id, "jobs", "jobs_timestamp");
     }
 
-    @PostMapping(value = "/job/mailto")
-    public ResponseEntity<String> emailJob(@RequestHeader String _id, @RequestHeader String session_id,
-                                             @RequestHeader String message, @RequestHeader String subject,
-                                             @RequestHeader String destination, @RequestBody Metafile metafile)
-    {
-        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling handling mailto request.");
-        return emailBusinessObject(_id, session_id, message, subject, destination, metafile, Job.class);
-    }
+//    @PostMapping(value = "/job/mailto")
+//    public ResponseEntity<String> emailJob(@RequestHeader String _id, @RequestHeader String session_id,
+//                                             @RequestHeader String message, @RequestHeader String subject,
+//                                             @RequestHeader String destination, @RequestBody Metafile metafile)
+//    {
+//        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling handling mailto request.");
+//        return emailBusinessObject(_id, session_id, message, subject, destination, metafile, Job.class);
+//    }
 
     @PostMapping(value = "/job/approval_request")
     public ResponseEntity<String> requestJobApproval(@RequestHeader String job_id, @RequestHeader String session_id,

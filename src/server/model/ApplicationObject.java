@@ -1,11 +1,15 @@
 package server.model;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.rest.core.annotation.RestResource;
 import server.auxilary.AccessLevel;
 import server.auxilary.IO;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.AbstractMap;
 
 /**
  * Created by th3gh0st on 2017/12/23
@@ -16,14 +20,18 @@ public abstract class ApplicationObject implements Serializable
     @Id
     @RestResource(exported = true)
     private String _id;
+    private long object_number;
     private long date_logged;
     private String creator;
-    private long object_number;
+    private String authoriser;
+    private int status;
     private String other;
     private boolean marked;
-    public static final int STATUS_PENDING =0;
-    public static final int STATUS_FINALISED =1;
-    public static final int STATUS_ARCHIVED =2;
+    public static final int STATUS_PENDING = 0;
+    public static final int STATUS_AUTHORISED = 1;
+    public static final int STATUS_ARCHIVED = 2;
+    public static final int STATUS_INVISIBLE = 3;
+    public static final int VAT = 15;
 
     public abstract AccessLevel getReadMinRequiredAccessLevel();
 
@@ -47,6 +55,16 @@ public abstract class ApplicationObject implements Serializable
         this._id = _id;
     }
 
+    public long getObject_number()
+    {
+        return object_number;
+    }
+
+    public void setObject_number(long object_number)
+    {
+        this.object_number = object_number;
+    }
+
     public boolean isMarked()
     {
         return this.marked;
@@ -64,6 +82,15 @@ public abstract class ApplicationObject implements Serializable
         this.date_logged = date_logged;
     }
 
+    public String getLogged_date()
+    {
+        // return date.format(DateTimeFormatter.BASIC_ISO_DATE);
+        AbstractMap.SimpleEntry<Integer, LocalDateTime> date_map = IO.isEpochSecondOrMilli(getDate_logged());
+        LocalDateTime date = date_map.getValue();
+
+        return IO.getYyyyMMddFormmattedDate(date);
+    }
+
     public String getCreator()
     {
         return this.creator;
@@ -74,14 +101,67 @@ public abstract class ApplicationObject implements Serializable
         this.creator = creator;
     }
 
-    public long getObject_number()
+    public String getCreator_name()
     {
-        return object_number;
+        Employee employee = getCreator_employee();
+        if(employee!=null)
+            return employee.getName();
+        return getCreator();// fallback to username
     }
 
-    public void setObject_number(long object_number)
+    public Employee getCreator_employee()
     {
-        this.object_number = object_number;
+        return IO.getInstance().mongoOperations().findOne(new Query(Criteria.where("usr").is(getCreator())), Employee.class, "employees");
+    }
+
+    public String getAuthoriser()
+    {
+        return this.authoriser;
+    }
+
+    public void setAuthoriser(String creator)
+    {
+        this.authoriser = authoriser;
+    }
+
+    public Employee getAuthoriser_employee()
+    {
+        return IO.getInstance().mongoOperations().findOne(new Query(Criteria.where("usr").is(getAuthoriser())), Employee.class, "employees");
+    }
+
+    public String getAuthoriser_name()
+    {
+        Employee employee = getAuthoriser_employee();
+        if(employee!=null)
+            return employee.getName();
+        else if(getAuthoriser() != null)
+            return getAuthoriser();
+        else return "N/A";
+    }
+
+    public int getStatus()
+    {
+        return status;
+    }
+
+    public void setStatus(int status)
+    {
+        this.status = status;
+    }
+
+    public String getStatus_description()
+    {
+        switch (getStatus())
+        {
+            case ApplicationObject.STATUS_PENDING:
+                return "Pending";
+            case ApplicationObject.STATUS_AUTHORISED:
+                return "Authorized";
+            case ApplicationObject.STATUS_ARCHIVED:
+                return "Archived";
+            default:
+                return "Unknown";
+        }
     }
 
     public String getOther()
@@ -104,6 +184,9 @@ public abstract class ApplicationObject implements Serializable
             case "creator":
                 creator = String.valueOf(val);
                 break;
+            case "status":
+                status = Integer.parseInt(String.valueOf(val));
+                break;
             case "other":
                 other = String.valueOf(val);
                 break;
@@ -124,6 +207,8 @@ public abstract class ApplicationObject implements Serializable
                 return getDate_logged();
             case "creator":
                 return getCreator();
+            case "status":
+                return getStatus();
             case "marked":
                 return isMarked();
             case "other":

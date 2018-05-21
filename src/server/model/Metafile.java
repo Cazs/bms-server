@@ -11,11 +11,8 @@ import server.auxilary.IO;
 public class Metafile extends ApplicationObject
 {
     private String filename;
-    private String label;
-    private String path;
     private String content_type;
     private String file;//Base64 String representation of file
-    //TODO: private String extra;//{"logo_options":{}, "required":false}
     public static final String TAG = "Metafile";
 
     public Metafile()
@@ -48,26 +45,6 @@ public class Metafile extends ApplicationObject
         this.filename = filename;
     }
 
-    public String getLabel()
-    {
-        return label;
-    }
-
-    public void setLabel(String label)
-    {
-        this.label = label;
-    }
-
-    public String get_path()
-    {
-        return path;
-    }
-
-    public void set_path(String path)
-    {
-        this.path = path;
-    }
-
     public String getContent_type()
     {
         return content_type;
@@ -93,10 +70,6 @@ public class Metafile extends ApplicationObject
     {
         if(getFilename()==null)
             return new String[]{"false", "invalid filename value."};
-        if(getLabel()==null)
-            return new String[]{"false", "invalid label value."};
-        if(get_path()==null)
-            return new String[]{"false", "invalid path value."};
         if(getContent_type()==null)
             return new String[]{"false", "invalid content_type value."};
 
@@ -109,20 +82,23 @@ public class Metafile extends ApplicationObject
         super.parse(var, val);
         switch (var.toLowerCase())
         {
-            case "filename":
-                filename = (String)val;
-                break;
-            case "label":
-                label=(String)val;
+            case "description":
+            case "documentDescription":
+            case "document_description":
+            case "fileDescription":
+            case "file_description":
+                setOther((String)val);
                 break;
             case "path":
-                path=(String)val;
+            case "filename":
+                setFilename((String)val);
                 break;
+            case "contentType":
             case "content_type":
-                content_type=(String)val;
+                setContent_type((String)val);
                 break;
             case "file":
-                file=(String)val;
+                setFile((String)val);
                 break;
             default:
                 IO.log(TAG, IO.TAG_ERROR, "unknown "+TAG+" attribute '" + var + "'");
@@ -138,16 +114,20 @@ public class Metafile extends ApplicationObject
         {
             switch (var.toLowerCase())
             {
-                case "filename":
-                    return filename;
-                case "label":
-                    return label;
                 case "path":
-                    return path;
+                case "filename":
+                    return getFilename();
+                case "contentType":
                 case "content_type":
-                    return content_type;
+                    return getContent_type();
                 case "file":
-                    return file;
+                    return getFile();
+                case "description":
+                case "documentDescription":
+                case "document_description":
+                case "fileDescription":
+                case "file_description":
+                    return getOther();
                 default:
                     return null;
             }

@@ -61,14 +61,14 @@ public class OvertimeController extends APIController
         return patchBusinessObject(overtime, session_id, "overtime_applications", "overtime_applications_timestamp");
     }
 
-    @PostMapping(value = "/overtime_application/mailto")
-    public ResponseEntity<String> emailOvertime(@RequestHeader String _id, @RequestHeader String session_id,
-                                             @RequestHeader String message, @RequestHeader String subject,
-                                             @RequestHeader String destination, @RequestBody Metafile metafile)
-    {
-        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Overtime Application mailto request.");
-        return emailBusinessObject(_id, session_id, message, subject, destination, metafile, Overtime.class);
-    }
+//    @PostMapping(value = "/overtime_application/mailto")
+//    public ResponseEntity<String> emailOvertime(@RequestHeader String _id, @RequestHeader String session_id,
+//                                             @RequestHeader String message, @RequestHeader String subject,
+//                                             @RequestHeader String destination, @RequestBody Metafile metafile)
+//    {
+//        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Overtime Application mailto request.");
+//        return emailBusinessObject(_id, session_id, message, subject, destination, metafile, Overtime.class);
+//    }
 
     @PostMapping(value = "/overtime_application/approval_request")
     public ResponseEntity<String> requestOvertimeApproval(@RequestHeader String overtime_record_id,

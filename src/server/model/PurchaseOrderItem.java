@@ -1,6 +1,9 @@
 package server.model;
 
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import server.auxilary.AccessLevel;
+import server.auxilary.Globals;
 import server.auxilary.IO;
 
 /**
@@ -15,7 +18,6 @@ public abstract class PurchaseOrderItem extends ApplicationObject
     private int quantity;
     private double discount;
     private double cost;
-    private String type;
 
     public PurchaseOrderItem()
     {}
@@ -57,16 +59,6 @@ public abstract class PurchaseOrderItem extends ApplicationObject
         this.purchase_order_id = purchase_order_id;
     }
 
-    public String getType()
-    {
-        return type;
-    }
-
-    public void setType(String type)
-    {
-        this.type = type;
-    }
-
     public String getItem_id()
     {
         return item_id;
@@ -104,6 +96,38 @@ public abstract class PurchaseOrderItem extends ApplicationObject
         this.discount = discount;
     }
 
+    public Resource getItem()
+    {
+        return IO.getInstance().mongoOperations().findOne(new Query(Criteria.where("_id").is(getItem_id())), Resource.class, "resources");
+    }
+
+    public String getUnit()
+    {
+        Resource res = IO.getInstance().mongoOperations().findOne(new Query(Criteria.where("_id").is(getItem_id())), Resource.class, "resources");
+        if(res!=null)
+            return res.getUnit();
+        return "N/A";
+    }
+
+    public String getItem_description()
+    {
+        Resource res = IO.getInstance().mongoOperations().findOne(new Query(Criteria.where("_id").is(getItem_id())), Resource.class, "resources");
+        if(res!=null)
+            return res.getResource_description();
+        return "N/A";
+    }
+
+    public double getRate()
+    {
+        return getCost() - (getCost() * getDiscount()/100);
+    }
+
+    public String getTotal()
+    {
+        double total = getRate()*getQuantity();
+        return Globals.CURRENCY_SYMBOL.getValue() + " " + total;
+    }
+
     @Override
     public String[] isValid()
     {
@@ -113,8 +137,6 @@ public abstract class PurchaseOrderItem extends ApplicationObject
             return new String[]{"false", "invalid item_number value."};
         if(getPurchase_order_id()==null)
             return new String[]{"false", "invalid purchase_order_id value."};
-        if(getType()==null)
-            return new String[]{"false", "invalid type value."};
         if(getCost()<0)
             return new String[]{"false", "invalid cost value."};
         if(getDiscount()<0)

@@ -1,5 +1,7 @@
 package server.model;
 
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import server.auxilary.AccessLevel;
 import server.auxilary.IO;
 
@@ -62,6 +64,21 @@ public class JobEmployee extends ApplicationObject
     public void setUsr(String usr)
     {
         this.usr = usr;
+    }
+
+    public Employee getEmployee()
+    {
+        return IO.getInstance().mongoOperations().findOne(new Query(Criteria.where("usr").is(getUsr())), Employee.class, "employees");
+    }
+
+    public Task getTask()
+    {
+        return IO.getInstance().mongoOperations().findOne(new Query(Criteria.where("task_id").is(getTask_id())), Task.class, "tasks");
+    }
+
+    public Job getJob()
+    {
+        return IO.getInstance().mongoOperations().findOne(new Query(Criteria.where("job_id").is(getJob_id())), Job.class, "jobs");
     }
 
     @Override

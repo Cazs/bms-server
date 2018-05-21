@@ -1,7 +1,11 @@
 package server.model;
 
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import server.auxilary.AccessLevel;
 import server.auxilary.IO;
+
+import java.util.List;
 
 /**
  * Created by th3gh0st on 2017/12/23.
@@ -14,7 +18,6 @@ public class PurchaseOrder extends ApplicationObject
     private String contact_person_id;
     private double vat;
     private String account_name;
-    private int status;
     public static final String TAG = "PurchaseOrder";
 
     public PurchaseOrder()
@@ -87,14 +90,42 @@ public class PurchaseOrder extends ApplicationObject
         this.account_name = account_name;
     }
 
-    public int getStatus()
+    public Supplier getSupplier()
     {
-        return status;
+        return IO.getInstance().mongoOperations().findOne(new Query(Criteria.where("_id").is(getSupplier_id())), Supplier.class, "suppliers");
     }
 
-    public void setStatus(int status)
+    public String getSupplier_name()
     {
-        this.status = status;
+        Supplier supplier = getSupplier();
+        if(supplier!=null)
+            return supplier.getSupplier_name();
+        else return getSupplier_id();
+    }
+
+    public Employee getContact()
+    {
+        return IO.getInstance().mongoOperations().findOne(new Query(Criteria.where("usr").is(getContact_person_id())), Employee.class, "employees");
+    }
+
+    public String getContact_person()
+    {
+        Employee person = getContact();
+        if(person!=null)
+            return person.getName();
+        return getContact_person_id();
+    }
+
+    public PurchaseOrderItem[] getResources()
+    {
+        PurchaseOrderItem[] arr = new PurchaseOrderItem[0];
+        List contents = IO.getInstance().mongoOperations().find(new Query(Criteria.where("purchase_order_id").is(get_id())), PurchaseOrderItem.class, "purchase_order_resources");
+        if(contents!=null)
+        {
+            arr = new PurchaseOrderItem[contents.size()];
+            contents.toArray(arr);
+        }
+        return arr;
     }
 
     @Override
@@ -110,8 +141,8 @@ public class PurchaseOrder extends ApplicationObject
             return new String[]{"false", "invalid vat value."};
         if(getPo_number()<0)
             return new String[]{"false", "invalid po_number value."};
-        /*if(getStatus()<0)
-            return new String[]{"false", "invalid status value."};*/
+        if(getStatus()<0)
+            return new String[]{"false", "invalid status value."};
 
         return super.isValid();
     }
@@ -141,9 +172,6 @@ public class PurchaseOrder extends ApplicationObject
                     break;
                 case "date_logged":
                     setDate_logged(Long.valueOf((String)val));
-                    break;
-                case "status":
-                    setStatus(Integer.valueOf(String.valueOf(val)));
                     break;
                 case "creator":
                     setCreator((String)val);
@@ -177,8 +205,6 @@ public class PurchaseOrder extends ApplicationObject
                 return getDate_logged();
             case "creator":
                 return getCreator();
-            case "status":
-                return getStatus();
         }
         return super.get(var);
     }

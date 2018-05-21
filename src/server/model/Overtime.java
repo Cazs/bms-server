@@ -3,6 +3,9 @@ package server.model;
 import server.auxilary.AccessLevel;
 import server.auxilary.IO;
 
+import java.time.LocalDateTime;
+import java.util.AbstractMap;
+
 /**
  * Created by th3gh0st on 2017/12/22.
  * @author th3gh0st
@@ -15,7 +18,6 @@ public class Overtime extends ApplicationObject
     private long date;
     private long time_in;
     private long time_out;
-    private int status;
     public static final String TAG = "Overtime";
 
     public Overtime()
@@ -68,6 +70,15 @@ public class Overtime extends ApplicationObject
         this.date = date;
     }
 
+    public String getOvertime_date()
+    {
+        // return date.format(DateTimeFormatter.BASIC_ISO_DATE);
+        AbstractMap.SimpleEntry<Integer, LocalDateTime> date_map = IO.isEpochSecondOrMilli(getDate());
+        LocalDateTime date = date_map.getValue();
+
+        return IO.getYyyyMMddFormmattedDate(date);
+    }
+
     public long getTime_in()
     {
         return time_in;
@@ -76,6 +87,16 @@ public class Overtime extends ApplicationObject
     public void setTime_in(long time_in)
     {
         this.time_in = time_in;
+    }
+
+    public String getIn_time()
+    {
+        // TODO: fix this
+        // return date.format(DateTimeFormatter.BASIC_ISO_DATE);
+        AbstractMap.SimpleEntry<Integer, LocalDateTime> date_map = IO.isEpochSecondOrMilli(getTime_in());
+        LocalDateTime date = date_map.getValue();
+
+        return IO.getYyyyMMddFormmattedDate(date);
     }
 
     public long getTime_out()
@@ -88,14 +109,14 @@ public class Overtime extends ApplicationObject
         this.time_out = time_out;
     }
 
-    public int getStatus()
+    public String getOut_time()
     {
-        return status;
-    }
+        // TODO: fix this
+        // return date.format(DateTimeFormatter.BASIC_ISO_DATE);
+        AbstractMap.SimpleEntry<Integer, LocalDateTime> date_map = IO.isEpochSecondOrMilli(getTime_out());
+        LocalDateTime date = date_map.getValue();
 
-    public void setStatus(int status)
-    {
-        this.status= status;
+        return IO.getYyyyMMddFormmattedDate(date);
     }
 
     @Override
@@ -143,9 +164,6 @@ public class Overtime extends ApplicationObject
                 case "time_out":
                     setTime_out(Long.parseLong(String.valueOf(val)));
                     break;
-                case "status":
-                    setStatus(Integer.parseInt(String.valueOf(val)));
-                    break;
                 default:
                     IO.log(getClass().getName(), IO.TAG_ERROR, "Unknown "+getClass().getName()+" attribute '" + var + "'.");
                     break;
@@ -173,8 +191,6 @@ public class Overtime extends ApplicationObject
                 return getTime_in();
             case "time_out":
                 return getTime_out();
-            case "status":
-                return getStatus();
         }
         return super.get(var);
     }

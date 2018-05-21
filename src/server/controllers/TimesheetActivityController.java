@@ -60,14 +60,14 @@ public class TimesheetActivityController extends APIController
         return patchBusinessObject(timesheetActivity, session_id, "timesheet_activities", "timesheet_activities_timestamp");
     }
 
-    @PostMapping(value = "/timesheet/activity/mailto")
-    public ResponseEntity<String> emailTimesheetActivity(@RequestHeader String _id, @RequestHeader String session_id,
-                                             @RequestHeader String message, @RequestHeader String subject,
-                                             @RequestHeader String destination, @RequestBody Metafile metafile)
-    {
-        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling TimesheetActivity mailto request.");
-        return emailBusinessObject(_id, session_id, message, subject, destination, metafile, TimesheetActivity.class);
-    }
+//    @PostMapping(value = "/timesheet/activity/mailto")
+//    public ResponseEntity<String> emailTimesheetActivity(@RequestHeader String _id, @RequestHeader String session_id,
+//                                             @RequestHeader String message, @RequestHeader String subject,
+//                                             @RequestHeader String destination, @RequestBody Metafile metafile)
+//    {
+//        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling TimesheetActivity mailto request.");
+//        return emailBusinessObject(_id, session_id, message, subject, destination, metafile, TimesheetActivity.class);
+//    }
 
     @PostMapping(value = "/timesheet/activity/approval_request")
     public ResponseEntity<String> requestTimesheetActivityApproval(@RequestHeader String timesheet_activity_id, @RequestHeader String session_id,

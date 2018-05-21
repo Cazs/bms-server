@@ -3,6 +3,9 @@ package server.model;
 import server.auxilary.AccessLevel;
 import server.auxilary.IO;
 
+import java.time.LocalDateTime;
+import java.util.AbstractMap;
+
 /**
  * Created by th3gh0st on 2017/12/22.
  * @author th3gh0st
@@ -14,7 +17,6 @@ public class Leave extends ApplicationObject
     private long start_date;
     private long end_date;
     private long return_date;
-    private int status;
     private String type;
     public static final String TAG = "Leave";
     public static String[] TYPES = {"ANNUAL", "SICK", "UNPAID", "FAMILY RESPONSIBILITY - See BCEA for definition"};
@@ -59,6 +61,15 @@ public class Leave extends ApplicationObject
         this.start_date = date;
     }
 
+    public String getDate_started()
+    {
+        // return date.format(DateTimeFormatter.BASIC_ISO_DATE);
+        AbstractMap.SimpleEntry<Integer, LocalDateTime> date_map = IO.isEpochSecondOrMilli(getStart_date());
+        LocalDateTime date = date_map.getValue();
+
+        return IO.getYyyyMMddFormmattedDate(date);
+    }
+
     public long getEnd_date()
     {
         return end_date;
@@ -67,6 +78,15 @@ public class Leave extends ApplicationObject
     public void setEnd_date(long date)
     {
         this.end_date = date;
+    }
+
+    public String getDate_ended()
+    {
+        // return date.format(DateTimeFormatter.BASIC_ISO_DATE);
+        AbstractMap.SimpleEntry<Integer, LocalDateTime> date_map = IO.isEpochSecondOrMilli(getEnd_date());
+        LocalDateTime date = date_map.getValue();
+
+        return IO.getYyyyMMddFormmattedDate(date);
     }
 
     public long getReturn_date()
@@ -79,14 +99,13 @@ public class Leave extends ApplicationObject
         this.return_date = date;
     }
 
-    public int getStatus()
+    public String getDate_returned()
     {
-        return status;
-    }
+        // return date.format(DateTimeFormatter.BASIC_ISO_DATE);
+        AbstractMap.SimpleEntry<Integer, LocalDateTime> date_map = IO.isEpochSecondOrMilli(getReturn_date());
+        LocalDateTime date = date_map.getValue();
 
-    public void setStatus(int status)
-    {
-        this.status= status;
+        return IO.getYyyyMMddFormmattedDate(date);
     }
 
     public String getType()
@@ -137,9 +156,6 @@ public class Leave extends ApplicationObject
                 case "return_date":
                     setReturn_date(Long.parseLong(String.valueOf(val)));
                     break;
-                case "status":
-                    setStatus(Integer.parseInt(String.valueOf(val)));
-                    break;
                 case "type":
                     setType((String)val);
                     break;
@@ -168,8 +184,6 @@ public class Leave extends ApplicationObject
                 return getReturn_date();
             case "date_logged":
                 return getDate_logged();
-            case "status":
-                return getStatus();
             case "type":
                 return getType();
         }

@@ -34,20 +34,19 @@ import java.util.List;
 @RequestMapping("/")
 public class APIController
 {
-    public ResponseEntity<String> emailBusinessObject(String _id,
+    public static ResponseEntity<String> emailBusinessObject(String _id,
                                                       String session_id,
                                                       String message,
                                                       String subject,
                                                       String destination,
-                                                      Metafile metafile,
-                                                      Class model)//, @RequestParam("file") MultipartFile file
+                                                      Metafile metafile)//, @RequestParam("file") MultipartFile file
     {
         if(metafile ==null)
             return new ResponseEntity<>("Invalid attached Metafile object.", HttpStatus.CONFLICT);
         if(session_id!=null)
         {
-            Session user_session = SessionManager.getInstance().getUserSession(session_id);
-            if(user_session!=null)
+            // Session user_session = SessionManager.getInstance().getUserSession(session_id);
+            // if(user_session!=null)
             {
                 if(_id!=null)
                 {
@@ -71,9 +70,9 @@ public class APIController
                             IO.log(APIController.class.getName(), IO.TAG_ERROR, e.getMessage());
                             return new ResponseEntity<>("Could not send eMail: "+e.getMessage(), HttpStatus.CONFLICT);
                         }
-                    } else return new ResponseEntity<>("Invalid attached ApplicationObject{"+model.getName()+"["+_id+"]} PDF", HttpStatus.CONFLICT);
+                    } else return new ResponseEntity<>("Invalid attachment.", HttpStatus.CONFLICT);
                 } else return new ResponseEntity<>("Invalid _id param", HttpStatus.CONFLICT);
-            } else return new ResponseEntity<>("Invalid user session. Please log in.", HttpStatus.CONFLICT);
+            } // else return new ResponseEntity<>("Invalid user session. Please log in.", HttpStatus.CONFLICT);
         } else return new ResponseEntity<>("Invalid session_id header param", HttpStatus.CONFLICT);
     }
 
@@ -174,7 +173,7 @@ public class APIController
                         IO.log(APIController.class.getName(), IO.TAG_INFO, "valid ApplicationObject{"+model+"["+_id+"]} approval credentials. Updating status.");
 
                         ApplicationObject applicationObject = applicationObjects.get(0);
-                        applicationObject.parse("status", ApplicationObject.STATUS_FINALISED);
+                        applicationObject.parse("status", ApplicationObject.STATUS_AUTHORISED);
                         HttpStatus status = patchBusinessObject(applicationObject, "", collection, collection_timestamp).getStatusCode();
 
                         if(status==HttpStatus.OK)
@@ -302,18 +301,18 @@ public class APIController
                 return new ResponseEntity("You are not authorised to READ " + object.getClass().getSimpleName() + " objects. Minimum read requirement is " + object.getReadMinRequiredAccessLevel(), HttpStatus.UNAUTHORIZED);
             }
 
-            IO.log(APIController.class.getName(), IO.TAG_INFO, "querying object ["+ object.get_id() + "] of type [" + object.getClass().getName()+"] from collection ["+collection+"]");
+            IO.log(APIController.class.getName(), IO.TAG_INFO, "querying all objects of type [" + object.getClass().getName()+"] from collection ["+collection+"]");
 
             List<? extends ApplicationObject> contents = IO.getInstance().mongoOperations().findAll(object.getClass(), collection);
             if(contents!=null)
                 if(contents.size()>0)
                     return new ResponseEntity(pagedResourcesAssembler.toResource(new PageImpl(contents, pageRequest, contents.size()), (ResourceAssembler) persistentEntityResourceAssembler), HttpStatus.OK);
+            return new ResponseEntity("No "+object.getClass().getSimpleName()+" objects were found in the database.", HttpStatus.NO_CONTENT);
         } else
         {
             IO.log(APIController.class.getName(), IO.TAG_ERROR, "Invalid object. Should create an empty ApplicationObject.");
             return new ResponseEntity("Invalid object. Should create an empty ApplicationObject.", HttpStatus.CONFLICT);
         }
-        return new ResponseEntity("No BusinessObjects were found in the database.", HttpStatus.CONFLICT);
     }
 
     public ResponseEntity<String> putBusinessObject(ApplicationObject applicationObject,
@@ -331,29 +330,38 @@ public class APIController
                 return patchBusinessObject(applicationObject, session_id, collection, collection_timestamp);
             }
 
-            //get session from session_id
-            Session session = SessionManager.getInstance().getUserSession(session_id);
-            if(session==null)
+            if(applicationObject instanceof Employee)
             {
-                IO.log(APIController.class.getName(),IO.TAG_ERROR, "putBusinessObject()> no sessions associated with session ["+session_id+"] were found.");
-                return new ResponseEntity<>("Not a valid session", HttpStatus.CONFLICT);
-            }
-
-            Employee employee = session.getEmployee();
-
-            if(employee==null)
+                // user creation, skip session & creator checks
+                // TODO: review this, allow Employee objects to has creators
+            }else
             {
-                IO.log(APIController.class.getName(), IO.TAG_ERROR, "putBusinessObject()> no employees associated with session ["+session_id+"] were found.");
-                return new ResponseEntity<>("Not a valid session.", HttpStatus.CONFLICT);
-            }
+                //get session from session_id
+                Session session = SessionManager.getInstance().getUserSession(session_id);
+                if (session == null)
+                {
+                    IO.log(APIController.class.getName(), IO.TAG_ERROR, "putBusinessObject()> no sessions associated with session [" + session_id + "] were found.");
+                    return new ResponseEntity<>("Not a valid session", HttpStatus.CONFLICT);
+                }
 
-            //check if employee is authorised to create objects of this type
-            if(employee.getAccess_level() < applicationObject.getWriteMinRequiredAccessLevel().getLevel())
-            {
-                IO.log(APIController.class.getName(), IO.TAG_ERROR, "putBusinessObject()> employee ["+employee.getName()
-                        +"]{current="+AccessLevel.values()[employee.getAccess_level()]+"} is not authorised to create " + applicationObject.getClass().getName() + "{required="+ applicationObject.getWriteMinRequiredAccessLevel()+"} objects.");
-                return new ResponseEntity<>("You are not authorised to CREATE " + applicationObject.getClass().getSimpleName() + " objects. Minimum write requirement is " + applicationObject.getWriteMinRequiredAccessLevel(), HttpStatus.UNAUTHORIZED);
+                Employee employee = session.getEmployee();
+
+                if (employee == null)
+                {
+                    IO.log(APIController.class.getName(), IO.TAG_ERROR, "putBusinessObject()> no employees associated with session [" + session_id + "] were found.");
+                    return new ResponseEntity<>("Not a valid session.", HttpStatus.CONFLICT);
+                }
+
+                //check if employee is authorised to create objects of this type
+                if (employee.getAccess_level() < applicationObject.getWriteMinRequiredAccessLevel().getLevel())
+                {
+                    IO.log(APIController.class.getName(), IO.TAG_ERROR, "putBusinessObject()> employee [" + employee.getName()
+                            + "]{current=" + AccessLevel.values()[employee.getAccess_level()] + "} is not authorised to create " + applicationObject.getClass().getName() + "{required=" + applicationObject.getWriteMinRequiredAccessLevel() + "} objects.");
+                    return new ResponseEntity<>("You are not authorised to CREATE " + applicationObject.getClass().getSimpleName() + " objects. Minimum write requirement is " + applicationObject.getWriteMinRequiredAccessLevel(), HttpStatus.UNAUTHORIZED);
+                }
             }
+            // TODO: remove below
+            // applicationObject.setCreator("jivesh");
 
             IO.log(APIController.class.getName(), IO.TAG_INFO, "attempting to create new ApplicationObject ["+ applicationObject.getClass().getName()+"]: "+ applicationObject.toString()+"");
 

@@ -5,9 +5,14 @@
  */
 package server.model;
 
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.rest.core.annotation.RestResource;
 import server.auxilary.AccessLevel;
 import server.auxilary.IO;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by th3gh0st on 2018/03/15.
@@ -22,8 +27,9 @@ public class Task extends ApplicationObject
     private String job_id;
     private String description;
     private String location;
-    private int status;
-    private String assignees;
+    public static final int STATUS_PENDING = 0;
+    public static final int STATUS_STARTED = 1;
+    public static final int STATUS_COMPLETE = 2;
 
     public Task()
     {}
@@ -81,19 +87,26 @@ public class Task extends ApplicationObject
 
     public void setDate_scheduled(long date_scheduled) {this.date_scheduled = date_scheduled;}
 
-    public boolean isCompleted()
+    public boolean isComplete()
     {
-        return (date_completed>0 && status== STATUS_FINALISED);
+        // return (date_completed>0 && status== STATUS_AUTHORISED);
+        return getStatus() == STATUS_COMPLETE;
     }
 
-    public int getStatus()
+    @Override
+    public String getStatus_description()
     {
-        return status;
-    }
-
-    public void setStatus(int status)
-    {
-        this.status = status;
+        switch (getStatus())
+        {
+            case STATUS_PENDING:
+                return "Pending";
+            case STATUS_STARTED:
+                return "Started";
+            case STATUS_COMPLETE:
+                return "Completed";
+            default:
+                return "Unknown";
+        }
     }
 
     public String getDescription()
@@ -126,14 +139,38 @@ public class Task extends ApplicationObject
         this.job_id = job_id;
     }
 
-    public String getAssignees()
+    public Employee[] getAssignees()
     {
-        return assignees;
+        Employee[] employees_arr = new Employee[]{}; // for JavaScript based clients
+
+        List<JobEmployee> contents = IO.getInstance().mongoOperations().find(new Query(Criteria.where("task_id").is(get_id())), JobEmployee.class, "job_employees");
+        ArrayList<Employee> employees_list = new ArrayList<>();
+        if(contents!=null)
+        {
+            if(employees_list.size() > 0)
+            {
+                System.out.println("Task: " + get_id() + " has " + employees_list.size() + " assignees");
+                for (JobEmployee jobEmployee : contents)
+                    employees_list.add(jobEmployee.getEmployee());
+
+                employees_arr = new Employee[employees_list.size()];
+                employees_list.toArray(employees_arr);
+            }
+        }
+
+        return employees_arr;
     }
 
-    public void setAssignees(String assignees)
+    public String[] getAssignee_names()
     {
-        this.assignees=assignees;
+        Employee[] assignees = getAssignees();
+        if(assignees != null && assignees.length>0)
+        {
+            String[] assignee_names = new String[assignees.length];
+            System.arraycopy(assignees, 0, assignee_names, 0, assignees.length); // will call Employee.toString() which in turn calls getName()
+            return assignee_names;
+        }
+        return new String[]{};// for JavaScript based clients
     }
 
     @Override
@@ -181,9 +218,6 @@ public class Task extends ApplicationObject
                 case "job_id":
                     job_id = (String)val;
                     break;
-                case "status":
-                    status = Integer.parseInt(String.valueOf(val));
-                    break;
                 case "date_scheduled":
                     date_scheduled = Long.parseLong(String.valueOf(val));
                     break;
@@ -201,10 +235,6 @@ public class Task extends ApplicationObject
                     break;
                 case "location":
                     location = (String)val;
-                    break;
-                case "assigned_employees":
-                case "assignees":
-                    assignees = (String) val;
                     break;
                 default:
                     IO.log(getClass().getName(), IO.TAG_ERROR, "unknown "+getClass().getName()+" attribute '" + var + "'.");

@@ -1,7 +1,11 @@
 package server.model;
 
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import server.auxilary.AccessLevel;
 import server.auxilary.IO;
+
+import java.util.List;
 
 /**
  * Created by th3gh0st on 2017/12/22.
@@ -18,7 +22,6 @@ public class Quote extends ApplicationObject
     private double vat;
     private String account_name;
     private double revision;
-    private int status;
     public static final String TAG = "Quote";
 
     public Quote()
@@ -91,16 +94,6 @@ public class Quote extends ApplicationObject
         this.request = request;
     }
 
-    public int getStatus()
-    {
-        return status;
-    }
-
-    public void setStatus(int status)
-    {
-        this.status = status;
-    }
-
     public double getVat()
     {
         return vat;
@@ -136,6 +129,61 @@ public class Quote extends ApplicationObject
     public void setRevision(double revision)
     {
         this.revision = revision;
+    }
+
+    public String getStatus_description()
+    {
+        switch (getStatus())
+        {
+            case ApplicationObject.STATUS_PENDING:
+                return "Pending";
+            case ApplicationObject.STATUS_AUTHORISED:
+                return "Authorized";
+            case ApplicationObject.STATUS_ARCHIVED:
+                return "Archived";
+            case ApplicationObject.STATUS_INVISIBLE:
+                return "Created from job.";
+            default:
+                return "Unknown";
+        }
+    }
+
+    public QuoteItem[] getResources()
+    {
+        QuoteItem[] arr = null;
+        List contents = IO.getInstance().mongoOperations().find(new Query(Criteria.where("quote_id").is(get_id())), QuoteItem.class, "quote_resources");
+        if(contents!=null)
+        {
+            arr = new QuoteItem[contents.size()];
+            contents.toArray(arr);
+        }
+        return arr;
+    }
+
+    public Client getClient()
+    {
+        return IO.getInstance().mongoOperations().findOne(new Query(Criteria.where("_id").is(getClient_id())), Client.class, "clients");
+    }
+
+    public String getClient_name()
+    {
+        Client client = getClient();
+        if(client!=null)
+            return client.getClient_name();
+        else return getClient_id();
+    }
+
+    public Employee getContact()
+    {
+        return IO.getInstance().mongoOperations().findOne(new Query(Criteria.where("usr").is(getContact_person_id())), Employee.class, "employees");
+    }
+
+    public String getContact_person()
+    {
+        Employee person = getContact();
+        if(person!=null)
+            return person.getName();
+        return getContact_person_id();
     }
 
     @Override
@@ -188,9 +236,6 @@ public class Quote extends ApplicationObject
                 case "request":
                     request = String.valueOf(val);
                     break;
-                case "status":
-                    status = Integer.parseInt(String.valueOf(val));
-                    break;
                 case "parent_id":
                     parent_id = String.valueOf(val);
                     break;
@@ -226,8 +271,6 @@ public class Quote extends ApplicationObject
                 return sitename;
             case "request":
                 return request;
-            case "status":
-                return status;
             case "parent_id":
                 return parent_id;
             case "vat":

@@ -53,13 +53,13 @@ public class LeaveController extends APIController
         return patchBusinessObject(leave, session_id, "leave_applications", "leave_applications_timestamp");
     }
 
-    @PostMapping(value = "/leave_application/mailto")
-    public ResponseEntity<String> emailLeave(@RequestHeader String _id, @RequestHeader String session_id,
-                                             @RequestHeader String message, @RequestHeader String subject,
-                                             @RequestHeader String destination, @RequestBody Metafile metafile)
-    {
-        return emailBusinessObject(_id, session_id, message, subject, destination, metafile, Leave.class);
-    }
+//    @PostMapping(value = "/leave_application/mailto")
+//    public ResponseEntity<String> emailLeave(@RequestHeader String _id, @RequestHeader String session_id,
+//                                             @RequestHeader String message, @RequestHeader String subject,
+//                                             @RequestHeader String destination, @RequestBody Metafile metafile)
+//    {
+//        return emailBusinessObject(_id, session_id, message, subject, destination, metafile, Leave.class);
+//    }
 
     @PostMapping(value = "/leave_application/approval_request")
     public ResponseEntity<String> requestLeaveApproval(@RequestHeader String leave_record_id, @RequestHeader String session_id,

@@ -172,8 +172,8 @@ public class Resource extends ApplicationObject
             return new String[]{"false", "invalid date_acquired value."};
         if(getDate_exhausted()<getDate_acquired() && getDate_exhausted()!=0)
             return new String[]{"false", "invalid date_exhausted value. Cannot be before date_acquired"};
-        if(getResource_code()==null)
-            return new String[]{"false", "invalid resource_code value."};
+        // if(getResource_code()==null)
+        //    return new String[]{"false", "invalid resource_code value."};
         if(getResource_type()==null)
             return new String[]{"false", "invalid resource_type value."};
         /**is optional field if(getBrand_name()==null)

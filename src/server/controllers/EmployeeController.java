@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import server.auxilary.AccessLevel;
+import server.auxilary.BCrypt;
 import server.auxilary.IO;
 import server.model.ApplicationObject;
 import server.model.Employee;
@@ -59,6 +60,11 @@ public class EmployeeController extends APIController
         //TODO: check access_level
         if(employee!=null)
         {
+            // hash user password
+            String hashed_pwd = BCrypt.hashpw(employee.getPwd(), BCrypt.gensalt(12));
+            IO.log(getClass().getName(), IO.TAG_INFO, "hashed pwd ["+hashed_pwd+"]");
+            employee.setPwd(hashed_pwd);
+
             //only superusers can create accounts with access_level >= ADMIN
             if(employee.getAccess_level()>= AccessLevel.ADMIN.getLevel())//if account to be created has access rights >= ADMIN
             {
@@ -98,8 +104,9 @@ public class EmployeeController extends APIController
                 }
             } else if(employee.getAccess_level() == AccessLevel.STANDARD.getLevel())//if account to be created has access rights == STANDARD
             {
+                return putBusinessObject(employee, session_id, "employees", "employees_timestamp");
                 //get Employee that's attempting to create the new Standard Employee object
-                List<Employee> employee_creator = IO.getInstance().mongoOperations().find(new
+                /* List<Employee> employee_creator = IO.getInstance().mongoOperations().find(new
                         Query(Criteria.where("usr").is(employee.getCreator())), Employee.class, "employees");
                 if(!employee_creator.isEmpty())
                 {
@@ -118,7 +125,7 @@ public class EmployeeController extends APIController
                 {
                     IO.log(getClass().getName(), IO.TAG_ERROR, "Could not find account of Employee that's creating the new STANDARD Employee account.");
                     return new ResponseEntity<>("You are not authorised to create users with this level of access. Please log in with an administrator/superuser account to create standard employee accounts.", HttpStatus.NOT_FOUND);//superuser ID could not be found on db
-                }
+                }*/
             } else //is a NO_ACCESS Employee, create object on db
                 return putBusinessObject(employee, session_id, "employees", "employees_timestamp");
         } else

@@ -54,14 +54,14 @@ public class InvoiceController extends APIController
         return patchBusinessObject(invoice, session_id, "invoices", "invoices_timestamp");
     }
 
-    @PostMapping(value = "/invoice/mailto")//, consumes = "text/plain"//value =//, produces = "application/pdf"
-    public ResponseEntity<String> emailInvoice(@RequestHeader String _id, @RequestHeader String session_id,
-                                                     @RequestHeader String message, @RequestHeader String subject,
-                                                     @RequestHeader String destination, @RequestBody Metafile metafile)//, @RequestParam("file") MultipartFile file
-    {
-        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Invoice mailto request.");
-        return emailBusinessObject(_id, session_id, message, subject, destination, metafile, Invoice.class);
-    }
+//    @PostMapping(value = "/invoice/mailto")//, consumes = "text/plain"//value =//, produces = "application/pdf"
+//    public ResponseEntity<String> emailInvoice(@RequestHeader String _id, @RequestHeader String session_id,
+//                                                     @RequestHeader String message, @RequestHeader String subject,
+//                                                     @RequestHeader String destination, @RequestBody Metafile metafile)//, @RequestParam("file") MultipartFile file
+//    {
+//        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Invoice mailto request.");
+//        return emailBusinessObject(_id, session_id, message, subject, destination, metafile, Invoice.class);
+//    }
 
     @PostMapping(value = "/invoice/approval_request")//, consumes = "text/plain"//value =//, produces = "application/pdf"
     public ResponseEntity<String> requestInvoiceApproval(@RequestHeader String invoice_id, @RequestHeader String session_id,

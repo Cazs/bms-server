@@ -14,8 +14,9 @@ public class TimesheetActivity extends ApplicationObject
     private String description;
     private String location;
     private long date_executed;
-    private int status;
-    public static final int STATUS_COMPLETED = 1;
+    public static final int STATUS_PENDING = 0;
+    public static final int STATUS_STARTED = 1;
+    public static final int STATUS_COMPLETE = 2;
     public static final String INTERNAL_ACTIVITY = "INTERNAL";
 
     public TimesheetActivity()
@@ -50,14 +51,25 @@ public class TimesheetActivity extends ApplicationObject
         this.date_executed = date_executed;
     }
 
-    public int getStatus()
+    public boolean isComplete()
     {
-        return status;
+        return getStatus() == STATUS_COMPLETE;
     }
 
-    public void setStatus(int status)
+    @Override
+    public String getStatus_description()
     {
-        this.status = status;
+        switch (getStatus())
+        {
+            case STATUS_PENDING:
+                return "Pending";
+            case STATUS_STARTED:
+                return "Started";
+            case STATUS_COMPLETE:
+                return "Completed";
+            default:
+                return "Unknown";
+        }
     }
 
     public String getDescription()
@@ -126,9 +138,6 @@ public class TimesheetActivity extends ApplicationObject
             {
                 case "client_id":
                     client_id = (String)val;
-                    break;
-                case "status":
-                    status = Integer.parseInt(String.valueOf(val));
                     break;
                 case "date_executed":
                     date_executed = Long.parseLong(String.valueOf(val));

@@ -25,7 +25,8 @@ public class Client extends ApplicationObject
     private String account_name;
     private long date_partnered;
     private String website;
-    private boolean active;
+    public static final int STATUS_INACTIVE = 0;
+    public static final int STATUS_ACTIVE = 1;
 
     public Client()
     {}
@@ -109,12 +110,26 @@ public class Client extends ApplicationObject
 
     public boolean isActive()
     {
-        return active;
+        return getStatus()==STATUS_ACTIVE;
     }
 
     public void setActive(boolean active)
     {
-        this.active = active;
+        setStatus(active ? STATUS_ACTIVE : STATUS_INACTIVE);
+    }
+
+    @Override
+    public String getStatus_description()
+    {
+        switch (getStatus())
+        {
+            case STATUS_ACTIVE:
+                return "Active";
+            case STATUS_INACTIVE:
+                return "Inactive";
+            default:
+                return "Unknown";
+        }
     }
 
     public long getDate_partnered()
@@ -180,7 +195,7 @@ public class Client extends ApplicationObject
             return new String[]{"false", "invalid date_partnered value."};
         if(getAccount_name()==null)
             return new String[]{"false", "invalid account_name value."};
-        if(getWebsite()==null)
+        /* if(getWebsite()==null)
             return new String[]{"false", "invalid website value."};
         if(getPhysical_address()==null)
             return new String[]{"false", "invalid physical_address value."};

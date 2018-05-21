@@ -58,14 +58,14 @@ public class QuoteController extends APIController
         return patchBusinessObject(quote, session_id, "quotes", "quotes_timestamp");
     }
 
-    @PostMapping(value = "/quote/mailto")
-    public ResponseEntity<String> emailQuote(@RequestHeader String _id, @RequestHeader String session_id,
-                                                        @RequestHeader String message, @RequestHeader String subject,
-                                                        @RequestHeader String destination, @RequestBody Metafile metafile)
-    {
-        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Quote mailto request.");
-        return emailBusinessObject(_id, session_id, message, subject, destination, metafile, Quote.class);
-    }
+//    @PostMapping(value = "/quote/mailto")
+//    public ResponseEntity<String> emailQuote(@RequestHeader String quote_id, @RequestHeader String session_id,
+//                                                        @RequestHeader String message, @RequestHeader String subject,
+//                                                        @RequestHeader String destination, @RequestBody Metafile metafile)
+//    {
+//        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Quote mailto request.");
+//        return emailBusinessObject(quote_id, session_id, message, subject, destination, metafile, Quote.class);
+//    }
 
     @PostMapping(value = "/quote/approval_request")
     public ResponseEntity<String> requestQuoteApproval(@RequestHeader String quote_id, @RequestHeader String session_id,

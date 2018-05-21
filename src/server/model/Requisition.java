@@ -1,7 +1,7 @@
 package server.model;
 
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import server.auxilary.AccessLevel;
 import server.auxilary.IO;
 
@@ -11,11 +11,11 @@ import server.auxilary.IO;
  */
 public class Requisition extends ApplicationObject
 {
-    private String client_id;
-    private String responsible_person_id;
+    // private String client_id;
+    private String supplier_id;
+    private String contact_person_id;
     private String description;
     private String type;
-    private int status;
     public static final String TAG = "Requisition";
 
     public Requisition()
@@ -38,9 +38,7 @@ public class Requisition extends ApplicationObject
         return AccessLevel.STANDARD;
     }
 
-    public StringProperty client_idProperty(){return new SimpleStringProperty(client_id);}
-
-    public String getClient_id()
+    /* public String getClient_id()
     {
         return client_id;
     }
@@ -48,21 +46,27 @@ public class Requisition extends ApplicationObject
     public void setClient_id(String client_id)
     {
         this.client_id = client_id;
-    }
+    } */
 
-    public StringProperty responsible_person_idProperty(){return new SimpleStringProperty(responsible_person_id);}
-
-    public String getResponsible_person_id()
+    public String getSupplier_id()
     {
-        return responsible_person_id;
+        return supplier_id;
     }
 
-    public void setResponsible_person_id(String responsible_person_id)
+    public void setSupplier_id(String supplier_id)
     {
-        this.responsible_person_id = responsible_person_id;
+        this.supplier_id = supplier_id;
     }
 
-    public StringProperty typeProperty(){return new SimpleStringProperty(type);}
+    public String getContact_person_id()
+    {
+        return contact_person_id;
+    }
+
+    public void setContact_person_id(String contact_person_id)
+    {
+        this.contact_person_id = contact_person_id;
+    }
 
     public String getType()
     {
@@ -74,8 +78,6 @@ public class Requisition extends ApplicationObject
         this.type = type;
     }
 
-    public StringProperty descriptionProperty(){return new SimpleStringProperty(description);}
-
     public String getDescription()
     {
         return description;
@@ -86,32 +88,64 @@ public class Requisition extends ApplicationObject
         this.description = description;
     }
 
-    private StringProperty statusProperty(){return new SimpleStringProperty(String.valueOf(status));}
-
-    public int getStatus()
+    /* public Client getClient()
     {
-        return status;
+        return IO.getInstance().mongoOperations().findOne(new Query(Criteria.where("_id").is(getClient_id())), Client.class, "clients");
     }
 
-    public void setStatus(int status)
+    public String getClient_name()
     {
-        this.status = status;
+        Client client = getClient();
+        if(client!=null)
+            return client.getClient_name();
+        else return getClient_id();
+    }*/
+
+    public Supplier getSupplier()
+    {
+        return IO.getInstance().mongoOperations().findOne(new Query(Criteria.where("_id").is(getSupplier_id())), Supplier.class, "suppliers");
+    }
+
+    public String getSupplier_name()
+    {
+        Supplier supplier = getSupplier();
+        if(supplier!=null)
+            return supplier.getSupplier_name();
+        else return getSupplier_id();
+    }
+
+    public Employee getContact()
+    {
+        return IO.getInstance().mongoOperations().findOne(new Query(Criteria.where("usr").is(getContact_person_id())), Employee.class, "employees");
+    }
+
+    public String getContact_person()
+    {
+        Employee person = getContact();
+        if(person!=null)
+            return person.getName();
+        return getContact_person_id();
     }
 
     @Override
     public String[] isValid()
     {
-        if(getClient_id()==null)
-            return new String[]{"false", "invalid client_id value."};
-        /*if(getParent_id()==null)
-        {
-            IO.log(getClass().getName(), IO.TAG_ERROR, "invalid parent_id value.");
-            return false;
-        }*/
-        if(getDescription()==null)
-            return new String[]{"false", "invalid description value."};
-        if(getType()==null)
-            return new String[]{"false", "invalid requisition type value."};
+        if(getSupplier_id()==null)
+            return new String[]{"false", "invalid supplier_id value."};
+        /*
+            if(getClient_id()==null)
+                return new String[]{"false", "invalid client_id value."};
+            if(getParent_id()==null)
+            {
+                IO.log(getClass().getName(), IO.TAG_ERROR, "invalid parent_id value.");
+                return false;
+            }
+        */
+
+        /* if(getDescription()==null)
+            return new String[]{"false", "invalid description value."};*/
+        /* if(getType()==null)
+            return new String[]{"false", "invalid requisition type value."}; */
         if(getStatus()<0)
             return new String[]{"false", "invalid status value."};
 
@@ -126,20 +160,20 @@ public class Requisition extends ApplicationObject
         {
             switch (var.toLowerCase())
             {
-                case "client_id":
+                /*case "client_id":
                     client_id = (String)val;
+                    break;*/
+                case "supplier_id":
+                    supplier_id = (String)val;
                     break;
-                case "responsible_person_id":
-                    responsible_person_id = (String)val;
+                case "contact_person_id":
+                    contact_person_id = (String)val;
                     break;
                 case "type":
                     type = String.valueOf(val);
                     break;
                 case "description":
                     description = String.valueOf(val);
-                    break;
-                case "status":
-                    status = Integer.parseInt(String.valueOf(val));
                     break;
                 default:
                     IO.log(getClass().getName(), IO.TAG_ERROR, "Unknown "+getClass().getName()+" attribute '" + var + "'.");
@@ -156,16 +190,16 @@ public class Requisition extends ApplicationObject
     {
         switch (var.toLowerCase())
         {
-            case "client_id":
-                return client_id;
-            case "responsible_person_id":
-                return responsible_person_id;
+            // case "client_id":
+            //    return client_id;
+            case "supplier_id":
+                return supplier_id;
+            case "contact_person_id":
+            return contact_person_id;
             case "type":
                 return type;
             case "description":
                 return description;
-            case "status":
-                return status;
         }
         return super.get(var);
     }
@@ -173,7 +207,7 @@ public class Requisition extends ApplicationObject
     @Override
     public String toString()
     {
-        return super.toString() + " type [" + getType() + "] "  + getDescription() + " for client [" +getClient_id() + "]";
+        return super.toString() + " type [" + getType() + "] "  + getDescription() + " to supplier [" +getSupplier_id() + "]";
     }
 
     /**

@@ -9,7 +9,7 @@ import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import server.model.ApplicationObject;
-import server.model.Quote;
+import server.model.QuoteItem;
 import server.model.QuoteItem;
 import server.repositories.QuoteItemRepository;
 
@@ -37,7 +37,7 @@ public class QuoteResourceController extends APIController
                                                                           Pageable pageRequest,
                                                                           PersistentEntityResourceAssembler assembler)
     {
-        return getBusinessObject(new Quote(id), "_id", session_id, "quote_resources", pagedAssembler, assembler, pageRequest);
+        return getBusinessObject(new QuoteItem(id), "_id", session_id, "quote_resources", pagedAssembler, assembler, pageRequest);
     }
 
     @GetMapping("/quotes/resources")
@@ -45,22 +45,22 @@ public class QuoteResourceController extends APIController
                                                                            Pageable pageRequest,
                                                                            PersistentEntityResourceAssembler assembler)
     {
-        return getBusinessObjects(new Quote(), session_id, "quote_resources", pagedAssembler, assembler, pageRequest);
+        return getBusinessObjects(new QuoteItem(), session_id, "quote_resources", pagedAssembler, assembler, pageRequest);
     }
 
     @PutMapping("/quote/resource")
-    public ResponseEntity<String> addQuoteRep(@RequestBody QuoteItem quote_item, @RequestHeader String session_id)
+    public ResponseEntity<String> addQuoteItem(@RequestBody QuoteItem quote_item, @RequestHeader String session_id)
     {
         return putBusinessObject(quote_item, session_id, "quote_resources", "quotes_timestamp");
     }
 
     @PostMapping("/quote/resource")
-    public ResponseEntity<String> patchQuote(@RequestBody QuoteItem quote_item, @RequestHeader String session_id)
+    public ResponseEntity<String> patchQuoteItem(@RequestBody QuoteItem quote_item, @RequestHeader String session_id)
     {
         return patchBusinessObject(quote_item, session_id, "quote_resources", "quotes_timestamp");
     }
 
-    @DeleteMapping(path="/quote/resource{quote_resource_id}")
+    @DeleteMapping(path="/quote/resource/{quote_resource_id}")
     public ResponseEntity<String> delete(@PathVariable String quote_resource_id, @RequestHeader String session_id)
     {
         return deleteBusinessObject(new QuoteItem(quote_resource_id), session_id, "requisitions", "requisitions_timestamp");

@@ -62,14 +62,14 @@ public class PurchaseOrderController extends APIController
         return patchBusinessObject(purchase_order, session_id, "purchase_orders", "purchase_orders_timestamp");
     }
 
-    @PostMapping(value = "/purchaseorder/mailto")
-    public ResponseEntity<String> emailPurchaseOrder(@RequestHeader String _id, @RequestHeader String session_id,
-                                                     @RequestHeader String message, @RequestHeader String subject,
-                                                     @RequestHeader String destination, @RequestBody Metafile metafile)
-    {
-        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling handling PurchaseOrder mailto request.");
-        return emailBusinessObject(_id, session_id, message, subject, destination, metafile, PurchaseOrder.class);
-    }
+//    @PostMapping(value = "/purchaseorder/mailto")
+//    public ResponseEntity<String> emailPurchaseOrder(@RequestHeader String _id, @RequestHeader String session_id,
+//                                                     @RequestHeader String message, @RequestHeader String subject,
+//                                                     @RequestHeader String destination, @RequestBody Metafile metafile)
+//    {
+//        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling handling PurchaseOrder mailto request.");
+//        return emailBusinessObject(_id, session_id, message, subject, destination, metafile, PurchaseOrder.class);
+//    }
 
     @PostMapping("/purchaseorder/approval_request")//, consumes = "text/plain"//value =//, produces = "application/pdf"
     public ResponseEntity<String> requestPurchaseOrderApproval(@RequestHeader String purchaseorder_id,

@@ -61,14 +61,14 @@ public class RequisitionController extends APIController
         return patchBusinessObject(requisition, session_id, "requisitions", "requisitions_timestamp");
     }
 
-    @PostMapping(value = "/requisition/mailto")
-    public ResponseEntity<String> emailRequisition(@RequestHeader String _id, @RequestHeader String session_id,
-                                               @RequestHeader String message, @RequestHeader String subject,
-                                               @RequestHeader String destination, @RequestBody Metafile metafile)
-    {
-        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Requisition mailto request.");
-        return emailBusinessObject(_id, session_id, message, subject, destination, metafile, Requisition.class);
-    }
+//    @PostMapping(value = "/requisition/mailto")
+//    public ResponseEntity<String> emailRequisition(@RequestHeader String _id, @RequestHeader String session_id,
+//                                               @RequestHeader String message, @RequestHeader String subject,
+//                                               @RequestHeader String destination, @RequestBody Metafile metafile)
+//    {
+//        IO.log(getClass().getName(), IO.TAG_INFO, "\nhandling Requisition mailto request.");
+//        return emailBusinessObject(_id, session_id, message, subject, destination, metafile, Requisition.class);
+//    }
 
     @PostMapping(value = "/requisition/request_approval")
     public ResponseEntity<String> requestRequisitionApproval(@RequestHeader String requisition_id,

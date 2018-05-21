@@ -7,7 +7,7 @@ import server.model.Task;
 
 import java.util.List;
 
-@RepositoryRestResource(collectionResourceRel = "tasks", path = "/tasks")
+@RepositoryRestResource(collectionResourceRel = "tasks", path = "/jobs/tasks")
 public interface TaskRepository extends MongoRepository<Task, String>
 {
     List<Task> findByCreator(@Param("creator") String creator);

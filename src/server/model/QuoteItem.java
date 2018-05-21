@@ -1,7 +1,13 @@
 package server.model;
 
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.rest.core.annotation.RestResource;
 import server.auxilary.AccessLevel;
+import server.auxilary.Globals;
 import server.auxilary.IO;
+
+import java.util.List;
 
 /**
  * Created by th3gh0st on 2017/12/22.
@@ -13,7 +19,6 @@ public class QuoteItem extends ApplicationObject
     private int quantity;
     private double unit_cost;
     private double markup;
-    private String additional_costs;
     private String quote_id;
     private String resource_id;
     private String category;
@@ -69,14 +74,41 @@ public class QuoteItem extends ApplicationObject
         this.resource_id = resource_id;
     }
 
-    public String getAdditional_costs()
+    public QuoteItemExtraCost[] getExtra_costs()
     {
-        return additional_costs;
+        QuoteItemExtraCost[] arr = null;
+        List contents = IO.getInstance().mongoOperations().find(new Query(Criteria.where("quote_item_id").is(get_id())), QuoteItemExtraCost.class, "quote_extra_costs");
+        if(contents!=null)
+        {
+            arr = new QuoteItemExtraCost[contents.size()];
+            contents.toArray(arr);
+        }
+        return arr;
     }
 
-    public void setAdditional_costs(String additional_costs)
+    /**
+     * @return Total of extra costs
+     */
+    @RestResource(exported = false)
+    public double computeExtraCostTotal()
     {
-        this.additional_costs = additional_costs;
+        double total = 0.0;
+        QuoteItemExtraCost[] extra_costs = getExtra_costs();
+        if(extra_costs!=null)
+          for(QuoteItemExtraCost extraCost: extra_costs)
+              total+=extraCost.getMarkedupCost();
+        return total;
+    }
+
+    /**
+     * @return Total of extra costs if available, or a message saying no extra costs otherwise.
+     */
+    public String getExtra_costs_total()
+    {
+        double total = computeExtraCostTotal();
+        if(total>0)
+            return Globals.CURRENCY_SYMBOL.getValue() + " " + total;// TODO: currency format
+        else return "No extra costs.";
     }
 
     public int getQuantity()
@@ -89,12 +121,28 @@ public class QuoteItem extends ApplicationObject
         this.quantity = quantity;
     }
 
-    public String getUnit_cost()
+    public String getUnit()
     {
-        return String.valueOf(getUnitCost());
+        Resource res = IO.getInstance().mongoOperations().findOne(new Query(Criteria.where("_id").is(getResource_id())), Resource.class, "resources");
+        if(res!=null)
+            return res.getUnit();
+        return "N/A";
     }
 
-    public double getUnitCost()
+    public String getItem_description()
+    {
+        Resource res = IO.getInstance().mongoOperations().findOne(new Query(Criteria.where("_id").is(getResource_id())), Resource.class, "resources");
+        if(res!=null)
+            return res.getResource_description();
+        return "N/A";
+    }
+
+    public Resource getResource()
+    {
+        return IO.getInstance().mongoOperations().findOne(new Query(Criteria.where("_id").is(getResource_id())), Resource.class, "resources");
+    }
+
+    public double getUnit_cost()
     {
         return unit_cost;
     }
@@ -110,51 +158,8 @@ public class QuoteItem extends ApplicationObject
 
     public double getRate()
     {
-        //double marked_up = getUnitCost() + getUnitCost()*(markup/100);
-        double total = 0;//getUnitCost();
-
-        //check additional costs
-        if (getAdditional_costs() != null)
-        {
-            if (!getAdditional_costs().isEmpty())
-            {
-                //compute additional costs for each Quote Item
-                if(getAdditional_costs().contains(";"))//check cost delimiter
-                {
-                    String[] costs = getAdditional_costs().split(";");
-                    for (String str_cost : costs)
-                    {
-                        if (str_cost.contains("="))
-                        {
-                            //retrieve cost and markup
-                            String add_cost = str_cost.split("=")[1];//the cost value is [1] (the cost name is [0])
-
-                            double cost,add_cost_markup=0;
-                            if(add_cost.contains("*"))//if(in the form cost*markup)
-                            {
-                                cost = Double.parseDouble(add_cost.split("\\*")[0]);
-                                add_cost_markup = Double.parseDouble(add_cost.split("\\*")[1]);
-                            }else cost = Double.parseDouble(add_cost);
-
-                            //add marked up additional cost to total
-                            total += cost + cost*(add_cost_markup/100);
-                        } else IO.log(getClass().getName(), IO.TAG_ERROR, "invalid Quote Item additional cost.");
-                    }
-                } else if (getAdditional_costs().contains("="))//if only one additional cost
-                {
-                    double cost,add_cost_markup=0;
-                    //get cost and markup
-                    if(getAdditional_costs().split("=")[1].contains("*"))
-                    {
-                        cost = Double.parseDouble(getAdditional_costs().split("=")[1].split("\\*")[0]);
-                        add_cost_markup = Double.parseDouble(getAdditional_costs().split("=")[1].split("\\*")[1]);
-                    }else cost = Double.parseDouble(getAdditional_costs().split("=")[1]);
-                    //add marked up additional cost to total
-                    total += cost + cost*(add_cost_markup/100);
-                } else IO.log(getClass().getName(), IO.TAG_WARN, getClass().getName()+" has no additional costs.");
-            } else IO.log(getClass().getName(), IO.TAG_WARN, getClass().getName()+" has no additional costs.");
-        }
-        return total;
+        double markedup_cost = getUnit_cost() + (getUnit_cost() * getMarkup()/100);
+        return markedup_cost + computeExtraCostTotal();
     }
 
     public String getCategory()
@@ -167,9 +172,10 @@ public class QuoteItem extends ApplicationObject
         this.category = category;
     }
 
-    public double getTotal()
+    public String getTotal()
     {
-        return getRate()*getQuantity();
+        double total = getRate()*getQuantity();
+        return Globals.CURRENCY_SYMBOL.getValue() + " " + total;
     }
 
     @Override
@@ -181,7 +187,7 @@ public class QuoteItem extends ApplicationObject
             return new String[]{"false", "invalid item_number value."};
         if(getQuote_id()==null)
             return new String[]{"false", "invalid quote_id value."};
-        if(getUnitCost()<0)
+        if(getUnit_cost()<0)
             return new String[]{"false", "invalid unit_cost value."};
         if(getQuantity()<0)
             return new String[]{"false", "invalid quantity value."};
@@ -207,9 +213,6 @@ public class QuoteItem extends ApplicationObject
                     break;
                 case "item_number":
                     setItem_number(Integer.valueOf((String)val));
-                    break;
-                case "additional_costs":
-                    setAdditional_costs((String)val);
                     break;
                 case "quantity":
                     setQuantity(Integer.valueOf((String)val));
@@ -244,13 +247,13 @@ public class QuoteItem extends ApplicationObject
                 return getResource_id();
             case "item_number":
                 return getItem_number();
-            case "additional_costs":
-                return getAdditional_costs();
+            case "extra_costs":
+                return getExtra_costs();
             case "quantity":
                 return getQuantity();
             case "unit_cost":
             case "value":
-                return getUnitCost();
+                return getUnit_cost();
             case "markup":
                 return getMarkup();
             case "category":
