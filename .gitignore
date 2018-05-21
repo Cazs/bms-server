@@ -18,3 +18,5 @@ README.html
 /BMSServer/nbproject/private/
 /nbproject/private/
 config.cfg
+out/
+.DS_Store
